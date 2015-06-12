@@ -1,0 +1,19 @@
+{
+   "id": "meta4ux",
+   "label": "User Experience",
+   "isRemote": true,
+   "isClient": true,
+   "type": "Remote", "prefetch": true, "debug": false,
+   "store": "SDK",
+   "scope": "tenant",
+   "filters": ["tenant"],
+   "defaults": {
+	  "label": "New User Experience"
+   },
+   "schema": {
+	  "id": { "type": "Text", "required": true },
+	  "label": { "type": "Text", "required": true },
+	  "comment": { "type": "TextArea" },
+	  "logo": { "type": "Upload" }
+   }
+}

@@ -1,0 +1,54 @@
+{
+   "id": "views/apis",
+   "widget": "CRUD2", "isSortable": false,
+   "collection": "apis",
+   "views": {
+	  "read": {
+		 "id": "views/apis/read",
+		 "label": "3rd Party Integration",
+		 "comment": "Integrate Meta4Beta with 3rd party project tools.",
+		 "icon": "/www/assets/images/apis.png",
+		 "widget": "List",
+		 "isSortable": false,
+		 "child": {
+			"className": "apis col-sm-3 list-group-item",
+			"template": "<div about='{{id}}'><img height='48' class='pull-right' src='{{iconURL}}'/><label>{{label}}</label><div>{{comment}}</div></div>"
+		 },
+		 "popover": {
+			"label": "Hint: 3rd Party Integration",
+			"comment": "Click API to configure integration"
+		 }
+	  },
+	  "create": "update",
+	  "update": {
+		 "id": "views/apis/update",
+		 "label": "Edit API",
+		 "comment": "Integrate Meta4Beta with a variety of 3rd party project tools.",
+		 "widget": "Tabs",
+		 "firstTab": "Connect",
+		 "tabs": {
+			"About": {
+			   "widget": "Form",
+			   "model": false,
+			   "schema": {
+				  "label": { "editor": "Text", "required": true },
+				  "comment": { "editor": "TextArea", "required": true },
+				  "iconURL": { "label": "Icon", "editor": "Text", "required": true }
+			   }
+			},
+			"Connect": {
+			   "widget": "Form",
+			   "model": false,
+			   "schema": {
+				  "url": { "label": "Connection URL", "editor": "Text", "required": false },
+				  "clientKey": { "editor": "Text" },
+				  "secretKey": { "editor": "Text" },
+				  "sourceOfTruth": { "label": "Source of Truth", "editor": "Select",
+					 "options": { "true": "Yes", "false": "No"}
+				  }
+			   }
+			}
+		 }
+	  }
+   }
+}

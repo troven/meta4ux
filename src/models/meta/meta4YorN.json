@@ -1,0 +1,10 @@
+{
+   "id": "meta4YorN",
+   "label": "Yes/No",
+   "isRemote": false,
+   "isClient": true,
+   "data": [
+	  { "id": true, "label": "Yes"},
+	  { "id": false, "label": "No"}
+   ]
+}

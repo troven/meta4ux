@@ -1,0 +1,61 @@
+{
+  "id": "views/meta4/principals",
+  "label": "Stakeholder Register",
+  "comment": "Stakeholders are Meta4Beta meta4principals. They include your Project Managers, Sponsors and Team Members.",
+  "icon": "/www/assets/images/meta4principals.png",
+  "widget": "CRUD2", "isSortable": false,
+  "collection": "meta4principals",
+  "views": {
+    "read": {
+      "id": "views/meta4/principals/read",
+      "label": "User Register",
+      "comment": "Click name of a stakeholder to edit contact information",
+      "widget": "List",
+      "isSortable": false,
+      "child": {
+        "className": "meta4principals col-sm-3 list-group-item",
+        "template": "<div about='{{id}}'><img height='48' class='pull-right' src='{{photoURL}}'/><label>{{firstname}} {{lastname}}</label><div>{{job_title}}</div></div>"
+      },
+      "popover": {
+        "label": "Hint: Stakeholders",
+        "comment": "Click stakeholder to edit contact information"
+      }
+    },
+    "create": "update",
+    "update": {
+      "id": "views/meta4/principals/update",
+      "label": "Edit Stakeholder",
+      "comment": "Stakeholders are Meta4Beta meta4principals. They include your Project Managers, Sponsors and Team Members.",
+      "widget": "Tabs",
+      "tabs": {
+        "About": {
+          "widget": "Form",
+          "model": false,
+          "schema": {
+            "firstname": { "editor": "Text", "required": true },
+            "lastname": { "editor": "Text", "required": true },
+            "job_title": { "label": "Job Title", "editor": "Text", "required": false },
+            "email": { "editor": "Email", "validators": ["required", "email"] }
+          }
+        },
+        "Access": {
+          "widget": "Form",
+          "model": false,
+          "schema": {
+            "profileClass": { "label": "Signs in using", "editor": "Select", "editable": false, "options": [
+              {"id": "", "label": "Email/Password"},
+              {"id": "FormProfile", "label": "Email/Password"},
+              {"id": "Google2Profile", "label": "Google / Gmail"},
+              {"id": "LinkedIn2Profile", "label": "LinkedIn"},
+              {"id": "WindowsLiveProfile", "label": "Windows Live"}
+
+            ] },
+            "is_active": { "editor": "Select", "options": {"true": "Enabled", "false": "Disabled" } },
+            "security": { "label": "Access Level", "editor": "Select", "options": ["user", "manager", "cx"] },
+            "reset_password": { "label": "Reset Password", "editor": "Button"  }
+          }
+        }
+      }
+    }
+  }
+}

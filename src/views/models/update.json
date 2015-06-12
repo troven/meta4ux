@@ -1,0 +1,49 @@
+{
+   "id": "views/meta4/models/update",
+   "label": "Edit Model",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/models/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"id": { "label": "Model ID", "editor": "Text", "required": true, "editable": false },
+			"label": { "label": "Model Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true },
+			"isClient": { "label": "Is Client?", "editor": "Selector", "options": "meta4YorN"},
+			"isServer": { "label": "Is Server?", "editor": "Selector", "options": "meta4YorN"},
+			"type": { "label": "Store", "editor": "Selector", "options":
+				[
+				   {"id": "SDK", "label":"Meta4 SDK" },
+				   {"id": "Orient", "label":"Orient DB" },
+				   {"id": "Users", "label":"Meta4 Users" },
+				   {"id": "Assets", "label":"Meta4 Assets" }
+				]
+			}
+		 }
+	  },
+	  "UseCase": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"useCase": {
+			   "label": "Use Case",
+			   "widget": "HTML"
+			}
+		 }
+	  },
+	  "Hint": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"hint": {
+			   "label": "Hint Page",
+			   "widget": "HTML"
+			}
+		 }
+	  }
+   }
+}

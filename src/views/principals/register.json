@@ -1,0 +1,17 @@
+{
+   "id": "views/meta4principals/register",
+   "label": "Register New User",
+   "modal": true,
+   "model": "invites",
+   "widget": "Form",
+   "iq": {
+      "register": "register.js"
+   },
+   "template": "<fieldset class='modal-body'></fieldset><div><button data-action='register'>Register</button></div>",
+   "schema": {
+	  "firstname": { "editor": "Text", "required": true },
+	  "lastname": { "editor": "Text", "required": true },
+	  "job_title": { "label": "Job Title", "editor": "Text", "required": true },
+	  "email": { "editor": "Email", "validators": ["required", "email"] }
+   }
+}

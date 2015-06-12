@@ -1,0 +1,26 @@
+{
+  "id": "views/ux/home",
+  "el": ".home",
+  "label": "Meta4Beta",
+  "widget": "Home",
+  "template": "<div class='home-body'></div>",
+  "views": {
+    "side_menu": "views/menu/home",
+    "user_menu": "views/menu/profile",
+    "body": "views/welcome",
+    "welcome": "views/welcome",
+
+    "meta4apis": "views/meta4/apis",
+    "meta4code": "views/meta4/code",
+    "meta4cx": "views/meta4/cx",
+    "meta4models": "views/meta4/models",
+    "meta4principals": "views/meta4/principals",
+    "meta4principal": "views/userProfile",
+    "meta4templates": "views/meta4/templates",
+    "meta4views": "views/meta4/views",
+    "meta4widgets": "views/meta4/widgets",
+    "meta4ux": "views/meta4/ux",
+
+    "terminal": "views/meta4/sdk/terminal"
+  }
+}

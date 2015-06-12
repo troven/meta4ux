@@ -1,0 +1,10 @@
+{
+   "id": "views/meta4/ux/create",
+   "label": "New UX",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+	  "label": {"label": "UX Name", "editor": "Text", "required": true},
+	  "comment": {"label": "Description", "editor": "TextArea", "required": true}
+   }
+}

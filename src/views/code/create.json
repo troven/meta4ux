@@ -1,0 +1,12 @@
+{
+   "id": "views/meta4/code/create",
+   "label": "New Code",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+	  "label": {"label": "Code Name", "editor": "Text", "required": true},
+	  "comment": {"label": "Description", "editor": "TextArea", "required": true},
+	  "owner": {"label": "Owner", "editor": "Select", "options": "meta4principals"},
+	  "cx": {"label": "CX", "editor": "Select", "options": "cx"}
+   }
+}

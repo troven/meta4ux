@@ -1,0 +1,10 @@
+{
+   "id": "views/meta4/assets/create",
+   "label": "New Asset",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+	  "label": {"label": "Assets Name", "editor": "Text", "required": true},
+	  "comment": {"label": "Description", "editor": "TextArea", "required": true}
+   }
+}

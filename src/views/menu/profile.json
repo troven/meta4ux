@@ -1,0 +1,19 @@
+{
+   "id": "views/menu/profile",
+   "label": "Menu",
+   "el": "#menu_profile",
+   "widget": "MenuList",
+   "model": true,
+   "collection": [
+      {
+         "id": "principal",
+         "icon": "user",
+         "label": "My Profile"
+      },
+      {
+         "id": "help",
+         "icon": "question",
+         "label": "Help"
+      }
+   ]
+}

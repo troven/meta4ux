@@ -1,0 +1,16 @@
+{
+   "id": "views/meta4/cx/read",
+   "label": "CX Register",
+   "comment": "",
+   "icon": "/static/brand/blank.png",
+   "widget": "List", "model": false,
+   "isSortable": false,
+   "child": {
+	  "className": "cx col-sm-8 list-group-item",
+	  "template": "<div about='{{id}}'><label>{{label}}</label><p>{{comment}}</p></div>"
+   },
+   "popover": {
+	  "label": "cx are used to organise projects",
+	  "comment": "Click a CX to edit"
+   }
+}

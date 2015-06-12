@@ -1,0 +1,6 @@
+{
+  "id": "urn:uuid:6d028f58-99d6-4ce6-a340-5817dc5d3271",
+  "label": "Test View",
+  "comment": "a simple input box",
+  "widget": "Number"
+}

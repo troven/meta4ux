@@ -1,0 +1,40 @@
+{
+  "name": "meta4ux",
+  "version": "0.3.0",
+  "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
+  "main": "server.js",
+  "scripts": {
+	"start": "node meta4/index.js",
+	"demo": "node demo/index.js"
+  },
+  "main": "./src/server",
+  "keywords": [
+	"meta4",
+	"backbone",
+	"marionette",
+	"bootstrap",
+	"json",
+	"wireframe",
+	"agile",
+	"lean",
+	"mvc",
+	"mvp"
+  ],
+  "author": "Troven <meta4@troven.com.au> (http://meta4beta.com/)",
+  "licenses": [
+	{
+	  "type": "Apache 2.0",
+	  "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+	}
+  ],
+  "dependencies": {
+  },
+
+  "devDependencies": {
+	"grunt": "~0.4.5",
+	"grunt-contrib-jshint": "~0.10.0",
+	"grunt-contrib-nodeunit": "~0.4.1",
+	"grunt-contrib-uglify": "~0.5.0"
+  }
+
+}

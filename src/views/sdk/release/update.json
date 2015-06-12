@@ -1,0 +1,81 @@
+{
+   "id": "views/meta4/sdk/release/update",
+   "label": "Edit Release",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "SDK Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  },
+	  "Email": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"id": { "editor": "Text" },
+			"name": { "editor": "Text" },
+			"host": { "editor": "Text" },
+
+			"boot.script": { "editor": "Text" },
+
+			"outgoing.mail.smtp.host": { "editor": "Text" },
+			"outgoing.mail.smtp.port": { "editor": "Number" },
+			"outgoing.mail.smtp.arttls.enable": { "editor": "YesNo" },
+			"outgoing.mail.smtp.auth": { "editor": "YesNo" },
+			"outgoing.mail.smtp.user": { "editor": "Text" },
+			"outgoing.mail.smtp.password": { "editor": "Text" }
+
+
+		 }
+	  },
+	  "Web": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"boot.httpd.home": { "editor": "Text" },
+			"boot.httpd.port": { "editor": "Number" }
+		 }
+	  },
+	  "Social": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"linkedin.key": { "editor": "Text" },
+			"linkedin.secret": { "editor": "Text" },
+
+			"google.key": { "editor": "Text" },
+			"google.secret": { "editor": "Text" },
+
+			"windows.key": { "editor": "Text" },
+			"windows.secret": { "editor": "Text" }
+		 }
+	  },
+	  "ODB": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"boot.odb.url": { "editor": "Text" },
+			"boot.odb.username": { "editor": "Text" },
+			"boot.odb.password": { "editor": "Text" }
+		 }
+	  },
+	  "Strata": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"boot.strata.url": { "editor": "Text" },
+			"boot.strata.username": { "editor": "Text" },
+			"boot.strata.password": { "editor": "Text" },
+
+			"boot.strata.tenant.script": { "editor": "Text" },
+			"boot.strata.user.script": { "editor": "Text" }
+		 }
+	  }
+
+   }
+}

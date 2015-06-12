@@ -1,0 +1,10 @@
+{
+   "id": "views/meta4/templates/create",
+   "label": "New Template",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+      "label": {"label": "Template Name", "editor": "Text", "required": true},
+      "comment": {"label": "Description", "editor": "TextArea", "required": true}
+   }
+}

@@ -1,0 +1,19 @@
+{
+   "id": "views/meta4/ux/view",
+   "label": "Create View",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+      "About": {
+         "id": "views/meta4/views/update/about",
+         "widget": "Form",
+         "model": false,
+         "schema": {
+            "label": { "label": "View Name", "editor": "Text", "required": true },
+            "widget": { "label": "Widget", "editor": "Select", "options": "meta4widgets" },
+            "comment": { "label": "Description", "editor": "TextArea", "required": true }
+         }
+      }
+   }
+}

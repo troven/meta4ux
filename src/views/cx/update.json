@@ -1,0 +1,38 @@
+{
+   "id": "views/meta4/cx/update",
+   "label": "Edit CX",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/cx/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "CX Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  },
+	  "UseCase": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"page": {
+			   "label": "Use Case",
+			   "widget": "HTML"
+			}
+		 }
+	  },
+	  "Hint": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"page": {
+			   "label": "Hint Page",
+			   "widget": "HTML"
+			}
+		 }
+	  }
+   }
+}

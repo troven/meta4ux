@@ -1,0 +1,8 @@
+{
+  "id": "views/welcome",
+  "label": "Welcome to Meta4Beta",
+  "comment": "",
+  "className": "welcome",
+  "template": "welcome.html",
+  "widget": "Template"
+}

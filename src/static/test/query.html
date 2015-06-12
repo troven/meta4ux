@@ -1,0 +1,112 @@
+<html>
+<head>
+
+    <script src="/static/js/vendor/require.js"></script>
+</head>
+<body>
+
+<script>
+require.config({
+    baseUrl: "/static/js/meta4beta",
+    paths: {
+        underscore: "../vendor/underscore/underscore",
+    }
+})
+
+require(["asq"], function(asq) {
+    console.log("ASQ: %o", asq);
+    var data = { "hello": "world" }
+
+    var test1 = data
+    var test2 = { "hello": "earthling" }
+    var test3 = { "hello": { "$eq": "world" } }
+    var test4 = { "hello": { "$eq": "earthling" } }
+    var test5 = { "hello": { "$ne": "earthling" } }
+    var test6 = { "hello": ["earthling", "world"] }
+    var test7 = { "hello": ["earthling", "hello"] }
+
+    assert = function(a) { if (!a) throw "failed: "+a }
+
+    tester = function(test,data) {
+        var fn = asq.compile(test)
+        var t = fn(data)
+        var eq = (t === asq.match(test,data))
+        if (!eq) throw "compile & match disagree"
+        return t
+    }
+
+    var t = null
+    t = tester( test1, data )
+    assert(t)
+    console.log("Test #1: %o = %o -> %s", test1, data, t);
+
+    t = tester( test2, data )
+    console.log("Test #2: %o = %o -> %s", test2, data, !t);
+    assert(!t)
+
+    t = tester( test3, data )
+    console.log("Test #3: %o = %o -> %s", test3, data, t);
+    assert(t)
+
+    t = tester( test4, data )
+    console.log("Test #4: %o = %o -> %s", test4, data, !t);
+    assert(!t)
+
+    t = tester( test5, data )
+    console.log("Test #5: %o = %o -> %s", test5, data, t);
+    assert(t)
+
+    t = tester( test6, data )
+    console.log("Test #6: %o = %o -> %s", test6, data, t);
+    assert(t)
+
+    t = tester( test7, data )
+    console.log("Test #7: %o = %o -> %s", test7, data, !t);
+    assert(!t)
+
+    data = { "ten": 10 }
+    test1 = data
+    test2 = { "ten": "10" }
+    test3 = { "ten": { "$eq": "10" } }
+    test4 = { "ten": { "$ne": "10" } }
+    test5 = { "ten": { "$ne": "ten" } }
+    test6 = { "ten": { "$lt": "11" } }
+    test7 = { "ten": { "$gt": "9" } }
+
+    assert = function(a,b) { if (!a) throw "failed: "+b }
+
+    var t = null
+    t = tester( test1, data )
+    assert(t, "t1" )
+    console.log("Test #1: %o = %o -> %s", test1, data, t);
+
+    t = tester( test2, data )
+    console.log("Test #2: %o = %o -> %s", test2, data, t);
+    assert(t, "t2" )
+
+    t = tester( test3, data )
+    console.log("Test #3: %o = %o -> %s", test3, data, t);
+    assert(t, "t3" )
+
+    t = tester( test4, data )
+    console.log("Test #4: %o = %o -> %s", test4, data, !t);
+    assert(!t, "t4" )
+
+    t = tester( test5, data )
+    console.log("Test #5: %o = %o -> %s", test5, data, t);
+    assert(t, "t5" )
+
+    t = tester( test6, data )
+    console.log("Test #6: %o = %o -> %s", test6, data, t);
+    assert(t, "t6" )
+
+    t = tester( test7, data )
+    console.log("Test #7: %o = %o -> %s", test7, data, t);
+    assert(t, "t7" )
+
+})
+
+
+</script>
+</body>
+</html>

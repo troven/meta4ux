@@ -1,0 +1,14 @@
+{
+   "id": "meta4assets",
+   "label": "SDK Assets",
+   "isRemote": true,
+   "isClient": false,
+
+   "type": "Remote", "prefetch": true,
+   "store": "Assets",
+   "scope": "tenant",
+   "filters": ["tenant"],
+   "defaults": {
+	  "label": "New Asset"
+   }
+}

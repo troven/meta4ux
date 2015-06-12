@@ -1,0 +1,7 @@
+{
+  "id": "menu_home",
+  "label": "Main Menu",
+  "isRemote": true,
+  "isClient": true,
+  "type": "Static", "prefetch": true
+}

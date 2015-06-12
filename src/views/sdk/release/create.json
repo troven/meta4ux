@@ -1,0 +1,10 @@
+{
+   "id": "views/meta4/sdk/release/create",
+   "label": "New Release",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+	  "label": {"label": "Release Name", "editor": "Text", "required": true},
+	  "comment": {"label": "Description", "editor": "TextArea", "required": true}
+   }
+}

@@ -1,0 +1,38 @@
+{
+   "id": "views/meta4/templates/update",
+   "label": "Edit Template",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/templates/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "Template Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  },
+	  "UseCase": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"page": {
+			   "label": "Use Case",
+			   "widget": "HTML"
+			}
+		 }
+	  },
+	  "Hint": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"page": {
+			   "label": "Hint Page",
+			   "widget": "HTML"
+			}
+		 }
+	  }
+   }
+}

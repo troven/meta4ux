@@ -1,0 +1,7 @@
+{
+   "id": "menu_profile",
+   "label": "Profile Menu",
+   "isRemote": true,
+   "isClient": true,
+   "type": "Static", "prefetch": true
+}

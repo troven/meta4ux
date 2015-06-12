@@ -1,0 +1,16 @@
+{
+   "id": "views/meta4/templates/read",
+   "label": "Templates",
+   "comment": ".",
+   "icon": "/static/brand/blank.png",
+   "widget": "List", "model": false,
+   "isSortable": false,
+   "child": {
+	  "className": "meta4templates col-sm-8 list-group-item",
+	  "template": "<div about='{{id}}'><label>{{label}}</label><p>{{comment}}</p></div>"
+   },
+   "popover": {
+	  "label": "Template",
+	  "comment": "Click to edit"
+   }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "meta4cx",
+  "label": "Customer Experience",
+  "isRemote": true,
+  "isClient": true,
+  "store": "SDK",
+  "type": "Remote",
+  "prefetch": true, "debug": false,
+  "scope": "tenant",
+  "filters": ["tenant"],
+  "defaults": {
+    "label": "New Customer Experience"
+  },
+  "schema": {
+    "id": { "type": "Text", "required": true },
+    "label": { "type": "Text", "required": true },
+    "comment": { "type": "TextArea" },
+    "logo": { "type": "Upload" }
+  }
+}

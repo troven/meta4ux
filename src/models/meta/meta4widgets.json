@@ -1,0 +1,19 @@
+{
+   "id": "meta4widgets",
+   "label": "Widgets Model",
+   "isRemote": true,
+   "isClient": false,
+   "type": "Remote", "prefetch": true, "debug": false,
+   "store": "SDK",
+   "scope": "tenant",
+   "filters": ["tenant"],
+   "defaults": {
+	  "label": "New Widget"
+   },
+   "schema": {
+	  "id": { "type": "Text", "required": true },
+	  "label": { "type": "Text", "required": true },
+	  "comment": { "type": "TextArea" },
+	  "icon": { "type": "Text" }
+   }
+}

@@ -1,0 +1,9 @@
+{
+   "id": "views/meta4/sdk/terminal",
+   "x_el": "#terminal",
+   "label": "Scorpio4 Terminal",
+   "widget": "Terminal",
+   "iq": {
+	  "debug": "debug.js"
+   }
+}

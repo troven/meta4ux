@@ -1,0 +1,12 @@
+{
+   "id": "meta4apis",
+   "label": "API",
+   "isRemote": true,
+   "type": "Remote", "prefetch": true,
+   "store": "SDK",
+   "scope": "tenant",
+   "filters": ["tenant"],
+   "defaults": {
+	  "label": "New API"
+   }
+}

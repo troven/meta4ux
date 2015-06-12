@@ -1,0 +1,16 @@
+{
+   "id": "views/meta4/views/read",
+   "label": "View Register",
+   "comment": "",
+   "icon": "/static/brand/blank.png",
+   "widget": "List", "model": false,
+   "isSortable": false,
+   "child": {
+	  "className": "meta4views col-sm-8 list-group-item",
+	  "template": "<div about='{{id}}'><label>{{label}} - {{widget}}</label><p>{{comment}}</p></div>"
+   },
+   "popover": {
+	  "label": "View",
+	  "comment": "Click to edit"
+   }
+}

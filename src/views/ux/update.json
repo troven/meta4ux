@@ -1,0 +1,79 @@
+{
+   "id": "views/meta4/ux/update",
+   "label": "Edit UX",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/ux/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "UX Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  },
+	  "Views": {
+		 "widget": "PickList",
+		 "model": false,
+		 "collection": ".views",
+		 "options": "meta4views"
+	  },
+	  "Models": {
+		 "widget": "PickList",
+		 "model": false,
+		 "collection": ".models",
+		 "options": "meta4models"
+	  },
+	  "Code": {
+		 "widget": "PickList",
+		 "model": false,
+		 "collection": ".code",
+		 "options": "meta4code"
+	  },
+	  "Templates": {
+		 "widget": "PickList",
+		 "model": false,
+		 "collection": ".templates",
+		 "options": "meta4templates"
+	  },
+	  "Paths": {
+		 "widget": "Form",
+		 "model": false,
+		 "collection": ".paths",
+		 "schema": {
+			"home": {
+			   "id": "paths.home",
+			   "label": "Home",
+			   "editor": "Text"
+			},
+			"meta": {
+			   "id": "paths.meta",
+			   "label": "Metadata",
+			   "editor": "Text"
+			},
+			"data": {
+			   "id": "paths.data",
+			   "label": "Data",
+			   "editor": "Text"
+			},
+			"views": {
+			   "id": "paths.views",
+			   "label": "Views",
+			   "editor": "Text"
+			},
+			"templates": {
+			   "id": "paths.templates",
+			   "label": "Templates",
+			   "editor": "Text"
+			},
+			"scripts": {
+			   "id": "paths.scripts",
+			   "label": "Client Code",
+			   "editor": "Text"
+			}
+		 }
+	  }
+   }
+}

@@ -1,0 +1,6 @@
+<section>
+    <h3>Static Assets</h3>
+
+<p>Files in this directory are not expected to change at runtime. As such, strategies such as caching can be applied to improve performance.</p>
+<p>They are served from the /www/* url and, if possible, compressed during transport.</p>
+</section>

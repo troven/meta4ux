@@ -1,0 +1,138 @@
+{
+   "id": "views/cx/create",
+   "label": "Create a Customer Experience",
+   "comment": "You can create a CX in a few short steps.",
+   "widget": "Wizard", "modal": true,
+   "collection": "cx",
+   "iq": {
+   },
+   "transitions": {
+	  "start": {
+		 "cancel": "cancelled",
+		 "next": "step1"
+	  },
+	  "step1": {
+		 "previous": "start",
+		 "next": "step2"
+	  },
+	  "step2": {
+		 "previous": "step1",
+		 "next": "step3"
+	  },
+	  "step3": {
+		 "previous": "step2",
+		 "next": "step4"
+	  },
+	  "step4": {
+		 "previous": "step3",
+		 "finish": "finished"
+	  }
+   },
+   "views": {
+	  "start": {
+		 "id": "views/cx/start",
+		 "label": "Create a new CX",
+		 "template": "<img class='pull-right' src='/www/assets/images/icons/wizard.png'/><div class='clearfix'><h2 >Welcome to the Meta4Beta CX wizard.</h2><h3>In a few clicks you will have created a CX and assigned a methodology.</h3></div>"
+	  },
+	  "step1": {
+		 "id": "views/cx/step1",
+		 "label": "Step 1: Describe your CX",
+		 "comment": "Your CX needs a name and a short description.",
+		 "widget": "Form",
+		 "schema": {
+			"label": {
+			   "widget": "Text",
+			   "required": true,
+			   "label": "CX Name",
+			   "focus": true,
+			   "className": "form-group"
+			},
+			"cx": {
+			   "label": "CX",
+			   "widget": "Select",
+			   "options": "cx"
+			},
+			"portfolio": {
+			   "label": "Portfolio",
+			   "widget": "Select",
+			   "options": "portfolio"
+			},
+			"comment": {
+			   "widget": "TextArea",
+			   "label": "Description"
+			}
+		 }
+	  },
+	  "step2": {
+		 "id": "views/cx/step2",
+		 "label": "Step 2: CX Methodology",
+		 "comment": "Select a methodology for your CX.",
+		 "widget": "Form",
+		 "schema": {
+			"methodology": {
+			   "widget": "Select",
+			   "options": "methodologies"
+			},
+			"CXNumber": {
+			   "widget": "Text",
+			   "required": false,
+			   "label": "CX Number",
+			   "className": "form-group"
+			},
+			"clientNumber": {
+			   "widget": "Text",
+			   "required": false,
+			   "label": "Client Number",
+			   "className": "form-group"
+			}
+		 }
+	  },
+	  "step3": {
+		 "id": "views/cx/step3",
+		 "label": "Step 3: CX Stakeholders",
+		 "comment": "Select the team members who will lead the CX.",
+		 "widget": "Form",
+		 "schema": {
+			"sponsor": {
+			   "widget": "Select",
+			   "options": "meta4principals"
+			},
+			"manager": {
+			   "widget": "Select",
+			   "options": "meta4principals"
+			}
+		 }
+	  },
+	  "step4": {
+		 "id": "views/cx/step4",
+		 "label": "Step 4: CX Status",
+		 "comment": "Describe the current status of the CX.",
+		 "widget": "Form",
+		 "schema": {
+			"stage": {
+			   "label": "Current Phase",
+			   "widget": "Select",
+			   "options": "methods"
+			},
+			"status": {
+			   "widget": "Select",
+			   "options": [
+				  "initial",
+				  "on_track",
+				  "issues",
+				  "risky",
+				  "closed",
+				  "aborted"
+			   ]
+			},
+			"complete": {
+			   "label": "% Completed",
+			   "widget": "Select",
+			   "options": [
+				  "0", "25", "50", "75", "95", "100"
+			   ]
+			}
+		 }
+	  }
+   }
+}

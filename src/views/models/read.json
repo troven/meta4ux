@@ -1,0 +1,16 @@
+{
+   "id": "views/meta4/models/read",
+   "label": "Meta Models",
+   "comment": ".",
+   "icon": "/static/brand/blank.png",
+   "widget": "List", "model": false,
+   "isSortable": false,
+   "child": {
+	  "className": "meta4models col-sm-8 list-group-item",
+	  "template": "<div about='{{id}}'><label>{{label}}</label><p>{{comment}}</p></div>"
+   },
+   "popover": {
+	  "label": "Meta Model",
+	  "comment": "Click to edit"
+   }
+}

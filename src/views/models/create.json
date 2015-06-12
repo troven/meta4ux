@@ -1,0 +1,10 @@
+{
+   "id": "views/meta4/models/create",
+   "label": "New Model",
+   "widget": "Form",
+   "model": false,
+   "schema": {
+      "label": {"label": "Model Name", "editor": "Text", "required": true},
+      "comment": {"label": "Description", "editor": "TextArea", "required": true}
+   }
+}

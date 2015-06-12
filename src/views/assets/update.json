@@ -1,0 +1,18 @@
+{
+   "id": "views/meta4/assets/update",
+   "label": "Edit Asset",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/assets/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "Assets Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  }
+   }
+}

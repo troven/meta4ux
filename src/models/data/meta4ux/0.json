@@ -1,0 +1,48 @@
+{
+  "id": "0",
+  "geo": false,
+  "notifications": false,
+  "label": "Demo #0",
+  "models": [
+    {
+      "id": "customers",
+      "label": "Customers",
+      "comment": "customers model",
+      "isClient": "true",
+      "type": "ODb",
+      "isServer": "false"
+    }
+  ],
+  "scripts": [],
+  "controllers": [],
+  "paths": {
+    "home": "../src/main/resource/meta4beta/v1/",
+    "meta": "models/meta/",
+    "data": "models/data/",
+    "views": "views/",
+    "templates": "templates/client/",
+    "scripts": "code/client/"
+  },
+  "templates": [],
+  "views": [
+    {
+      "id": "urn:uuid:6d028f58-99d6-4ce6-a340-5817dc5d3271",
+      "label": "Test View",
+      "comment": "a simple input box",
+      "widget": "Text"
+    },
+    {
+      "label": "Text Box",
+      "widget": "TextArea",
+      "id": "urn:uuid:e13cdbba-ccf2-4bf5-b44e-3591221ce1ae"
+    }
+  ],
+  "code": [
+    {
+      "label": "New Code",
+      "owner": "#10:1",
+      "id": "new_code"
+    }
+  ],
+  "requires": []
+}

@@ -1,0 +1,11 @@
+{
+   "id": "views/meta4/views",
+   "widget": "CRUD2", "isSortable": false,  "debug": false,
+   "can": { "create": false, "delete": true },
+   "collection": "meta4views",
+   "views": {
+	  "create": "views/meta4/views/create",
+	  "read": "views/meta4/views/read",
+	  "update": "views/meta4/views/update"
+   }
+}

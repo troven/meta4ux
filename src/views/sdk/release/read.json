@@ -1,0 +1,16 @@
+{
+   "id": "views/meta4/sdk/release/read",
+   "label": "Release Register",
+   "comment": "",
+   "icon": "/static/brand/blank.png",
+   "widget": "List", "model": false,
+   "isSortable": false,
+   "child": {
+	  "className": "meta4sdk col-sm-8 list-group-item",
+	  "template": "<div about='{{id}}'><label>{{label}}</label><p>{{comment}}</p></div>"
+   },
+   "popover": {
+	  "label": "User Experience",
+	  "comment": "Click a Release to edit"
+   }
+}

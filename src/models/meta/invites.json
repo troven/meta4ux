@@ -1,0 +1,15 @@
+{
+   "id": "invites",
+   "label": "User Registration",
+   "singleton": true,
+   "type": "Remote", "prefetch": false,
+   "store": "file",
+   "url": "/api/user/register.groovy",
+
+   "defaults": {
+	  "firstname": "Your first name",
+	  "lastname": "Your last name",
+      "job_title": "N/A",
+	  "email": "test@example.com"
+   }
+}

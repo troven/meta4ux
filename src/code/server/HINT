@@ -1,0 +1,6 @@
+<section>
+    <h3>Meta API</h3>
+    <p>Server-side scripts called by REST-ful API.</p>
+    <p>Can only be accessed by authenticated principals.</p>
+    <p>For non-authenticated principals, see 'guest/api'.</p>
+</section>

@@ -1,0 +1,139 @@
+<%
+def me = http.session.getAttribute("signup")
+me = me?me:[firstname:"", lastname:"", username: ""]
+%>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+        <meta name="description" content="Meta4Beta: "/>
+        <meta name="author" content="Meta4Beta / Troven"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <link rel="icon" type="image/png" href="/www/assets/images/logo.png">
+
+        <title>Meta4Beta</title>
+
+    </head>
+
+    <body class="signin">
+        
+        
+        <section>
+            
+            <div class="panel panel-signup">
+                <div class="panel-body">
+                    <div class="logo text-center">
+                        <img src="/static/brand/logo-small.png" alt="Meta4Beta" >
+                    </div>
+                    <br />
+                    <h4 class="text-center mb5">Create a new account</h4>
+                    <p class="text-center">Please complete the form below <b>or use your 'single sign-on' account</b>:</p>
+
+                    <div class='social-login'>
+                        <center>
+                            <div data-provider='linkedin' class="btn btn-default">Linked<i class="fa fa-linkedin ml5"></i></div>
+                            <div data-provider='google' class="btn btn-default">Google <i class="fa fa-google ml5"></i></div>
+                            <!--<div href="/public/api/auth/facebook" class="btn btn-default">Facebook <i class="fa fa-facebook ml5"></i></div>-->
+                            <div data-provider='windows' class="btn btn-default">Windows Live<i class="fa fa-windows ml5"></i></div>
+                            <!--<div href="/public/api/auth/yahoo" class="btn btn-default">Yahoo <i class="fa fa-yahoo ml5"></i></div>-->
+                        </center>
+                    </div>
+
+                    <div class="mb30"></div>
+                    
+                    <form action="/public/api/auth/register" method="POST">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="input-group mb15">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input name='firstname' value="${me.firstname}" type="text" class="form-control" placeholder="Enter Firstname">
+                                </div><!-- input-group -->
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-group mb15">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input name='lastname' value="${me.lastname}" type="text" class="form-control" placeholder="Enter Lastname">
+                                </div><!-- input-group -->
+                            </div>
+                        </div><!-- row -->
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="input-group mb15">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                    <input name='username' value="${me.username}" type="email" class="form-control" placeholder="Enter Email Address">
+                                </div><!-- input-group -->
+                            </div>
+                            <!--<div class="col-sm-6">-->
+                                <!--<div class="input-group mb15">-->
+                                    <!--<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>-->
+                                    <!--<input name='password' type="password" class="form-control" placeholder="Enter Password">-->
+                                <!--</div>&lt;!&ndash; input-group &ndash;&gt;-->
+                            <!--</div>-->
+
+                            <div class="col-sm-6">
+                                <div class="input-group">
+                                    <span class="">How did you hear about Meta4Beta?<br/></span>
+                                <select name='marketing' class="col-sm-12" >
+                                    <option value="event">A networking event</option>
+                                    <option value="private">A private invite</option>
+                                    <option value="colleague">A colleague</option>
+                                    <option value="friend">Friend of a friend</option>
+                                    <option value="news">News or Blog</option>
+                                    <option value="social">Social Media</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                </div><!-- input-group -->
+                            </div>
+
+                        </div><!-- row -->
+
+                        <div class="row">
+                            <div class=" col-sm-6">
+                                <div class="input-group mb15">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input name="password" type="password" class="form-control" placeholder="Password"/>
+                                </div><!-- input-group -->
+                            </div>
+                            <div class=" col-sm-6">
+                                <div class="input-group mb15">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                                    <input name="passwordConfirm" type="password" class="form-control" placeholder="Confirm Password"/>
+                                </div><!-- input-group -->
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="clearfix">
+                            <div class="pull-left">
+                                <div class="ckbox ckbox-primary mt5">
+                                    <input type="checkbox" id="agree" name="agree" value="1">
+                                    <label for="agree">I agree with <a href="/www/legal/terms.html">Terms and Conditions</a></label>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <button type="submit" class="btn btn-success">Create New Account <i class="fa fa-angle-right ml5"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div><!-- panel-body -->
+                <div class="panel-footer">
+                    <a href="/www/index.html" class="btn btn-primary btn-block">Already a Member? Click here to Login or select a social account</a>
+                </div><!-- panel-footer -->
+            </div><!-- panel -->
+            
+        </section>
+
+        <script src="/www/meta4beta/frontend.js"></script>
+
+<script>
+    scorpio4.oauth()
+    jQuery(function() {
+        jQuery("[name='marketing']").val("${me.marketing}")
+	    jQuery("[name='firstname']").focus()
+    })
+</script>
+</body>
+</html>

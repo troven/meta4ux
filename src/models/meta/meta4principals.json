@@ -1,0 +1,23 @@
+{
+  "id": "meta4principals",
+  "label": "Users Model",
+  "store": "Users",
+  "isRemote": true,
+  "isClient": false,
+  "type": "Remote",
+  "prefetch": true,
+  "scope": "owner",
+  "ignore_filters": ["tenant"],
+  "script": "code/strata/meta4principals.groovy",
+  "defaults": {
+    "locale": "en",
+    "roles": [],
+    "homepage": "index",
+    "gender": "UNSPECIFIED",
+    "profileClass": "demo",
+    "location": "cyberspace",
+    "photoURL": "http://meta4beta.com/favicon.png"
+  },
+  "schema": {
+  }
+}

@@ -1,0 +1,11 @@
+{
+   "id": "views/meta4/sdk/release",
+   "widget": "CRUD2", "isSortable": false,  "debug": false,
+   "can": { "create": false, "delete": true },
+   "collection": "meta4release",
+   "views": {
+	  "create": "views/meta4/sdk/release/create",
+	  "read": "views/meta4/sdk/release/read",
+	  "update": "views/meta4/sdk/release/update"
+   }
+}

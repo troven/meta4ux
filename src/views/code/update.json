@@ -1,0 +1,54 @@
+{
+   "id": "views/meta4/code/update",
+   "label": "Edit Code",
+   "widget": "Tabs",
+   "model": false,
+   "firstTab": "About",
+   "tabs": {
+	  "About": {
+		 "id": "views/meta4/code/update/about",
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"label": { "label": "Script Name", "editor": "Text", "required": true },
+			"comment": { "label": "Description", "editor": "TextArea", "required": true }
+		 }
+	  },
+	  "Source": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"language": {
+			   "label": "Language",
+			   "widget": "Select", "options": [
+				  {"id": "js", "label": "Javascript" }
+			   ]
+			},
+			"src": {
+			   "label": "Source Code",
+			   "widget": "CodeEditor"
+			}
+		 }
+	  },
+	  "UseCase": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"useCase": {
+			   "label": "Use Case",
+			   "widget": "HTML"
+			}
+		 }
+	  },
+	  "Notes": {
+		 "widget": "Form",
+		 "model": false,
+		 "schema": {
+			"notes": {
+			   "label": "Notes",
+			   "widget": "HTML"
+			}
+		 }
+	  }
+   }
+}
