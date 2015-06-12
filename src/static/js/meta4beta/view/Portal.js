@@ -43,9 +43,10 @@ DEBUG && console.debug("getPortlet (%s): %o", portletType, _model)
 				var childView = ChildView(_model)
 				return childView;
 			},
+
 			childViewOptions: function(_model) {
-			    var childOptions = _.extend( {}, this.options.options, _model.toJSON());
-DEBUG && console.debug("getPortlet options: %o %o %o", this, _model.id, childOptions)
+			    var childOptions = _.extend( {}, this.options.options, _model.toJSON(), { model: this.model } );
+DEBUG && console.debug("getPortlet options: %o %o %o", this, _model, childOptions)
 			    return childOptions
 			}
 		}

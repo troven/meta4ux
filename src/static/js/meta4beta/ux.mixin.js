@@ -566,7 +566,9 @@ console.log("navigateTo (%s): %o", go_to)
 		    var _DEBUG = options.debug || DEBUG
 	        view._views = view._resolveNested(options.views)
 _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
-            this.on("show", this.showAllNested )
+            this.on("show", function() {
+                view.showAllNested()
+             })
 		},
 
 		showAllNested: function(meta) {
@@ -591,6 +593,7 @@ console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
                 if (subview) {
                         self.listenTo(subview)
                         subview.render()
+//                        .$el.appendTo( $(v.el) )
                 }
 			} else if (self[k] && self[k].show && self.regions[k]) {
 				var subview = self.getNestedView(v, meta)

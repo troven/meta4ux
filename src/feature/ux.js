@@ -27,9 +27,12 @@ exports.feature = function(router, feature, config) {
     assert(config.features.crud, "UX requires CRUD configuration");
     assert(config.features.crud.home, "CRUD {{home}} is missing");
 
-console.log("UX path: ", feature.path)
+    var DEBUG = feature.DEBUG || false
+
+DEBUG && console.log("UX path: ", feature.path)
     router.get(feature.path, function(req, res) {
-console.log("GET UX: ", req.path)
+
+DEBUG && console.log("GET UX: ", req.path)
 
         // live re-generation of recipe files
         // NOTE: blocking I/O inside
@@ -45,7 +48,7 @@ console.log("GET UX: ", req.path)
         if (path.indexOf('..') === -1) {
             var file = paths.normalize(__dirname + "/../static/"+path)
             var stat = fs.existsSync(file)
-console.log("UX Asset: ", file, stat?true:false)
+DEBUG && console.log("UX Asset: ", file, stat?true:false)
             if (stat) {
                 res.sendFile(file);
                 return ;

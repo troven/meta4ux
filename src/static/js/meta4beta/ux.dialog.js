@@ -23,14 +23,19 @@ ux.DEBUG && console.log("UX Widget (%s): %o", [ux.typeAttribute], options)
 		    throw "meta4:ux:oops:missing-home-"+ux.idAttribute;
 		}
 
-
+		// make sure we have an el && a Widget
         options = _.extend({ el: options.el || "body" }, options)
         options[ux.typeAttribute] = options[ux.typeAttribute] || "Home"
 
         // Render Home View - over-ride using 'home.type'
         var home = ux.views.widget(options[ux.idAttribute], options)
         if (!home) throw "meta4:app:boot:oops:missing-home";
-
+		home.on("action", function(action) {
+			alert("action:"+action)
+		})
+		home.on("navigate", function(go_to) {
+			alert("navigate:"+go_to)
+		})
         // render & show
         home.render().triggerMethod("show")
 ux.DEBUG && console.log("UX Home (%s): %o", options[ux.idAttribute], options)

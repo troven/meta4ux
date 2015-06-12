@@ -308,18 +308,42 @@ DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
         },
         commit:  function(model, $field) {
             var self = this
-            var files = new FormData();
-            $("input", this.$el).each(function() {
+
+            model = model || this.options._form.model
+            var formData = new FormData();
+
+            var $inputs = $("input[type=file]", this.$el)
+            var uploadCount = 0
+            $inputs.each(function() {
                 _.each(this.files, function(file) {
-                    console.debug("Upload File: %o", file)
-                    files.append(self.model.id, file, file.name)
+                    formData.append(self.model.id, file, file.name)
+                    uploadCount++
                 })
             })
-            console.debug("Commit Upload: %o %o %o", self, model.attributes, files)
-            ux.iq.upload(files, function(response) {
-                console.debug("Uploaded Files: %o %o %o", self, model.attributes, response)
-//                    model.set(self.model.id, files)
+            if (!uploadCount) return;
+
+            // copy all attributes, except ours
+            _.each(model.attributes, function(v,k) {
+                if (!self.model.id==k) formData.append(k,v)
             })
+
+            // upload API
+            var url = this.options.url || model.url()
+            // reset the file fields
+            $inputs.replaceWith( $inputs.clone( true ) );
+
+            // perform multi-part upload
+            var then = new Date().getTime()
+            $.ajax({ url: url, data: formData,
+                processData: false, contentType: false, type: 'POST',
+                success: function(response) {
+                    var elapsed = Math.ceil((new Date().getTime()-then)/1000)
+                    var bitRate = response.data.size/elapsed
+                    var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
+                    model.set("attached_"+self.model.id, new Backbone.Model(data) )
+                    console.log("Uploaded: %s %o %o", self.model.id, model, data, response)
+                }
+            });
         }
     })
 
