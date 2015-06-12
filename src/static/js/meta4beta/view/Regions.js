@@ -20,11 +20,13 @@ DEBUG && console.log("Regions: (%s) %o", this.id, options)
 				return this;
 			},
 			onShow: function() {
+
 				var self = this
 				setTimeout(function() {
+console.log("Regions Activated", self)
+alert("a")
 					if (!self.body || !self.body.currentView) {
-console.log("Regions Activated")
-						self.showAllNested(self)
+						self.showAllNested( {model: self.model, collection: self.collection} )
 					}
 				}, 2)
 			},

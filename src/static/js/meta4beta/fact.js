@@ -361,6 +361,7 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators)
 		},
 
 		filter: function(collection, query) {
+			if (!collection) throw "meta4:oops:fact:missing-filter"
 			if (!query || _.isEmpty(query)) {
 				query = collection.filters || new Backbone.Model()
 			}

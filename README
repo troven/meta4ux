@@ -1,0 +1,10 @@
+meta4ux
+-------
+
+meta4ux comprises the client side view, model and controller architecture
+
+Backbone is used to model application state. 
+Marionette is used to manage view state.
+JSON is used to bind it all together.
+
+

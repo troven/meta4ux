@@ -4,11 +4,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 	var commentAttribute = ux.commentAttribute || "comment"
-	var DEBUG = options.debug || ux.DEBUG;
 
 	ux.view.Collection = ux.view.List = ux.view["meta4:ux:Collection"] = function(options) {
 		options = ux.checkOptions(options, ["id"]);
 		_.defaults(options, { child: {} })
+		var DEBUG = options.debug || ux.DEBUG;
 
 		var Item = Backbone.Marionette.ItemView.extend( {
 			isHoverPanel: true, isPopOver: true, isActionable: true, isTemplating: true,

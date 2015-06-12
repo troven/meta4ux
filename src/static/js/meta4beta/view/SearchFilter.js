@@ -16,6 +16,7 @@ define(["jquery", "underscore", "backbone", "marionette", "fact", "ux",
 			initialize: function(_options) {
 				ux.initialize(this, options);
 				this.model = new Backbone.Model();
+console.log("SearchFilter:", this, _options)
 				this.collection = fact.filter(this.collection)
 			},
 			render: function() {

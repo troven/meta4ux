@@ -569,7 +569,7 @@ _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
             this.on("show", this.showAllNested )
 		},
 
-		showAllNested: function() {
+		showAllNested: function(meta) {
 			var self = this
 			if (!self.getNestedView || !self._views) throw "meta4:ux:oops:view-not-nested";
 
@@ -579,21 +579,21 @@ _DEBUG && console.log("showNested: %o %o", self, self._views)
 
 			_.each(self._views, function(v,k) {
 //    			var meta = _.extend({ model: self.model || false, collection: self.collection }, v)
-				self.__showNested( self, v, k )
+				self.__showNested( self, v, k, meta )
 			})
 		},
 
-		__showNested: function(self, v, k) {
+		__showNested: function(self, v, k, meta) {
 			if (v.el) {
 //_DEBUG &&
 console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
-                var subview = self.getNestedView(v)
+                var subview = self.getNestedView(v, meta)
                 if (subview) {
                         self.listenTo(subview)
                         subview.render()
                 }
 			} else if (self[k] && self[k].show && self.regions[k]) {
-				var subview = self.getNestedView(v)
+				var subview = self.getNestedView(v, meta)
 				if (subview) {
 // _DEBUG &&
 console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
@@ -648,7 +648,7 @@ console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
 		    	if (_.isObject(conf)) {
 					_.extend(conf,meta)
 					conf.id = conf.id || "_ux_"+ux._viewIDcounter++
-					widget = ux.views.widget(conf.id, conf);
+					widget = ux.views.widget(conf.id, _.extend({}, conf, meta) );
 // console.debug("getNested (%s): %o", conf.id, widget)
 		    	}
 		    }

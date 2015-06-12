@@ -1,13 +1,8 @@
 {
   "name": "meta4ux",
-  "version": "0.3.0",
+  "version": "0.5.7",
   "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
-  "main": "server.js",
-  "scripts": {
-	"start": "node meta4/index.js",
-	"demo": "node demo/index.js"
-  },
-  "main": "./src/server",
+  "main": "src/index.js",
   "keywords": [
 	"meta4",
 	"backbone",
@@ -28,6 +23,7 @@
 	}
   ],
   "dependencies": {
+	"underscore": "~1.8.3"
   },
 
   "devDependencies": {

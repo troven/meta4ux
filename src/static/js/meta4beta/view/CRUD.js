@@ -163,14 +163,16 @@ console.log("Create Error: %o", response)
             },
             onRead: function() {
                 var can = this.options.can
-
+                var self = this
                 var meta = { collection: this.collection}
                 var view = this.getNestedView("read", meta );
 
 DEBUG && console.log("onRead: %o %o", this, view)
                 if (view) {
                     this.body.show(view);
-                this.showHeaderFooters("read", view.options )
+                    this.body.once("render", function() {
+                        self.showHeaderFooters("read", view.options )
+                    })
                 } else {
                     this.destroy()
                 }
