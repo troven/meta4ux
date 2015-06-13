@@ -23,9 +23,18 @@ exports.feature = function(router, feature, config) {
     assert(feature, "feature arguments: feature")
     assert(config, "feature arguments: config")
 
+    // we need to find lots of files ... so, are we correctly configured?
     assert(feature.path, "{{ux}} feature not configured")
+    assert(feature.paths, "{{paths}} feature not configured")
+    assert(feature.paths.models, "{{paths.models}} feature not configured")
+    assert(feature.paths.views, "{{paths.views}} feature not configured")
+    assert(feature.paths.templates, "{{paths.templates}} feature not configured")
+    assert(feature.paths.scripts, "{{paths.scripts}} feature not configured")
+
+    // why??
     assert(config.features.crud, "UX requires CRUD configuration");
     assert(config.features.crud.home, "CRUD {{home}} is missing");
+
 
     var DEBUG = feature.DEBUG || false
 
@@ -75,7 +84,7 @@ exports.handle = function(feature, config) {
     // =============================================================================
     // load the View definitions
 
-    var viewsDir = feature.home
+    var viewsDir = feature.views
     var found  = helper.files.find(viewsDir, AcceptJSON )
 
     // create View recipe
@@ -92,7 +101,7 @@ exports.handle = function(feature, config) {
     // =============================================================================
     // load the Model definitions
 
-    var modelsDir = feature.models
+    var modelsDir = feature.paths.models
     found  = helper.files.find(modelsDir, AcceptJSON )
 
     _.each( found, function(data, file) {
@@ -116,7 +125,7 @@ exports.handle = function(feature, config) {
     // =============================================================================
     // load the HTML Templates
 
-    var templatesDir = feature.templates
+    var templatesDir = feature.paths.templates
     found  = helper.files.find(templatesDir, AcceptHTML )
 
     // add templates to recipe
@@ -132,7 +141,7 @@ exports.handle = function(feature, config) {
     // =============================================================================
     // load the client-side JS scripts
 
-    var scriptsDir = feature.scripts
+    var scriptsDir = feature.paths.scripts
     found  = helper.files.find(scriptsDir, AcceptECMA )
 
     // add JS scripts to recipe

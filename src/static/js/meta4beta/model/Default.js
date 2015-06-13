@@ -11,7 +11,7 @@ define(["underscore", "backbone", "fact",
         // internal constants
         var _DEBUG = options.debug || fact.DEBUG
         var storeType = options.store || "file"
-        var storeURL = options.url || "/models/"+storeType
+        var storeURL = options.url || "models/"+storeType
 
         // define our collection's Model
 

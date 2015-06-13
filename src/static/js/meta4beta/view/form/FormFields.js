@@ -340,7 +340,7 @@ DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
                     var elapsed = Math.ceil((new Date().getTime()-then)/1000)
                     var bitRate = response.data.size/elapsed
                     var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
-                    model.set("attached_"+self.model.id, new Backbone.Model(data) )
+                    model.set(self.model.id, data )
                     console.log("Uploaded: %s %o %o", self.model.id, model, data, response)
                 }
             });
