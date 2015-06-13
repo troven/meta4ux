@@ -1,6 +1,6 @@
 {
   "name": "meta4ux",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
   "main": "src/index.js",
   "keywords": [
@@ -16,11 +16,10 @@
     "mvp"
   ],
   "author": "Troven <meta4@troven.com.au> (http://meta4beta.com/)",
-"repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/troven/meta4ux.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/troven/meta4ux.git"
   },
-
   "licenses": [
     {
       "type": "Apache 2.0",
