@@ -479,15 +479,17 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
 			var model = this.collection?this.collection.get(action): false
 			var meta = _.extend({}, { model: model || this.model, collection: this.collection }, $this.data() )
 
-console.log("doActionEvent(%s) %o %o", action, this, meta );
-
 			// call both action forms
-			this.triggerMethod( action, meta )
+			this.trigger( "action:"+action, meta )
 			this.triggerMethod("action", action, meta )
+console.log("trigger [action:%s] %o %o", action, this, meta );
 
 			// trigger navigate?
 			var go_to = $this.attr("data-navigate")
-			go_to && this.triggerMethod("navigate", go_to, meta )
+			if (go_to) {
+				this.triggerMethod("navigate", go_to, meta )
+console.log("navigate [%s] %o %o", go_to, this, meta );
+			}
 
 			ux.muffle(e);
 			return this;

@@ -84,7 +84,8 @@ exports.handle = function(feature, config) {
     // =============================================================================
     // load the View definitions
 
-    var viewsDir = feature.views
+    var viewsDir = feature.paths.views
+    helper.files.mkdirs(viewsDir)
     var found  = helper.files.find(viewsDir, AcceptJSON )
 
     // create View recipe
@@ -102,6 +103,7 @@ exports.handle = function(feature, config) {
     // load the Model definitions
 
     var modelsDir = feature.paths.models
+    helper.files.mkdirs(modelsDir)
     found  = helper.files.find(modelsDir, AcceptJSON )
 
     _.each( found, function(data, file) {
@@ -126,12 +128,13 @@ exports.handle = function(feature, config) {
     // load the HTML Templates
 
     var templatesDir = feature.paths.templates
+    helper.files.mkdirs(templatesDir)
     found  = helper.files.find(templatesDir, AcceptHTML )
 
     // add templates to recipe
     var assetKey = "templates"
     _.each( found, function(data, file) {
-        var id = file.substring(feature[assetKey].length+1)
+        var id = file.substring(feature.paths[assetKey].length+1)
 //console.log("UX: template", id)
 
         // strip repetitive whitespace
@@ -142,12 +145,13 @@ exports.handle = function(feature, config) {
     // load the client-side JS scripts
 
     var scriptsDir = feature.paths.scripts
+    helper.files.mkdirs(scriptsDir)
     found  = helper.files.find(scriptsDir, AcceptECMA )
 
     // add JS scripts to recipe
     assetKey = "scripts"
     _.each( found, function(data, file) {
-        var id = file.substring(feature[assetKey].length+1)
+        var id = file.substring(feature.paths[assetKey].length+1)
 //console.log("UX: script", id)
         recipe.scripts[assetKey+":"+id] = ""+data
     })

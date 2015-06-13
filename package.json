@@ -1,6 +1,6 @@
 {
   "name": "meta4ux",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
   "main": "src/index.js",
   "keywords": [
@@ -24,7 +24,7 @@
   ],
   "dependencies": {
     "express": "~4.x.x",
-    "meta4helpers": "^0.1.3",
+    "meta4helpers": "~0.1.3",
     "underscore": "~1.8.3"
   },
   "devDependencies": {

@@ -50,10 +50,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 			events: {
 				'sortstart': 		"doEventDrag",
 				"click [data-id]": 	"doEventSelect",
-				"click [about]": 	"doEventSelect"
+				"click [data-trigger]": 	"doEventAction"
 			},
+			childEvents: ListItem.events,
 			childViewOptions: function(model, index) {
-				return _.extend({ model: model }, this.options.child)
+				return _.extend({ model: model, when: this.options.when }, this.options.child)
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options)

@@ -84,7 +84,7 @@ console.debug("Uploading Files:", this, this._module.options, files)
             _.each(iqFn, function(fnId,key) {
                 var fn = core.iq.get(fnId);
 //DEBUG &&
-console.log("IQ:%o  %s -> %s %o", vents, key, fnId, fn)
+console.log("when [%s] %o -> %s %o", key, vents, fnId, fn)
                 vents.on(key, function() { fn.apply(vents,arguments) })
             })
 			return vents
