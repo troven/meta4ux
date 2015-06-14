@@ -29,7 +29,7 @@ DEBUG && console.log("Tab Select: %o %o", this, arguments);
 
 	        	this._views = this._resolveNested(options.tabs || options.views)
 
-				this.currentTab = _options.firstTab || _options.currentTab|| _options.view
+				this.currentTab = _options.firstTab || _options.currentTab || _options.currentView|| _options.view
 DEBUG && console.log("Init Tabs (%o) %o", this, _options)
 
 			    this.collection = new Backbone.Collection()

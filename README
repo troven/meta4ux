@@ -1,13 +1,21 @@
 meta4ux
 -------
 
-meta4ux comprises the client side view, model and controller architecture
+meta4 makes it easy to create responsive, feature-rich prototypes, MVPs or DevOps apps that target both mobiles and desktops.
 
-Backbone is used to model application state.  Marionette is used to manage view state.
-JSON is used to bind it all together.
+meta4 helps you to experiment, test hypotheses and iterate towards product/market fit before investing too much into hard-baked software.
 
-For more information, type a look at the Wiki
+You describe what you want to achieve, and let meta4 worry about the 'how'.
 
-https://github.com/troven/meta4ux/wiki
+In essence, meta4 embodies a declarative approach to constructing software by favouring JSON over code. 
+
+You can find out more by reading:
+
+<a href="Intro">Introduction</a>.
+
+<a href="UX---User-Experience">User Experience</a>.
+
+<a href="Views">Views</a>.
+
 
 
