@@ -11,11 +11,11 @@ In essence, meta4 embodies a declarative approach to constructing software by fa
 
 You can find out more by reading:
 
-<a href="Intro">Introduction</a>.
+<a href="https://github.com/troven/meta4ux/wiki/Intro">Introduction</a>.
 
-<a href="UX---User-Experience">User Experience</a>.
+<a href="https://github.com/troven/meta4ux/wiki/UX---User-Experience">User Experience</a>.
 
-<a href="Views">Views</a>.
+<a href="https://github.com/troven/meta4ux/wiki/Views">Views</a>.
 
 
 
