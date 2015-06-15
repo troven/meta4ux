@@ -66,8 +66,6 @@ DEBUG && console.log("UX Asset: ", file, stat?true:false)
         next()
     });
 
-
-    console.log("\tUX is active:", feature.path)
 }
 
 // =============================================================================
