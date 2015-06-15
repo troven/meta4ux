@@ -1,8 +1,0 @@
-{
-  "id": "customers",
-  "isServer": "false",
-  "label": "Customers",
-  "comment": "customers model",
-  "type": "ODb",
-  "isClient": "false"
-}
