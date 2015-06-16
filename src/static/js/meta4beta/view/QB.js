@@ -57,7 +57,7 @@ DEBUG && console.log("QB Template Lookup (%s): %o %o", k, labels, lookup)
 			isTemplating: false, isActionable: false, isSortable: true,
 			isNavigator: false, isSelectable: false, isHoverPanel: false,
 			isPopOver: false, isActionMenu: true,
-            template: options.template || "<div about='{{id}}' >{{label}}<ul class='nav nav-tabs'></ul></div>",
+            template: options.template || "<div data-id='{{id}}' >{{label}}<ul class='nav nav-tabs'></ul></div>",
             childViewContainer: "ul", childView: DashView,
 			events: {
 				"click [about]": "doEventSelect",

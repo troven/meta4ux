@@ -9,7 +9,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var MenuTree = Backbone.Marionette.CompositeView.extend( _.extend({
 			childViewContainer: "ul", tagName: "li", className: "dropdown-submenu",
-			template: "<a class='selectable ' about='{{id}}' title='{{comment}}'>{{label}}</a><ul></ul>",
+			template: "<a class='selectable ' data-id='{{id}}' title='{{comment}}'>{{label}}</a><ul></ul>",
 		}, options ));
 
 		var MenuToggle = Backbone.Marionette.CompositeView.extend( _.extend({
@@ -19,7 +19,7 @@ DEBUG && console.log("MenuToggle", this, _options);
 			childView: MenuToggle,
 			childViewContainer: "ul.dropdown-menu", className: "dropdown",
 			events: { "click [about]": "onSelect"},
-			tagName: "li", template: "<a class='selectable dropdown-toggle' data-toggle='dropdown' about='{{id}}' title='{{label}}'>{{label}}</a><ul class='dropdown-menu'></ul>"
+			tagName: "li", template: "<a class='selectable dropdown-toggle' data-toggle='dropdown' data-id='{{id}}' title='{{label}}'>{{label}}</a><ul class='dropdown-menu'></ul>"
 		}, ux.mixin ) );
 
 		var MenuBar = Backbone.Marionette.CollectionView.extend({ childView: MenuToggle, tagName: "ul", className: "nav" });

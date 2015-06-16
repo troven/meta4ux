@@ -14,7 +14,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			initialize: function(_options) {
 				ux.initialize(this,_options)
             },
-			template: "<a about='{{id}}' data-navigate='{{id}}' title='{{comment}}' href='#'><i class='fa fa-{{icon}}'></i><span>{{label}}</span></a>",
+			template: "<a data-id='{{id}}' data-navigate='{{id}}' title='{{comment}}' href='#'><i class='fa fa-{{icon}}'></i><span>{{label}}</span></a>",
 		});
 
 		var MenuList = Backbone.Marionette.CollectionView.extend( {

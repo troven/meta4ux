@@ -21,7 +21,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"
 			events: {
 				"click [about]": "doEventSelect"
 			},
-			template: "<span about='{{id}}' title='{{comment}}'>Branch: {{label}}</span>",
+			template: "<span data-id='{{id}}' title='{{comment}}'>Branch: {{label}}</span>",
 			initialize: function(_options) {
 DEBUG && console.debug("Init Branch", this, _options)
 				ux.initialize(this, _options);

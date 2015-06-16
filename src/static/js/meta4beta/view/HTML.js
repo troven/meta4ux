@@ -58,7 +58,7 @@ console.debug("Toolbar: Extra: %o %o", locale, _options);
 		}, options.edited.toolbar);
 
 		var HTML = Backbone.Marionette.ItemView.extend(_.extend({
-			editTemplate: options.template || "<div><textarea about='{{id}}' cols='"+options.edited.cols+"' rows='"+options.edited.rows+"' placeholder='{{comment}}'>{{"+options.metaKey+"}}</textarea></div>",
+			editTemplate: options.template || "<div><textarea data-id='{{id}}' cols='"+options.edited.cols+"' rows='"+options.edited.rows+"' placeholder='{{comment}}'>{{"+options.metaKey+"}}</textarea></div>",
 			className: "ux_html",
 			initialize: function() {
 				ux.model(options, this);
@@ -138,7 +138,7 @@ DEBUG && console.debug("HTML Hover Off", contained, event, $(event.target), self
                 var reClose = new RegExp('}}', 'g');
     			viewTemplate = viewTemplate.replace( reOpen,  "<span class='ux_html_block'>");
     			viewTemplate = viewTemplate.replace( reClose, "</span>");
-    			viewTemplate = "<div about='{{id}}' class='ux_html_view'>"+viewTemplate+"</div>";
+    			viewTemplate = "<div data-id='{{id}}' class='ux_html_view'>"+viewTemplate+"</div>";
 				this.template = viewTemplate;
 DEBUG && console.debug("HTML View Template: ", isEditing, viewTemplate);
 			},
@@ -244,7 +244,7 @@ DEBUG && console.debug("HTML onToolbarInsertProperty", value, view, $this, event
                 this.editor.focus();
 			}
 		}, ux.mixin.Common, ux.mixin.Attachable, ux.mixin.Droppable), {
-			sample: options.template || "<label class='ux_sample' about='{{id}}'>Example: {{label}}</label>",
+			sample: options.template || "<label class='ux_sample' data-id='{{id}}'>Example: {{label}}</label>",
 			className: "ux_html"
 		});
 
@@ -261,14 +261,14 @@ DEBUG && console.debug("HTML onToolbarInsertProperty", value, view, $this, event
 		var DEBUG = ux.DEBUG && true;
 
 		var HTML = Backbone.Marionette.ItemView.extend({
-			template: "<div class='ux_sample'><label about='{{id}}'>{{label}}</label><div class='ux_toggled ux_preview'>{{{template}}}</div></div>"
+			template: "<div class='ux_sample'><label data-id='{{id}}'>{{label}}</label><div class='ux_toggled ux_preview'>{{{template}}}</div></div>"
 		});
 //		var HTML = ux.view["meta4:ux:HTML"](options);
 		if (!HTML) throw "meta4:ux:oops:missing-widget";
 
 		var Pages = Backbone.Marionette.CompositeView.extend( _.extend({
 			itemView: HTML, tagName: "ul", className: "nav-list",
-			template: "<div><label about='{{id}}'>{{label}}</label><ul></ul><div>",
+			template: "<div><label data-id='{{id}}'>{{label}}</label><ul></ul><div>",
 			itemViewContainer: "ul",
 			events: {
 				'click [about]': 'doEventSelect',

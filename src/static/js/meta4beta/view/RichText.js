@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		var DEBUG = true;
 
 		var RichText = Backbone.Marionette.ItemView.extend({
-			template: "<div about='{{id}}'><label>{{label}}</label><div class='ux_content'>{{html}}</div></div>",
+			template: "<div data-id='{{id}}'><label>{{label}}</label><div class='ux_content'>{{html}}</div></div>",
 			className: "ux_rich_text",
 			initialize: function() {
 				ux.model(options,this);

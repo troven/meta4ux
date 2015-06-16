@@ -9,7 +9,7 @@ define(["jquery", "underscore", "core", "ux", "full_calendar"], function ($,_, m
 		options = _.extend({selectable: true, ignoreTimezone: false, editable: true }, options)
 
 		var Calendar = Backbone.Marionette.ItemView.extend({
-			template: "<label about='{{id}}'>{{label}}</label>",
+			template: "<label data-id='{{id}}'>{{label}}</label>",
 			className: "ux_widget",
 			initialize: function(options) {
 				ux.initialize(this, options)

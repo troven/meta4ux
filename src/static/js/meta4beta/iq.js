@@ -83,8 +83,7 @@ console.debug("Uploading Files:", this, this._module.options, files)
 			// bind local 'iq' events events to fn()
             _.each(iqFn, function(fnId,key) {
                 var fn = core.iq.get(fnId);
-//DEBUG &&
-console.log("when [%s] %o -> %s %o", key, vents, fnId, fn)
+//DEBUG && console.log("when [%s] %o -> %s %o", key, vents, fnId, fn)
                 vents.on(key, function() { fn.apply(vents,arguments) })
             })
 			return vents

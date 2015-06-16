@@ -505,7 +505,7 @@ console.log("navigate [%s] %o %o", go_to, this, meta );
 		doNavigate: function(e) {
 //			if (!this._resolveNested) return
 			var $this = $(e.currentTarget)
-			var go_to = $this.attr("data-trigger")
+			var go_to = $this.attr("data-navigate") || $this.attr("data-trigger")
 			if (!go_to) throw "meta4:ux:oops:missing-navigate";
 //DEBUG &&
 console.log("doNavigate (%s): %o", go_to, this)

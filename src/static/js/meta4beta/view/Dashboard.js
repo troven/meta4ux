@@ -25,12 +25,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				DEBUG && console.warn("Gizmo onRender", this, _options)
 			},
 			tagName: "li", className: ux.stylize("ux_gizmo", options),
-			template: "<span class='ux_gizmo_header selectable' about='{{id}}' title='{{comment}}'><i class='pull-right icon icon-minus'></i>{{label}}<div class='ux_gizmo_body'></div></span>"
+			template: "<span class='ux_gizmo_header selectable' data-id='{{id}}' title='{{comment}}'><i class='pull-right icon icon-minus'></i>{{label}}<div class='ux_gizmo_body'></div></span>"
 		});
 
 		var Dashboard = Backbone.Marionette.CompositeView.extend( _.extend({
 			itemView: Gizmo,
-			tagName: "div", template: "<span about='{{id}}' title='{{comment}}'>{{label}}<ul class='ux_dashboard'></ul></div>", itemViewContainer: "ul",
+			tagName: "div", template: "<span data-id='{{id}}' title='{{comment}}'>{{label}}<ul class='ux_dashboard'></ul></div>", itemViewContainer: "ul",
 			events: {
 			  'click .selectable': 'doEventSelect'
 			},

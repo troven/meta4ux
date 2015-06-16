@@ -5,12 +5,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		var DEBUG = true;
 
 		var ChildView = Backbone.Marionette.ItemView.extend({ tagName: "li",
-			template: "<div data-trigger='debug' about='{{id}}'>{{label}}</div>",
+			template: "<div data-trigger='debug' data-id='{{id}}'>{{label}}</div>",
 		});
 
 		var config = {
 		    isTemplating: true, isActionable: true, isNavigator: true,
-			template: options.template || "<div about='{{id}}'>DEBUG: {{id}}</div>",
+			template: options.template || "<div data-id='{{id}}'>DEBUG: {{id}}</div>",
 			childView: ChildView,
 			events: {
 			    "click [data-action]": "doAction",

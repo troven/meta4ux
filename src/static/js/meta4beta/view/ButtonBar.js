@@ -9,12 +9,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkAttributes(options);
 
 		var ButtonItem = Backbone.Marionette.ItemView.extend({ tagName: "li",
-			template: "<a about='{{this}}' href='#'>{{label}}</a>",
+			template: "<a data-id='{{id}}' href='#'>{{label}}</a>",
 		});
 
 		var ButtonMenu = Backbone.Marionette.CompositeView.extend( {
 			childView: ButtonItem, className: "btn-toolbar", tagName: "span",
-			template: "<div class='btn-group'><button about='{{this}}' class='btn dropdown-toggle' data-toggle='dropdown'>{{label}}&nbsp;<span class='btn-optional caret'></span></button><ul class='btn-optional dropdown-menu'></ul></div>",
+			template: "<div class='btn-group'><button data-id='{{id}}' class='btn dropdown-toggle' data-toggle='dropdown'>{{label}}&nbsp;<span class='btn-optional caret'></span></button><ul class='btn-optional dropdown-menu'></ul></div>",
 			x_template: "<div class='btn-group'><button class='btn'>{{label}}</button><button class='btn-optional btn dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button><ul class='btn-optional dropdown-menu'></ul></div>",
 			childViewContainer: "ul",
 			initialize: function() {
