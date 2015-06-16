@@ -47,10 +47,11 @@ DEBUG && console.log("renderField: %s %o %o", fieldId, value, $field)
 
             if (_.isObject(validate)) {
                 var valid = true
-                if (validate.regexp) {
-                    var regexp = new RegExp(validate.regexp)
+                var pattern = validate.pattern || validate.regexp
+                if (pattern) {
+                    var regexp = new RegExp(pattern)
                     valid = value.match(regexp)?true:false
-DEBUG && console.log("valid rx: %s %s -> %o", validator, validate.regexp, valid)
+DEBUG && console.log("valid rx: %s %s -> %o", validator, pattern, valid)
                 }
                 if (validate.fn && _.isFunction(validate.fn) ) {
                     valid = validate.fn(value, model.attributes, self.model.attributes)

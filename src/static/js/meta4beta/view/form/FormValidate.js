@@ -14,21 +14,25 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
             message: "required",
             fn: function(v) { return v?true:false }
         },
+        "sanitize": {
+            message: "Only Alpha/Numeric and _",
+            pattern: /^\w+$/
+        },
         "email": {
             message: "Invalid email address",
-            regexp: /^[\w\-]{1,}([\w\-\+.]{1,1}[\w\-]{1,}){0,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}$/
+            pattern: /^[\w\-]{1,}([\w\-\+.]{1,1}[\w\-]{1,}){0,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}$/
         },
         "url": {
             message: "Invalid Web Address",
-            regexp: /^(http|https):\/\/(([A-Z0-9][A-Z0-9_\-]*)(\.[A-Z0-9][A-Z0-9_\-]*)+)(:(\d+))?\/?/i
+            pattern: /^(http|https):\/\/(([A-Z0-9][A-Z0-9_\-]*)(\.[A-Z0-9][A-Z0-9_\-]*)+)(:(\d+))?\/?/i
         },
         "number": {
             message: "Not a number",
-            regexp: /^[0-9]*\.?[0-9]*?$/
+            pattern: /^[0-9]*\.?[0-9]*?$/
         },
         "currency": {
             message: "Not a currency",
-            regexp: /^[0-9]*\.?[0-9]*?$/
+            pattern: /^[0-9]*\.?[0-9]*?$/
         },
         "date": {
         },

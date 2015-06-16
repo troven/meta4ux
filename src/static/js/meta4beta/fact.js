@@ -585,9 +585,10 @@ console.warn("Model Invalid: %o %o", self, errors)
 
 				if (_.isObject(validate)) {
 					var valid = true
-					if (validate.pattern) {
-						var pattern = new RegExp(validate.pattern)
-						valid = value.match(pattern)?true:false
+					var pattern = validate.pattern || validate.regexp
+					if (pattern) {
+						var regex = new RegExp(pattern)
+						valid = value.match(regex)?true:false
 					}
 					if (valid && validate.fn && _.isFunction(validate.fn) ) {
 						valid = validate.fn(value, attributes)
