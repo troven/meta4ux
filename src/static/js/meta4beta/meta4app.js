@@ -34,7 +34,7 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
 //    "meta4beta/view/Toolbar",
     "meta4beta/view/Regions",
     "meta4beta/view/Home"
-], function ($,_, scorpio4, ux, fact, iq, mobility, bootstrap) {
+], function ($,_, core, ux, fact, iq, mobility, bootstrap) {
 
 	var newApp = new Marionette.Application({});
 
@@ -42,11 +42,11 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
         if (!options) throw "meta4:app:boot:oops:missing-options";
         if (!options.id) throw "meta4:app:boot:oops:missing-module-id";
 
-    	var DEBUG = options.debug || scorpio4.DEBUG
+    	var DEBUG = options.debug || core.DEBUG
         options.requires && require(options.requires);
 
         // Extend Marionette module with Scorpio4's fn() tree
-        var module = _.extend(newApp.module(options.id, options), scorpio4 );
+        var module = _.extend(newApp.module(options.id, options), core );
         module.id=options.id
 
 module.on("all", function(e,x) {
@@ -59,14 +59,14 @@ module.on("all", function(e,x) {
         module.ux.boot(module, options)
 
         var ProfileModel = Backbone.Model.extend({url: "/api/auth/Principal"})
-        scorpio4.fact.models.set("principal", new ProfileModel(options.user) );
+        core.fact.models.set("principal", new ProfileModel(options.user) );
 
         // notification timer
         if (options.notifications) {
             var GossipCollection = Backbone.Collection.extend({url: "/api/fact/Gossip"})
-            scorpio4.fact.models.set("userGossip", new GossipCollection() );
+            core.fact.models.set("userGossip", new GossipCollection() );
             setInterval(function() {
-                var gossip = scorpio4.fact.models.get("userGossip")
+                var gossip = core.fact.models.get("userGossip")
 console.debug("Gossip: %o", gossip)
                 gossip.fetch()
             }, (1000*options.notifications) )
@@ -88,16 +88,15 @@ console.error("OOPS! server went away. It'll be back ASAP.")
     newApp.addInitializer(function(options) {
         var self = this;
         if (!options.url) throw "meta4:app:boot:oops:missing-boot-url";
-    	var DEBUG = options.debug || scorpio4.DEBUG
+    	var DEBUG = options.debug || core.DEBUG
 
-//DEBUG &&
-console.log("Boot Loader: %o -> %s", options, options.url);
+DEBUG && console.log("Boot Loader: %o -> %s", options, options.url);
 
         $.ajax({url: options.url, dataType: "json", type: "GET", data: JSON.stringify(options),
         contentType: "application/json; charset=utf-8",
         success: function(resp) {
 
-            var parse = options.parse || function(resp) { return resp?resp.result:false }
+            var parse = options.parse || function(resp) { return resp?resp.data:false }
             var result = parse(resp)
 
             if (!result) {
@@ -109,8 +108,7 @@ console.log("Boot Loader: %o -> %s", options, options.url);
             // Boot  Module
             var m_options = result
             var module = self.bootModule(m_options)
-//DEBUG &&
-console.log("Boot Module (%s) %o %o", m_options.id, m_options, module)
+DEBUG && console.log("Boot Module (%s) %o %o", m_options.id, m_options)
             self.trigger("boot", module)
             self.trigger("boot:"+m_options.id, module)
         }})

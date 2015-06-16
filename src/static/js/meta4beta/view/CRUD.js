@@ -11,10 +11,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         var TEMPLATE_HEADER = ux.compileTemplate("<div  class='panel-heading'><img class='pull-right' height='64' src='{{icon}}'/><h3>{{label}}</h3><p>{{comment}}</p></div>")
 
-        var TEMPLATE_FOOTER_CREATE = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary pull-right' data-trigger='save'>OK</button></div>")
-        var TEMPLATE_FOOTER_READ = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary' data-trigger='create'>Create</button><div/>")
-        var TEMPLATE_FOOTER_UPDATE = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-default' data-trigger='delete'>Delete</button><button class='btn btn-primary pull-right' data-trigger='save'>OK</button></div>")
-        var TEMPLATE_FOOTER_EDIT = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary pull-right' data-trigger='save'>OK</button></div>")
+        var TEMPLATE_FOOTER_CREATE = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary pull-right' data-action='save'>OK</button></div>")
+        var TEMPLATE_FOOTER_READ = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary' data-action='create'>Create</button><div/>")
+        var TEMPLATE_FOOTER_UPDATE = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-default' data-action='delete'>Delete</button><button class='btn btn-primary pull-right' data-action='save'>OK</button></div>")
+        var TEMPLATE_FOOTER_EDIT = ux.compileTemplate("<div class='panel-footer'><button class='btn btn-primary pull-right' data-action='save'>OK</button></div>")
 
         var TEMPLATE_FORM = ux.compileTemplate("<div class='regions'><div class='region_header'></div><div class='panel-body region_body'></div><div class='region_footer'></div>")
 
@@ -59,7 +59,7 @@ DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can)
                footers.update =  footers.update || { "template": TEMPLATE_FOOTER_UPDATE }
                footers.edit   =  footers.edit   || { "template": TEMPLATE_FOOTER_EDIT}
 
-console.log("initHeadersFooters: %o %o", this.headers, this.footers)
+DEBUG && console.log("initHeadersFooters: %o %o", this.headers, this.footers)
 
 //				ux.initialize(this, { isNested: true, views: _options.headers })
 //				ux.initialize(this, { isNested: true, views: _options.footers })
@@ -78,7 +78,7 @@ console.log("initHeadersFooters: %o %o", this.headers, this.footers)
                 if (!can[action]===false) throw "meta4:ux:crud:oops:cannot-"+action;
                 var _view = this.getNestedView(action, meta);
 
-console.log("onAction (%s): %o %o", action, meta, _view)
+DEBUG && console.log("onAction (%s): %o %o", action, meta, _view)
                  if (_view) {
                     this.body.show(_view)
                 }
@@ -99,30 +99,28 @@ DEBUG && console.log("onSaved: %o %o", this, arguments)
                 })
 
 //                model.validate && model.validate()
-//DEBUG &&
-console.log("onSave: %o %o valid: %s", this, model, model.isValid())
+DEBUG && console.log("onSave: %o %o valid: %s", this, model, model.isValid())
                 if (model.isValid())  model.save()
             },
 
-            showHeaderFooters: function(action, options) {
-                options = options || { headers: true, footers: true }
-                var meta = { model: this.body.currentView.model, collection: this.collection }
+            showHeaderFooters: function(action, meta) {
+                meta = meta || { model: this.body.currentView?this.body.currentView.model:this.model, collection: this.collection }
 
-                if (options.modal) {
+                if (this.options.modal) {
                     this.header.show(new EmptyView(meta))
                     this.footer.show(new EmptyView(meta))
-console.debug("modalHeaderFooters (%s): %o %o", options.id, this, options)
+DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, options)
                     return;
                 }
-                var header = options.headers!==false && this.headers[action] || options.headers
-                var footer = options.footers!==false && this.footers[action] || options.footers
+                var header = this.options.headers!==false && this.headers[action] || this.options.headers
+                var footer = this.options.footers!==false && this.footers[action] || this.options.footers
 
-console.debug("showHeaderFooters: %o %o -> %o %o / %o %o", options, meta, this.headers, header, this.footers, footer)
+DEBUG && console.debug("showHeaderFooters: %o %o -> %o %o / %o %o", options, meta, this.headers, header, this.footers, footer)
 
                 header = ( header && this.getNestedView(header, meta) ) || new EmptyView(meta)
                 footer = ( footer && this.getNestedView(footer, meta) ) || new EmptyView(meta)
 
-console.debug("HeaderFooters: %o %o", header, footer)
+DEBUG && onsole.debug("HeaderFooters: %o %o", header, footer)
                 header && this.header.show(header)
                 this.listenTo(header, "action", this.onAction )
                 footer && this.footer.show(footer);
@@ -142,24 +140,24 @@ console.debug("HeaderFooters: %o %o", header, footer)
                 var view = this.getNestedView("create") || this.getNestedView("update")
                 if (!view) throw "meta4:ux:crud:oops:missing:view:create";
 
-//DEBUG &&
-console.log("onCreate: %o %o %o", this, _collection, view)
+DEBUG && console.log("onCreate: %o %o %o", this, _collection, view)
                 view.model = _model
+
+                this.once("cancel", function() { self.onRead() })
+
+                this.once("save", function() {
+                    console.log("onCreateModel: %o %o %o", _collection, view, arguments)
+                    _collection.add(_model)
+                })
+
+                view.collection.once("error", function(response) {
+                    console.log("Create Error: %o", response)
+                    ux.Alert({ message: "Error: "+response.message})
+                    self.onRead()
+                })
+
                 this.body.show(view);
-
-                this.showHeaderFooters("create", view.options )
-                view.once("cancel", function() { self.onRead() })
-
-view.once("save", function() {
-console.log("onCreateModel: %o %o %o", _collection, view, arguments)
-                _collection.add(_model)
-})
-view.collection.once("error", function(response) {
-console.log("Create Error: %o", response)
-    ux.Alert({ message: "Error: "+response.message})
-    self.onRead()
-})
-
+                this.showHeaderFooters("create", { model: _model, collection: _collection} )
             },
             onRead: function() {
                 var can = this.options.can
@@ -169,10 +167,8 @@ console.log("Create Error: %o", response)
 
 DEBUG && console.log("onRead: %o %o", this, view)
                 if (view) {
+                    this.showHeaderFooters("read", meta )
                     this.body.show(view);
-                    this.body.once("render", function() {
-                        self.showHeaderFooters("read", view.options )
-                    })
                 } else {
                     this.destroy()
                 }
@@ -185,7 +181,7 @@ DEBUG && console.log("onRead: %o %o", this, view)
 DEBUG && console.log("onUpdate: %o %o", this, selected)
 
                 this.body.show(view);
-                this.showHeaderFooters("update", view.options )
+                this.showHeaderFooters("update", meta )
 
             },
             onDelete: function() {

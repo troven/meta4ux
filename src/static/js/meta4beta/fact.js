@@ -209,6 +209,41 @@ console.error("Remote Error: %s %s -> %o %o", url, id, response, arguments);
 				return $future;
 			},
 
+			meta4beta: function(method, collection, options) {
+				collection.options = collection.options || {}
+
+				var _DEBUG = true || options.DEBUG || collection.options.debug || fact.DEBUG
+
+			    var httpMethod = core.fact.crud._methods[method];
+
+				var url = _.result(collection,"url");
+				if (!url) throw "meta4:fact:register:oops:missing-url";
+
+				var self = this
+				var data = method=="read"?collection.options.filter:collection.toJSON()
+_DEBUG && console.log("Meta4 CRUD (%s/%s): %o %s, %s %o %o %o", httpMethod, method, this, url, collection, data, options);
+
+				var $future = $.ajax( { url: url, type: httpMethod,
+					dataType: "json", data: data && JSON.stringify(data),
+					contentType: "application/json; charset=utf-8",
+					success: function(response) {
+						if (response && response.status == "success" ) {
+_DEBUG && console.log("Meta4 CRUD Success: %s %s -> %o %o", url, response.status, collection, response);
+							options.success(response.data);
+						} else if (response.status) {
+console.error("Meta4 CRUD Failed: %s %s -> %o", url, response.message, response);
+							options.error && options.error(response);
+							collection.trigger("error", response)
+						} else {
+							core.fact.models.trigger("error", collection, options, response)
+						}
+				}, error: function(response) {
+console.error("Meta4 Error: %s %s -> %o %o", url, id, response, arguments);
+					options.error && options.error(collection, response);
+				} })
+				return $future;
+			},
+
 			local: function(method, model, options) {
 				options || (options = {});
 				var _DEBUG = options.debug || fact.DEBUG

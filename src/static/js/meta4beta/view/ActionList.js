@@ -20,7 +20,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 			isActionable: true, isActionMenu: true,
 			events: {
                 "click [data-trigger]": "doEventAction",
-				"click [data-id]": "doEventSelect",
+				"click": "doEventSelect",
 				"dblClick [data-id]": "doEventSelect",
 			},
 			initialize: function(_options) {
@@ -29,13 +29,6 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 			onRender: function() {
 			    var $actions = $("[data-actions]")
 			    if (!$actions||!$actions.length) return;
-			},
-			onSelect: function(event, model) {
-				this.$el.find(".active").removeClass("active");
-				var $item = this.$el.find("[about='"+model[idAttribute]+"']");
-//DEBUG && console.debug("onChildViewSelect():", event, model, $item);
-				$item.addClass("active");
-				return this;
 			}
 		});
 
@@ -48,11 +41,15 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 				connectWith: false
 			},
 			events: {
-				'sortstart': 		"doEventDrag",
-				"click [data-id]": 	"doEventSelect",
-				"click [data-trigger]": 	"doEventAction"
+				'sortstart': 		    "doEventDrag",
+				"click [data-id]": 	    "doEventSelect",
+				"click [data-trigger]": "doEventAction"
 			},
-			childEvents: ListItem.events,
+			childEvents: function() {
+//console.debug("childEvents: %o %o", event, this);
+				return {}
+			},
+//			childEvents: ListItem.events,
 			childViewOptions: function(model, index) {
 				return _.extend({ model: model, when: this.options.when }, this.options.child)
 			},

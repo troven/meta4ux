@@ -427,7 +427,7 @@ _DEBUG && console.log("** Unknown model for selection: ", selected, event);
 		// default event-handler for model selections
 		doEventSelect: function(event) {
 			if (!event) throw "meta4:ux:oops:select:event-missing";
-			var _DEBUG = this.options?this.options.debug:false
+			var _DEBUG = this.options?this.options.debug:DEBUG
 			event.stopImmediatePropagation()
 			event.preventDefault()
 
@@ -588,9 +588,9 @@ _DEBUG && console.log("showNested: %o %o", self, self._views)
 		},
 
 		__showNested: function(self, v, k, meta) {
+		    var _DEBUG = self.options.debug || DEBUG
 			if (v.el) {
-//_DEBUG &&
-console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
+//_DEBUG && console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
                 var subview = self.getNestedView(v, meta)
                 if (subview) {
                         self.listenTo(subview)
@@ -600,8 +600,7 @@ console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
 			} else if (self[k] && self[k].show && self.regions[k]) {
 				var subview = self.getNestedView(v, meta)
 				if (subview) {
-// _DEBUG &&
-console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
+//_DEBUG && console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
 					self[k].show(subview)
 					self.listenTo(subview)
 				}

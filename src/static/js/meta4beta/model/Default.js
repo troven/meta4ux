@@ -17,7 +17,7 @@ define(["underscore", "backbone", "fact",
 
         var Model = Backbone.DocumentModel.extend({
             url: function() { return this.collection?this.collection.url:storeURL } ,
-            sync: fact.crud.remote,
+            sync: fact.crud.meta4beta,
             mutators: options.mutators,
             defaults: options.defaults,
             validate: fact.validate.model,
@@ -28,7 +28,7 @@ define(["underscore", "backbone", "fact",
 
         var Collection = Backbone.DocumentCollection.extend({
             url: storeURL,
-            sync: fact.crud.remote,
+            sync: fact.crud.meta4beta,
             model: Model
         });
 
