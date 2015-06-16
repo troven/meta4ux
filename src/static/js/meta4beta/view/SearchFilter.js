@@ -17,7 +17,7 @@ define(["jquery", "underscore", "backbone", "marionette", "fact", "ux",
 				ux.initialize(this, options);
 				this.model = new Backbone.Model();
 console.log("SearchFilter:", this, _options)
-				this.collection = fact.filter(this.collection)
+				this.collection = this.collection?fact.filter(this.collection):this.collection
 			},
 			render: function() {
 DEBUG && console.log("onRender: ", this)
@@ -29,6 +29,7 @@ DEBUG && console.log("onRender: ", this)
 			    var self = this;
 			    this.facetMatches = []
                 this.valuesByFacet = {}
+				if (!self.collection) return;
 
 			    _.each(self.options.facets, function(facet) {
 			        if (_.isString(facet)) self.facetMatches.push({label: facet})
@@ -127,7 +128,7 @@ DEBUG && console.log("buildClientFilter: %o %o %o", models.filters, query, model
 
 			showEmpty: function() {
 console.log("showEmpty")
-				this.collection.filters.clear()
+				this.collection && this.collection.filters.clear()
 			},
 			showResults: function() {
 console.log("showResults")

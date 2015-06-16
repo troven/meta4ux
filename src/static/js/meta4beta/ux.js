@@ -333,8 +333,8 @@ _DEBUG && console.log("UX Widget: ", options)
 
 _DEBUG && console.debug("UX Widget (%s @ %s): %o -> (css: %s) %o", options[ux.idAttribute], widgetType, options, widget.className +" - "+options.className, widget);
 
-        // deprecate - should be isModal - and a mix-in
-		if (options.modal)  ux.modal(widget)
+        // deprecate - should be isModal mix-in
+		if (options.modal || options.isModal)  ux.Modal(widget)
 
 		// refresh remote collections
 		if (widget.collection && options.fetch) {

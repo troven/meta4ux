@@ -369,7 +369,7 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 console.log("Filtered Collection: %o %o %o ", collection, collection.model.schema, options.filter)
 				return this.filter(collection, options.filter===true?{}:options.filter)
 			}
-_DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model.schema, options.when)
+_DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model.schema, options.when || "no IQ")
 			return collection;
 		},
 
@@ -396,7 +396,7 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators)
 		},
 
 		filter: function(collection, query) {
-			if (!collection) throw "meta4:oops:fact:missing-filter"
+			if (!collection) throw "meta4:oops:fact:missing-filter-collection"
 			if (!query || _.isEmpty(query)) {
 				query = collection.filters || new Backbone.Model()
 			}

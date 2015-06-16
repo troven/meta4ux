@@ -24,7 +24,6 @@ DEBUG && console.log("Regions: (%s) %o", this.id, options)
 				var self = this
 				setTimeout(function() {
 console.log("Regions Activated", self)
-alert("a")
 					if (!self.body || !self.body.currentView) {
 						self.showAllNested( {model: self.model, collection: self.collection} )
 					}
