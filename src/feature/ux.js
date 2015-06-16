@@ -17,7 +17,10 @@ var helper     = require('meta4helpers');      // utilities
 // =============================================================================
 // Configure UX - load recipes from local files
 
-exports.feature = function(router, feature, config) {
+exports.feature = function(meta4, feature) {
+
+    assert(meta4, "feature needs meta4")
+	var router = meta4.router, config = meta4.config
 
     assert(router, "feature arguments: router")
     assert(feature, "feature arguments: feature")
