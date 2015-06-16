@@ -238,7 +238,7 @@ console.error("Meta4 CRUD Failed: %s %s -> %o", url, response.message, response)
 							core.fact.models.trigger("error", collection, options, response)
 						}
 				}, error: function(response) {
-console.error("Meta4 Error: %s %s -> %o %o", url, id, response, arguments);
+console.error("Meta4 Error: %s-> %o %o", url, response, arguments);
 					options.error && options.error(collection, response);
 				} })
 				return $future;
