@@ -13,7 +13,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
 		var ListItem = Backbone.Marionette.ItemView.extend({
 			tagName: "li", className: "list-group-item clickable",
-			template: options.child.template || "<span data-id='{{"+ux.idAttribute+"}}' data-trigger='{{"+ux.idAttribute+"}}' title='{{"+ux.commentAttribute+"}}'>{{"+ux.labelAttribute+"}}</span>",
+			template: options.child.template || "<div data-id='{{"+ux.idAttribute+"}}' data-trigger='{{"+ux.idAttribute+"}}' title='{{"+ux.commentAttribute+"}}'>{{"+ux.labelAttribute+"}}</div>",
 
 			isSelectable: true, isDroppable: true,
 			isHoverPanel: true, isTemplating: true, isPopOver: true,
