@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
     "select2"
 ],
-    function ($, _, Backbone, Marionette, scorpio4, ux, select2) {
+    function ($, _, Backbone, Marionette, core, ux, select2) {
 
 	var idAttribute = ux.idAttribute || "id";
 	var typeAttribute = ux.typeAttribute || "widget";
@@ -326,15 +326,25 @@ DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
             // copy all attributes, except ours
             _.each(model.attributes, function(v,k) {
                 if (!self.model.id==k) formData.append(k,v)
+console.log("formData:", k, v)
             })
 
             // upload API
-            var url = this.options.url || model.url()
+            var url = this.options.url || model.url()+"/_upload_"
+
             // reset the file fields
             $inputs.replaceWith( $inputs.clone( true ) );
 
+            var params = JSON.stringify(_.pick(this.options, ["model", "", ""]) )
+console.log("Upload: %o %o", this.options, params)
+
             // perform multi-part upload
             var then = new Date().getTime()
+
+            var opts = {}
+            if (model.collection && model.collection.options) opts = model.collection.options.upload
+            url = url+"?"+core.toQueryString(opts)
+
             $.ajax({ url: url, data: formData,
                 processData: false, contentType: false, type: 'POST',
                 success: function(response) {
@@ -342,7 +352,7 @@ DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
                     var bitRate = response.data.size/elapsed
                     var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
                     model.set(self.model.id, data )
-                    console.log("Uploaded: %s %o %o", self.model.id, model, data, response)
+                    console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, data, response)
                 }
             });
         }

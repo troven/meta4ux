@@ -211,6 +211,22 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 		**/
 		humanize: function(s) {
 			return s.replace(/\W+|_|-/g, " ").toLowerCase().replace(/(^[a-z]| [a-z]|-[a-z])/g, function($1) { return $1.toUpperCase() });
+		},
+
+		toQueryString(obj, prefix) {
+			serialize = function(obj, prefix) {
+			  var str = [];
+			  for(var p in obj) {
+			    if (obj.hasOwnProperty(p)) {
+			      var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
+			      str.push(typeof v == "object" ?
+			        serialize(v, k) :
+			        encodeURIComponent(k) + "=" + encodeURIComponent(v));
+			    }
+			  }
+			  return str.join("&");
+			}
+			return serialize(obj, prefix)
 		}
 
 	}
