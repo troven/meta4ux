@@ -1,0 +1,27 @@
+{
+  "name": "meta4ux",
+  "version": "0.8.0",
+  "homepage": "https://github.com/troven/meta4ux",
+  "authors": [
+    "Lee Curtis <lee.curtis@troven.com.au>"
+  ],
+  "description": "executable JSON wireframes",
+  "main": "src/index.js",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "keywords": [
+    "meta4",
+    "meta4ux",
+    "mvp"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
