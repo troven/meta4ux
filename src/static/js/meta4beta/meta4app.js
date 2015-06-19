@@ -33,6 +33,9 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
 //    "meta4beta/view/Terminal",
 //    "meta4beta/view/Toolbar",
     "meta4beta/view/Regions",
+    "meta4beta/view/Tabs",
+    "meta4beta/view/Template",
+    "meta4beta/view/Form",
     "meta4beta/view/Home"
 ], function ($,_, core, ux, fact, iq, mobility, bootstrap) {
 

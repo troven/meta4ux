@@ -5,6 +5,15 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 ],
     function ($, _, Backbone, Marionette, ux) {
 
+   ux.meta.Form =  ux.meta["meta4:ux:Form"] = {
+        "triggers": [ "invalid", "valid", "commit", "change" ],
+        "mixins": false,
+        "views": true,
+        "collection": true,
+        "options": true,
+        "schema": true
+    }
+
     ux.view.fields = ux.view.fields || {}
     ux.view.validators = ux.view.validators || {}
 

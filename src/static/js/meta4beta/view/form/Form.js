@@ -18,7 +18,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 
 			initialize: function(_options) {
 
-			    _.defaults(_options, { model: false, editable: true , autoCommit: true, autoValidate: true, field: { className: "form-group row" }  } )
+			    _.defaults(_options, { model: false, editable: true , autoCommit: true, autoValidate: true, field: { css: "row" }  } )
 				ux.initialize(this, _options)
 
 				if (!this.model) throw "meta4:ux:oops:missing-model#"+_options.id
@@ -60,6 +60,7 @@ DEBUG && console.debug("Schema Field (%s): %o %o -> %o", id, field, field.valida
                     _form: this,
                     formModel: this.model,
                 })
+//                options.className = options.className+" "+options.css
 DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
 //                ux.stylize(this, options)
                 return options;

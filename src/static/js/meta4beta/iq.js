@@ -10,6 +10,7 @@ define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone,core
 
 	core.iq = _.extend({}, Backbone.Events, {
         fn: {},
+        _apis: {},
         boot: function(module, options) {
             var self = this
 			self._module = module;

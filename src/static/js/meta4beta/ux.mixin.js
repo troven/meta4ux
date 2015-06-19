@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "marionette", "Handlebars", "core", "ux" ],
 	function ($,_, Marionette, handlebars, core, ux) {
 
-    var ux = core.ux = core.ux || {}
+    var ux = core.ux = core.ux || { meta: {} }
 	ux.idAttribute = core.idAttribute || "id";
 	ux.typeAttribute = core.typeAttribute || "widget";
 	ux.labelAttribute = core.labelAttribute || "label";

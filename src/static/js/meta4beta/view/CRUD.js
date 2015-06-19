@@ -4,6 +4,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 
+    ux.meta.CRUD = ux.meta["meta4:ux:CRUD"] = {
+        "triggers": [ "create", "read", "update", "delete", "save", "invalid", "transition", "select" ],
+        "mixins": [ "isNested", "isActionable" ],
+        "views": [ "create", "read", "update", "delete" ],
+        "collection": true,
+        "options": true
+    }
+
 	ux.view.CRUD = ux.view["meta4:ux:CRUD"] = function(options) {
 		options = ux.checkOptions(options, ["id", "views"]);
 

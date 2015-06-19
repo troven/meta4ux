@@ -123,7 +123,7 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
     }
 
 	var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.ItemView.extend( _.extend({
-	    tagName: "div", className: "form-group",
+	    tagName: "div", className: "form-group row form-field",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label>",
         onRender: renderField,
         validate: validateField,
@@ -143,56 +143,67 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
     // Field Editors
 
     fields.Text  = FormField.extend({
+        className: "form-group row form-text",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='20' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.LongText = FormField.extend({
+        className: "form-group row form-longtext",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='40' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.TextArea = FormField.extend({
+        className: "form-group row form-textarea",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><textarea class='form-control' placeholder='{{comment}}' cols='{{default 'cols' 60}}' rows='{{default 'rows' 5}}' name='{{id}}'></textarea></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Number = FormField.extend({
+        className: "form-group row form-number",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='number form-control' placeholder='{{comment}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
         validators: ["number"]
     })
 
     fields.Currency = FormField.extend({
+        className: "form-group row form-currency",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='form-control currency' placeholder='{{comment}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
         validators: ["currency"]
     })
 
     fields.Email = FormField.extend({
+        className: "form-group row form-email",
         validators: ["email"],
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='16' type='email' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.URL = FormField.extend({
+        className: "form-group row form-url",
         validators: ["url"],
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='16' type='url' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Date = FormField.extend({
+        className: "form-group row form-date",
         validators: ["date"],
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='16' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Password = FormField.extend({
+        className: "form-group row form-password",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='12' type='password' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Button = FormField.extend({
+        className: "form-group row form-button",
         template: "<label class='col-sm-3 control-label'></label><div class='col-sm-2'><span data-trigger='{{id}}' class='btn btn-default' title='{{comment}}'>{{label}}</span></div>"
     })
 
     fields.Boolean = FormField.extend({
+        className: "form-group row form-boolean",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' type='checkbox' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Select = Backbone.Marionette.CompositeView.extend({
-        className: "form-group",
+        className: "form-group row form-select",
         childViewContainer: "select",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-8'><select class='col-sm-6' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
         events: {
@@ -232,10 +243,12 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
     })
 
     fields.Boolean = fields.Select.extend({
+        className: "form-group row form-boolean",
         options: { options: { true: "Yes", false: "No" } }
     })
 
     fields.Tags = fields.Select.extend({
+        className: "form-group row form-tags",
         onShow: function() {
 DEBUG && console.log("Tag Show: %o %o", this, this.collection)
             renderField.apply(this, arguments)
@@ -244,7 +257,7 @@ DEBUG && console.log("Tag Show: %o %o", this, this.collection)
     })
 
     fields.Checkbox = Backbone.Marionette.CompositeView.extend({
-        className: "form-group",
+        className: "form-group row form-checkbox",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><ul class='col-sm-4 form-group-container'></ul><div class='message text-danger'>{{message}}</div>",
         events: { blur: "doCommit", "change": "doCommit" },
         childView: Backbone.Marionette.ItemView.extend({
@@ -274,7 +287,7 @@ DEBUG && console.log("CommitCheckbox: %o", this)
     })
 
     fields.Selector = Backbone.Marionette.CompositeView.extend({
-        className: "form-group",
+        className: "form-group row form-selector",
         template: "<span class='col-sm-4 control-label' title='{{comment}}'>{{label}}</span><div class='selector col-sm-8'></div><div class='message text-danger'>{{message}}</div>",
         events: {  },
         childEvents: { "click .selection": "commit" },
@@ -303,10 +316,8 @@ DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
     })
 
     fields.Upload  = FormField.extend({
-        className: "form-group",
+        className: "form-group row form-upload",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='4' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
-        onRender: function() {
-        },
         commit:  function(model, $field) {
             var self = this
 
@@ -352,9 +363,42 @@ console.log("Upload: %o %o", this.options, params)
                     var bitRate = response.data.size/elapsed
                     var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
                     model.set(self.model.id, data )
+                    self.triggerMethod("upload", data)
                     console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, data, response)
+                },
+                error: function() {
+                    self.triggerMethod("upload-failed")
                 }
             });
+        }
+    })
+
+    fields.Portrait = fields.Upload.extend({
+        className: "form-group row form-portrait",
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><img class='clickable' title='{{comment}} alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
+        events: {
+            "click img": "doUploadClick"
+        },
+        initialize: function() {
+            this.on("upload", this.render)
+        },
+        doUploadClick: function() {
+            var $input = $('input', this.$el)
+            $input.click();
+        },
+        onRender: function() {
+            var self = this
+            var model = this.options._form.model
+            var file = model.get(this.options.id)
+            var url = file.get("url")
+            url = this.options.baseURL?this.options.baseURL+url:url
+
+console.log("Portrait: %o %o @ %s", this, model, url);
+            $("img", this.$el).attr("src", url)
+
+            $("input", this.$el).change(function() {
+                self.commit();
+            })
         }
     })
 

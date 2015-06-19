@@ -1,5 +1,14 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
+   ux.meta.Tabs =  ux.meta["meta4:ux:Tabs"] = {
+        "triggers": [ "navigate", "select" ],
+        "mixins": [ "isNested" ],
+        "collection": true,
+        "options": true,
+        "views": true
+    }
+
+
     ux.view.Tabs = ux.view["meta4:ux:Tabs"] = function(options) {
 
 		var DEBUG = options.debug || ux.DEBUG;

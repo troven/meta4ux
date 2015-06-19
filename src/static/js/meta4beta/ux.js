@@ -11,7 +11,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 	ux.idAttribute = core.idAttribute || "id";
 	ux.typeAttribute = core.typeAttribute || "widget";
 	ux.labelAttribute = core.labelAttribute || "label";
-
+	ux.meta = ux.meta || {}
 	ux.DEBUG = false
 
     /*
