@@ -33,6 +33,7 @@ console.log("Initialize meta4models: %o", fact)
 		},
 
 		mutate: function(options) {
+			if (!options) return
 			if (options.mutators) {
 				_.each(options.mutators, function(fn, name) {
 					options[name] = core.iq.get(fn)
@@ -41,120 +42,6 @@ console.log("Initialize meta4models: %o", fact)
 			return options;
 		},
 
-		old_factory: {
-
-			/**
-				Factory method to create a Local runtime Collection
-			**/
-
-			Static: function(_options) {
-				var options = core.fact.mutate(_options)
-				var _DEBUG = options.debug || fact.DEBUG
-				var Model = Backbone.DocumentModel.extend({
-					sync: core.fact.crud.local,
-					mutators: options.mutators,
-					defaults: options.defaults,
-					validate: core.fact.validate.model,
-					idAttribute: options.idAttribute||fact.idAttribute
-				})
-
-				var Collection = Backbone.DocumentCollection.extend({
-					sync: core.fact.crud.local,
-					model: Model
-				});
-				var collection = new Collection();
-_DEBUG && console.log("Static Collection:  %o %o", options, collection)
-				collection.options = _.omit(options, ["data"])
-				return collection;
-			},
-
-			/**
-				Factory method to create a Local Collection
-			**/
-			Local: function(_options) {
-				var options = core.fact.mutate(_options)
-				var _DEBUG = options.debug || fact.DEBUG
-				var Model = Backbone.DocumentModel.extend({
-					sync: core.fact.crud.local,
-					mutators: options.mutators,
-					defaults: options.defaults,
-					validate: core.fact.validate.model,
-					idAttribute: options.idAttribute||fact.idAttribute
-				})
-
-				var Collection = Backbone.DocumentCollection.extend({
-					sync: core.fact.crud.local,
-					model: Model
-				});
-				var collection = new Collection();
-_DEBUG && console.log("Local Collection:  %o %o", options, collection)
-				collection.options = _.omit(options, ["data"])
-				return collection;
-			},
-
-			/**
-				Factory method to create a Remote Collection
-			**/
-			Remote: function(_options) {
-				var options = core.fact.mutate(_options)
-				var _DEBUG = options.debug || fact.DEBUG
-
-				var storeType = options.store || "file"
-				var storeURL = options.url || "/models/"+storeType
-
-				var Model = Backbone.DocumentModel.extend({
-					url: function() { return this.collection?this.collection.url:storeURL } ,
-					sync: core.fact.crud.remote,
-					mutators: options.mutators,
-					defaults: options.defaults,
-					validate: core.fact.validate.model,
-					idAttribute: options.idAttribute||fact.idAttribute
-				})
-
-//_DEBUG && console.debug("Mutated (%s): %o %o %o %o", options.id, Model.prototype, Backbone.Mutators.prototype, options, core.fact)
-
-				var Collection = Backbone.DocumentCollection.extend({
-					url: storeURL,
-					sync: core.fact.crud.remote,
-					model: Model
-				});
-				var collection = new Collection();
-_DEBUG && console.log("Remote Collection (%s): %o %o @ %s", options.id, options, collection, storeURL)
-				collection.options = _.omit(options, ["data"])
-				return collection;
-			},
-
-			/**
-				Factory method to create a Remote Collection
-			**/
-			Simple: function(_options) {
-				var options = core.fact.mutate(_options)
-				var _DEBUG = options.debug || fact.DEBUG
-
-				var Model = Backbone.DocumentModel.extend({
-					url: function() { return this.collection.url } ,
-					mutators: options.mutators,
-					defaults: options.defaults,
-					validate: core.fact.validate.model,
-					idAttribute: options.idAttribute||fact.idAttribute
-				})
-
-//_DEBUG && console.debug("Mutated (%s): %o %o %o %o", options.id, Model.prototype, Backbone.Mutators.prototype, options, core.fact)
-
-				var storeType = options.store || "Assets"
-				var storeURL = options.url || "/meta4/models/"+storeType
-				var Collection = Backbone.DocumentCollection.extend({
-					url: storeURL,
-					model: Model
-				});
-
-				var collection = new Collection();
-//_DEBUG &&
-console.log("Simple Collection (%s): %o %o @ %s", options.id, options, collection, storeURL)
-				collection.options = _.omit(options, ["data"])
-				return collection;
-			}
-		},
 		crud: {
 			_methods: { 'create': 'POST', 'update': 'PUT', 'patch':  'PATCH', 'delete': 'DELETE', 'read': 'GET' },
 			remote: function(method, collection, options) {
@@ -165,7 +52,7 @@ console.log("Simple Collection (%s): %o %o @ %s", options.id, options, collectio
 _DEBUG && console.log("Remote %s Sync: %s -> %s %o %o %o", _DEBUG?"DEBUG":"", collection.id, method, collection, collection.options, options)
 
 if (!isModel && collection.options.data) {
-_DEBUG && console.log("Ignore Remote %s %s %o %o", collection.id, method, collection, collection.options, options)
+console.warn("Instance Data - Ignore Remote %s %s %o %o", collection.id, method, collection, collection.options, options)
 	return;
 }
 			    var httpMethod = core.fact.crud._methods[method];
@@ -219,9 +106,15 @@ console.error("Remote Error: %s %s -> %o %o", url, id, response, arguments);
 				var url = _.result(collection,"url");
 				if (!url) throw "meta4:fact:register:oops:missing-url";
 
+				if (collection.options && collection.options.data) {
+//_DEBUG &&
+console.warn("Meta4 Instance Disables Remote: %s %o", collection.options.id, collection);
+					return;
+				}
+
 				var self = this
-				var data = method=="read"?collection.options.filter:collection.toJSON()
-_DEBUG && console.log("Meta4 CRUD (%s/%s): %o %s, %s %o %o %o", httpMethod, method, this, url, collection, data, options);
+				var data = method=="read"?collection.options.filter||{}:collection.toJSON()
+_DEBUG && console.log("Meta4 CRUD (%s): %o %o %o %o", method, url, collection, data, options);
 
 				var $future = $.ajax( { url: url, type: httpMethod,
 					dataType: "json", data: data && JSON.stringify(data),
@@ -319,6 +212,8 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 			var model = new _Model()
 
 			core.iq.aware(model, options.iq || options.when );
+
+
 			return model
 		},
 
@@ -335,9 +230,10 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 				collection = core.fact.factory.Local( options )
 			} else if (_.isArray(options)) {
 				options = { data: options }
-				collection = core.fact.factory.Local( options )
-			}
-			else if (_.isObject(options)) {
+				collection = core.fact.factory.Local(options)
+//console.log("Local Array: %o %o", options, collection)
+				collection.add( options.data )
+			} else if (_.isObject(options)) {
 				var id = options[fact.idAttribute]
 				if (!id) throw "meta4:fact:Collection:oops:missing-"+fact.idAttribute;
 
@@ -359,10 +255,15 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 				// instantiate typed-finder
 				collection = new Finder(options);
 				collection[fact.idAttribute] = id
+
+				if (options.data && _.isArray(options.data)) {
+					collection.add(options.data)
+console.log("Instance Data: %o %o", options.data, collection, options.data.length == collection.models.length)
+				}
 			}
 
 			collection.model.schema = this._buildSchema(options.schema)
-			options.data && collection.add(options.data)
+
 			core.iq.aware(collection, options.iq || options.when);
 			if (!_.isUndefined(options.filter) && options.filter!==false) {
 //_DEBUG &&

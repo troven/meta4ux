@@ -1,6 +1,8 @@
 define(["underscore", "backbone", "fact", "meta4beta/model/Default"], function (_, Backbone, fact) {
 
     fact.factory.Local = function(_options) {
+        _options = _options || {}
+
         var options = fact.mutate(_options)
         var _DEBUG = options.debug || fact.DEBUG
 
