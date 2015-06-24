@@ -20,7 +20,7 @@ define(["jquery", "jquery_ui", "underscore", "backbone", "marionette", "ux",
             childView: OrgBranch,  tagName: "li", childViewContainer: "ul",
             isSortable: true, isSelectable: true, isHideable: false, isHoverPanel: true,
 			events: {
-				"click [about]": "doEventSelect"
+				"click [data-id]": "doEventSelect"
 			},
 			template: "<div data-id='{{id}}' title='{{comment}}'>{{label}}</div><ul></ul>",
 			initialize: function(_options) {
@@ -45,7 +45,7 @@ define(["jquery", "jquery_ui", "underscore", "backbone", "marionette", "ux",
 			template: "<div class='orgchart_container'></div><ul class='hide org_root'><li title='{{comment}}'>{{label}}<ul></ul></li></ul>",
 			className: "ux-org-chart", childViewContainer: ".org_root li ul",
 			events: {
-			  'click [about]': 'doEventSelect'
+			  'click [data-id]': 'doEventSelect'
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options);

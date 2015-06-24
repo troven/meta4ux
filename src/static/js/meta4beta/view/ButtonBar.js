@@ -17,7 +17,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			template: "<div class='btn-group'><button data-id='{{id}}' class='btn dropdown-toggle' data-toggle='dropdown'>{{label}}&nbsp;<span class='btn-optional caret'></span></button><ul class='btn-optional dropdown-menu'></ul></div>",
 			x_template: "<div class='btn-group'><button class='btn'>{{label}}</button><button class='btn-optional btn dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button><ul class='btn-optional dropdown-menu'></ul></div>",
 			childViewContainer: "ul",
-			initialize: function() {
+			initialize: function(options) {
+				ux.initialize(this, options)
 			},
 			onRender: function() {
 				if (!this.collection || !this.collection.length) {
@@ -30,7 +31,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			isCommon:true, isSelectable: true,
 			childView: ButtonMenu, className: "btn-toolbar", tagName: "div",
 			events: {
-			  'click [about]': 'doEventSelect'
+			  'click [data-id]': 'doEventSelect'
 			},
 			initialize: function() {
 				var self = this;

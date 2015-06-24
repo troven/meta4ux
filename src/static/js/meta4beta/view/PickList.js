@@ -16,20 +16,20 @@ function ($, _, Backbone, Marionette, ux, Form) {
 
 		var ListItem = Backbone.Marionette.ItemView.extend( _.extend({
 			tagName: "li", isHoverPanel: true, isActionable: true,
-			template: options.child.template || "<span about='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'><span class='pull-right action-buttons'><i data-trigger='delete' class='btn btn-sm btn-info fa fa-trash' title='Remove'></i></span><label>{{"+labelAttribute+"}}</label></span>",
+			template: options.child.template || "<span data-id='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'><span class='pull-right action-buttons'><i data-trigger='delete' class='btn btn-sm btn-info fa fa-trash' title='Remove'></i></span><label>{{"+labelAttribute+"}}</label></span>",
 			events: {
                 "click [data-action]": "doAction",
                 "click [data-trigger]": "doAction",
 
-				"click [about]": "doEventSelect",
-				"dblClick [about]": "doEventSelect"
+				"click [data-id]": "doEventSelect",
+				"dblClick [data-id]": "doEventSelect"
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options)
 			},
 			onSelect: function(event, model) {
 				this.$el.find(".active").removeClass("active");
-				var $item = this.$el.find("[about='"+model[idAttribute]+"']");
+				var $item = this.$el.find("[data-id='"+model[idAttribute]+"']");
 //DEBUG && console.debug("onChildViewSelect():", event, model, $item);
 				$item.addClass("active");
 				return this;

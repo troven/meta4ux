@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
 	ux.view.Template = ux.view["meta4:ux:Template"] = function(options) {
-//		options = ux.checkOptions(options, ["id"]);
+		options = ux.checkOptions(options, ["template"]);
 		var DEBUG = true;
 
 		var config = {

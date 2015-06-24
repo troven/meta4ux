@@ -15,19 +15,19 @@ define(["jquery", "jquery_ui", "underscore", "backbone", "marionette", "core", "
 		var PanelItem = Backbone.Marionette.ItemView.extend( {
 			tagName: "li", isHoverPanel: true, isActionable: true, isTemplating: true,
 			className: "list-group-item",
-			template: options.child.template || "<div about='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'>{{"+labelAttribute+"}}</div><div>{{"+commentAttribute+"}}</div>",
+			template: options.child.template || "<div data-id='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'>{{"+labelAttribute+"}}</div><div>{{"+commentAttribute+"}}</div>",
 			events: {
                 "click [data-action]": "doAction",
                 "click [data-trigger]": "doAction",
-				"click [about]": "doEventSelect",
-				"dblClick [about]": "doEventSelect"
+				"click [data-id]": "doEventSelect",
+				"dblClick [data-id]": "doEventSelect"
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options)
 			},
 			onSelect: function(event, model) {
 				this.$el.find(".active").removeClass("active");
-				var $item = this.$el.find("[about='"+model[idAttribute]+"']");
+				var $item = this.$el.find("[data-id='"+model[idAttribute]+"']");
 //DEBUG && console.debug("onChildViewSelect():", event, model, $item);
 				$item.addClass("active");
 				return this;
@@ -40,7 +40,7 @@ define(["jquery", "jquery_ui", "underscore", "backbone", "marionette", "core", "
 			childView: PanelItem, tagName: "ul",
 			events: {
 				'sortstart': 'doEventDrag',
-				"click [about]": "doEventSelect"
+				"click [data-id]": "doEventSelect"
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options)

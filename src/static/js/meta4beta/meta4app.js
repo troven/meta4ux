@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
-    "bootstrap",
+    "bootstrap", "socket_io",
     "jquery_cookie",
     "meta4beta/model/Default",
     "meta4beta/model/Local",
@@ -37,7 +37,7 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
     "meta4beta/view/Template",
     "meta4beta/view/Form",
     "meta4beta/view/Home"
-], function ($,_, core, ux, fact, iq, mobility, bootstrap) {
+], function ($,_, core, ux, fact, iq, mobility, bootstrap, io) {
 
 	var newApp = new Marionette.Application({});
 
@@ -61,12 +61,24 @@ module.on("all", function(e,x) {
         module.fact.boot(module, options)
         module.ux.boot(module, options)
 
-        var ProfileModel = Backbone.Model.extend({url: "/api/auth/Principal"})
+        // define the user principal
+        var ProfileModel = Backbone.Model.extend({url: "/models/me"})
         core.fact.models.set("principal", new ProfileModel(options.user) );
+
+        localStorage.debug = false;
+        var socket = io.connect(options.url, {});
+        socket.on("connect", function (data) {
+            console.warn("[io] connect", data);
+            alert("c")
+	        socket.on("hello", function (data) {
+	            console.warn("[io] welcome", data);
+	            alert("m")
+	        })
+        })
 
         // notification timer
         if (options.notifications) {
-            var GossipCollection = Backbone.Collection.extend({url: "/api/fact/Gossip"})
+            var GossipCollection = Backbone.Collection.extend({url: "/models/fact/Gossip"})
             core.fact.models.set("userGossip", new GossipCollection() );
             setInterval(function() {
                 var gossip = core.fact.models.get("userGossip")

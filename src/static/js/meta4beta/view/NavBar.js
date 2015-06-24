@@ -18,7 +18,7 @@ DEBUG && console.log("MenuToggle", this, _options);
 			},
 			childView: MenuToggle,
 			childViewContainer: "ul.dropdown-menu", className: "dropdown",
-			events: { "click [about]": "onSelect"},
+			events: { "click [data-id]": "onSelect"},
 			tagName: "li", template: "<a class='selectable dropdown-toggle' data-toggle='dropdown' data-id='{{id}}' title='{{label}}'>{{label}}</a><ul class='dropdown-menu'></ul>"
 		}, ux.mixin ) );
 

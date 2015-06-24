@@ -13,7 +13,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
 		var ViewStep = Backbone.Marionette.ItemView.extend( {
 			className: "ux_view step",
 			templateHelpers: ux.mixin.Common.templateHelpers,
-			template: "<div class='slide' about='{{"+idAttribute+"}}' title='{{comment}}'>{{label}}</div>"
+			template: "<div class='slide' data-id='{{"+idAttribute+"}}' title='{{comment}}'>{{label}}</div>"
 		} );
 
 		var Dashboard3D = Backbone.Marionette.CollectionView.extend(_.extend({
@@ -157,7 +157,7 @@ console.log("layoutRacks()", coords, ix, collection)
 					}, options.animation ),
 					transitionDuration: 10,
 					setActive: function( element, eventData ) {
-						var $dom = $("[about]", eventData.delegatedFrom);
+						var $dom = $("[data-id]", eventData.delegatedFrom);
 						var that = $dom.attr("about");
 						var model = self.collection.get(that);
 						self.triggerMethod("select", model);

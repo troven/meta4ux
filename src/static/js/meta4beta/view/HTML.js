@@ -90,7 +90,7 @@ DEBUG && console.debug("HTML onDrop", this, model, view, ui, event);
 				var $html = $(model.get('template'));
 				$html.addClass("ux_imported");
 				$html.attr("rel", model.id);
-				self.editor.composer.commands.exec("insertHTML", "<div class='ux_fact' about='"+model.id+"'>"+$html.html()+"</div>");
+				self.editor.composer.commands.exec("insertHTML", "<div class='ux_fact' data-id='"+model.id+"'>"+$html.html()+"</div>");
 			},
 			onSelect: function(that) {
 DEBUG && console.debug("HTML onSelect", this, that);
@@ -271,8 +271,8 @@ DEBUG && console.debug("HTML onToolbarInsertProperty", value, view, $this, event
 			template: "<div><label data-id='{{id}}'>{{label}}</label><ul></ul><div>",
 			itemViewContainer: "ul",
 			events: {
-				'click [about]': 'doEventSelect',
-				'dblclick [about]': 'doActivate',
+				'click [data-id]': 'doEventSelect',
+				'dblclick [data-id]': 'doActivate',
 				'dragstart': 'doEventDrag',
 			},
 			initialize: function() {
@@ -282,7 +282,7 @@ console.debug("Init Pages:", this);
 			},
 			selectItem: function(model) {
 				this.$el.find(".active").removeClass("active");
-				var $item = this.$el.find("[about='"+model.id+"']");
+				var $item = this.$el.find("[data-id='"+model.id+"']");
 console.debug("Select Item:", model, $item);
 				$item.addClass("active");
 			},

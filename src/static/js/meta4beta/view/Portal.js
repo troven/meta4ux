@@ -17,7 +17,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			isPopOver: false, isActionMenu: true,
             template: options.template || "<div data-id='{{id}}'>{{label}}</div>",
 			events: {
-				"click [about]": "doEventSelect",
+				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doAction",
                 "click [data-trigger]": "doAction",
 				"click [data-navigate]": "doNavigate"

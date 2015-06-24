@@ -5,7 +5,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	var labelAttribute = ux.labelAttribute || "label";
 
     ux.meta.CRUD = ux.meta["meta4:ux:CRUD"] = {
-        "triggers": [ "create", "read", "update", "delete", "save", "invalid", "transition", "select" ],
+        "label": "CRUD",
+        "comment": "Manage collections with create, read, update & delete",
+        "triggers": [ "create", "read", "update", "delete", "save", "invalid", "transition", "select", "action" ],
+        "can": [ "create", "read", "update", "delete" ],
         "mixins": [ "isNested", "isActionable" ],
         "views": [ "create", "read", "update", "delete" ],
         "collection": true,
@@ -36,13 +39,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             className: "panel panel-default",
             regions: { header: ".regions>.region_header" , body: ".regions>.region_body", footer: ".regions>.region_footer" },
             model: new Backbone.Model(options),
+
 			initialize: function(_options) {
+				// sanitize options
 			    _.defaults(_options, { model: true, views: {} } )
                 this.can = _.extend({ create: true, read: true, update: true, delete: true }, _options.can)
 
+				// initialize
 				ux.initialize(this, _options)
 				this.initializeHeadersFooters(_options);
 
+				// bind events
 DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can)
                 // bind CRUD events
                 this.on("nested:create", this.onCreate)

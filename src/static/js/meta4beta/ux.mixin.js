@@ -432,8 +432,7 @@ _DEBUG && console.log("** Unknown model for selection: ", selected, event);
 			event.preventDefault()
 
 			var $about = $(event.currentTarget).closest("[data-id]");
-//_DEBUG &&
-console.log("doEventSelect (%s) %o %o ", event, this, $about)
+_DEBUG &&console.log("doEventSelect (%s) %o %o ", event, this, $about)
 			if ($about.length && this.collection) {
 				var focus = $about.attr("data-id")
 				// handle flat and nested (via _all) collections
@@ -553,7 +552,7 @@ console.log("navigateTo (%s): %o", go_to)
 		},
 		_getTemplate: function(t) {
 			t = t || this.options.template || this.template
-			if (_.isFunction(t)) return t;
+			if (!t || _.isFunction(t)) return t;
 			var template = ux.templates[t] || ux.compileTemplate(t)
 //console.log("UX getTemplate() ", this, t, template );
 			return template;

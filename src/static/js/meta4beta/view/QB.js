@@ -60,7 +60,7 @@ DEBUG && console.log("QB Template Lookup (%s): %o %o", k, labels, lookup)
             template: options.template || "<div data-id='{{id}}' >{{label}}<ul class='nav nav-tabs'></ul></div>",
             childViewContainer: "ul", childView: DashView,
 			events: {
-				"click [about]": "doEventSelect",
+				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doAction",
 				"click [data-navigate]": "doNavigate"
 			},

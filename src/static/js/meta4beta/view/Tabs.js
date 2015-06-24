@@ -1,6 +1,9 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
    ux.meta.Tabs =  ux.meta["meta4:ux:Tabs"] = {
+        "label": "Tabs",
+        "comment": "A tabbed navigation panel for nested views",
+
         "triggers": [ "navigate", "select" ],
         "mixins": [ "isNested" ],
         "collection": true,

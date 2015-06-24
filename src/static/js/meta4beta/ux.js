@@ -283,7 +283,7 @@ console.log("Named Lookup: %o -> %o", values, core.fact)
 				var key = required[i];
 				if (_.isUndefined(options[key])) {
 //					console.error("Missing '%s' options: %s -> %o", key, options[idAttribute], options);
-					throw new TypeError("meta4:ux:oops:missing-option-"+key);
+					throw new Error("meta4:ux:oops:missing-option-"+key);
 				}
 			}
 			return options;

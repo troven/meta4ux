@@ -1,18 +1,18 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _, Backbone, Marionette, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "ux", "masonry"], function ($, _, Backbone, Marionette, ux, Masonry) {
 
 	var idAttribute = ux.idAttribute || "id";
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 	var commentAttribute = ux.commentAttribute || "comment"
 
-	ux.view.Collection = ux.view.List = ux.view["meta4:ux:Collection"] = function(options) {
+	ux.view.Masonry = ux.view["meta4:ux:Masonry"] = function(options) {
 		options = ux.checkOptions(options, ["id"]);
 		_.defaults(options, { child: {} })
 		var DEBUG = options.debug || ux.DEBUG;
 
 		var Item = Backbone.Marionette.ItemView.extend( {
 			isHoverPanel: true, isPopOver: true, isActionable: true, isTemplating: true,
-			isSelectable: true,
+			isSelectable: true, className: "gallery-item",
 			template: options.child.template || "<div data-id='{{id}}''>{{"+labelAttribute+"}}</div>",
 			events: {
                 "click [data-id]": "doAction",
@@ -25,17 +25,13 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 		});
 
 		var config = {
-			isSortable: true, isCommon: true,
-			isPopOver: true, isSelectable: true, isHoverPanel: true,
-			isNestedView: true,
+			isSortable: false, isCommon: true, isPopOver: true, isSelectable: true, isHoverPanel: true,
 			childView: Item,
+			className: "row",
 			events: {
-				'sortstart': 'doEventDrag',
 				"click [data-id]": "doEventSelect"
 			},
 			childViewOptions: function() {
-				var views = []
-				_.each()
 				return this.options.child || {}
 			},
 			initialize: function(_options) {
@@ -49,6 +45,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 
 				return this;
 			},
+			onRender: function() {
+				var options = _.extend({itemSelector: ".gallery-item", columnWidth: 200 }, this.options.options)
+				var masonry = new Masonry(this.$el[0], options);
+				console.log("Masonry: %o %o", options, masonry)
+			}
 		}
 
 		return Backbone.Marionette.CollectionView.extend( config );

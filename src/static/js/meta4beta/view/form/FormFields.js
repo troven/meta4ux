@@ -128,6 +128,9 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
         onRender: renderField,
         validate: validateField,
         commit: commitField,
+        initialize: function(options) {
+            ux.initialize(this,options)
+        },
         onInvalid: function(invalid) {
             this.model.set("message", invalid.message)
 // console.log("onInvalid: %o %o", this, arguments);
@@ -228,6 +231,7 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
         initialize: function(options) {
             options = _.extend({}, this.options, options)
             this.collection = ux.lookup(options.collection || options.options)
+            ux.initialize(this,options)
         },
         commit: commitField,
         onRender: renderField,
@@ -296,6 +300,7 @@ DEBUG && console.log("CommitCheckbox: %o", this)
             template: "<span data-icon='{{id}}'>{{label}}</span>", className: "selection btn btn-info",
         }),
         initialize: function(options) {
+            ux.initialize(this,options)
             var values = options.options
             this.collection = ux.lookup(values)
 console.log("Selector %o %o %o", this, options, this.collection)
@@ -354,6 +359,7 @@ console.log("Upload: %o %o", this.options, params)
 
             var opts = {}
             if (model.collection && model.collection.options) opts = model.collection.options.upload
+            opts.id = model.id || model.cid
             url = url+"?"+core.toQueryString(opts)
 
             $.ajax({ url: url, data: formData,
@@ -361,8 +367,12 @@ console.log("Upload: %o %o", this.options, params)
                 success: function(response) {
                     var elapsed = Math.ceil((new Date().getTime()-then)/1000)
                     var bitRate = response.data.size/elapsed
+
                     var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
+					// update model
                     model.set(self.model.id, data )
+
+                    // trigger event
                     self.triggerMethod("upload", data)
                     console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, data, response)
                 },
@@ -375,11 +385,12 @@ console.log("Upload: %o %o", this.options, params)
 
     fields.Portrait = fields.Upload.extend({
         className: "form-group row form-portrait",
-        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><img class='clickable' title='{{comment}} alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><img class='clickable' title='{{comment}}' alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
         events: {
             "click img": "doUploadClick"
         },
-        initialize: function() {
+        initialize: function(options) {
+            ux.initialize(this,options)
             this.on("upload", this.render)
         },
         doUploadClick: function() {
@@ -390,6 +401,7 @@ console.log("Upload: %o %o", this.options, params)
             var self = this
             var model = this.options._form.model
             var file = model.get(this.options.id)
+            if (!file) file = new Backbone.Model({ "url": "default_"+this.options.id+".png"})
             var url = file.get("url")
             url = this.options.baseURL?this.options.baseURL+url:url
 
