@@ -23,13 +23,13 @@ console.log("Tree: %o", options)
 				ux.checkAttributes(_options, [ "child"] );
 				ux.initialize(this, _options);
 			},
-			getChildView: function(_model) {
+			x_getChildView: function(_model) {
 				var options = this.options.child || {}
 				var branch = options.branch && _model.get(options.branch)
 				var widget = this.options.child.widget
-				var Widget = (widget && ux.view[widget]) || this.childView
+				var Widget = (widget && ux.view[widget])
 DEBUG && console.debug("getBranch (%s): %o %o %o %o",  _model.id, _model, this.options, widget, Widget)
-				if (!Widget) return Widget
+				if (!Widget) return this.childView?this.childView:null
 				var View = Widget(options)
 				return View
 			},
