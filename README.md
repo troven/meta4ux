@@ -11,6 +11,8 @@ meta4 helps you to experiment, test hypotheses and iterate towards product/marke
 
 In essence, meta4 embodies a declarative approach to constructing software by favouring JSON over code. 
 
+** Note: this is a the UI only, the client/server is <a href="https://github.com/troven/meta4beta">meta4beta</a>. We encourage you to download it & have fun **
+
 You can find out more by reading:
 
 <a href="https://github.com/troven/meta4ux/wiki/Intro">Introduction</a>.
