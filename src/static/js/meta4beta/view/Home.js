@@ -58,4 +58,16 @@ DEBUG && console.log("onNavigate: %o %o %o", this, go_to, view)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-return ux; })
+   return {
+	    "id": "Home",
+        "label": "Home",
+        "comment": "A widget that co-ordinates navigation between views",
+        "mixins": [ "isNested", "isNavigator", "isTemplating" ],
+        "views": true,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Home
+    }
+})

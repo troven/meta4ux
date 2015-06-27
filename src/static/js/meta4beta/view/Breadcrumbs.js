@@ -43,5 +43,17 @@ DEBUG && console.log("Breadcrumb: %o (%s) -> %o %o", this, view.id, view, attrs)
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
- 	return ux;
+  return {
+	    "id": "Breadcrumbs",
+        "label": "Breadcrumbs",
+        "comment": "A widget used to show heirarchy between content",
+
+        "triggers": [ "action", "select" ],
+        "mixins": [ "isSelectable", "isActionable", "isDroppable" ],
+        "collection": true,
+        "options": true,
+        "views": true,
+
+        "fn": ux.view.Breadcrumbs
+    }
 })

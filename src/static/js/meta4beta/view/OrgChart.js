@@ -72,5 +72,19 @@ console.debug("OrgChart: %o", $root)
 
 		return OrgChart
 	}
-    return ux;
+
+   return {
+	    "id": "OrgChart",
+        "label": "Org Chart",
+        "comment": "A simple hierarchical organisation chart",
+        "emits": ["action"],
+        "mixins": [ "isHoverPanel" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.OrgChart
+    }
+
  })

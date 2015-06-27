@@ -59,4 +59,19 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	}
 
 
- 	return ux; })
+    return {
+	    "id": "Dashboard",
+        "label": "Dashboard",
+        "comment": "",
+        "triggers": [ "transition", "select", "action" ],
+        "can": [ "create", "read", "update", "delete" ],
+        "mixins": [ "isNested", "isActionable" ],
+        "views": true,
+        "collection": true,
+        "options": true,
+
+        "fn": ux.view.Dashboard
+    }
+
+
+})

@@ -113,5 +113,17 @@ console.log("onResizeEvent: %o", fcEvent)
 		return Calendar;
 	}
 
-return ux; })
+  return {
+	    "id": "Calendar",
+        "label": "Calendar",
+        "comment": "A widget that shows a collection of events grouped by date (day, week, month or year)",
+
+        "triggers": [ "action", "select" ],
+        "mixins": [ "isSelectable", "isActionable" ],
+        "collection": true,
+        "options": true,
+
+        "fn": ux.view.Calendar
+    }
+})
 

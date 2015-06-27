@@ -7,11 +7,6 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options) {
 		options = ux.checkOptions(options); // sanity check ('this', 'label')
 
-		var MenuTree = Backbone.Marionette.CompositeView.extend( _.extend({
-			childViewContainer: "ul", tagName: "li", className: "dropdown-submenu",
-			template: "<a class='selectable ' data-id='{{id}}' title='{{comment}}'>{{label}}</a><ul></ul>",
-		}, options ));
-
 		var MenuToggle = Backbone.Marionette.CompositeView.extend( _.extend({
 			initialize: function(_options) {
 DEBUG && console.log("MenuToggle", this, _options);
@@ -66,5 +61,18 @@ DEBUG && console.log("menu select", this, that)
 		return NavBar;
 	}
 
+   return {
+	    "id": "NavBar",
+        "label": "Navigation Bar",
+        "comment": "A list of Menu Buttons",
+        "emits": ["action"],
+        "mixins": [ "isActionable", "isNavigator" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
 
- 	return ux; })
+        "fn": ux.view.NavBar
+    }
+
+})

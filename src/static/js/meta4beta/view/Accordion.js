@@ -62,5 +62,17 @@ console.log("onRenderAccordion: %o", this.$el)
 		return Backbone.Marionette.CollectionView.extend( Accordion );
 	}
 
-	return ux;
+   return {
+	    "id": "Accordion",
+        "label": "Accordion",
+        "comment": "A widget that displays collapsible content panels for presenting information in a limited amount of space.",
+
+        "triggers": [ "sortstart", "action", "select" ],
+        "mixins": [ "isNested", "isSortable", "isSelectable", "isHoverPanel" ],
+        "collection": true,
+        "options": true,
+        "views": true,
+
+        "fn": ux.view.Accordion
+    }
 })

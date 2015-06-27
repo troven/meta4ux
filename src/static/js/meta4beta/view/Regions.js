@@ -34,4 +34,18 @@ DEBUG && console.log("Regions Activated", self)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-return ux; })
+   return {
+	    "id": "Regions",
+        "label": "Regions",
+        "comment": "A widget that manages the layout of named views",
+        "emits": [],
+        "mixins": [ "isNavigator", "isNested" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Regions
+    }
+
+})

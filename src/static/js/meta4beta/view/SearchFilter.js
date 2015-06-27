@@ -141,5 +141,18 @@ console.log("showBusy")
 		return SearchFilter;
 	}
 
- 	return ux;
+   return {
+	    "id": "SearchFilter",
+        "label": "Search Filter",
+        "comment": "A widget that allows searching & filtering of a collection",
+        "emits": [],
+        "mixins": [],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.SearchFilter
+    }
+
 })

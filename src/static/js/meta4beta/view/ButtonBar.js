@@ -28,7 +28,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		});
 
 		var ButtonBar = Backbone.Marionette.CollectionView.extend({
-			isCommon:true, isSelectable: true,
+			isCommon:true, isSelectable: true
 			childView: ButtonMenu, className: "btn-toolbar", tagName: "div",
 			events: {
 			  'click [data-id]': 'doEventSelect'
@@ -49,5 +49,17 @@ DEBUG && console.debug("ButtonBar Selected: %o %o", self, that);
 		return ButtonBar;
 	}
 
-    return ux;
+  return {
+	    "id": "ButtonBar",
+        "label": "ButtonBar",
+        "comment": "A widget that displays a toolbar-style list of Buttons",
+
+        "triggers": [ "action", "select" ],
+        "mixins": [ "isSelectable", "isActionable" ],
+        "collection": true,
+        "options": true,
+
+        "fn": ux.view.ButtonBar
+    }
+
 })

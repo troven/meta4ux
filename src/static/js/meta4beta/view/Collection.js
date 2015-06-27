@@ -54,5 +54,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 		return Backbone.Marionette.CollectionView.extend( config );
 	}
 
-	return ux;
+  return {
+	    "id": "Collection",
+        "label": "Collection",
+        "comment": "A widget that shows a collection of items",
+
+        "triggers": [ "action", "select" ],
+        "mixins": [ "isSelectable", "isActionable" ],
+        "collection": true,
+        "options": true,
+        "child": true,
+
+        "fn": ux.view.Collection
+    }
 })

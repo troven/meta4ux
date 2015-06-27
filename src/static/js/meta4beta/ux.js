@@ -70,8 +70,8 @@ throw "deprecated"
 	})
 
 	_.extend(core.ux, {
-		views: new ViewRegistry, templates: {},
-		view: {},
+		views: new ViewRegistry,
+		templates: {}, view: {}, widget: {},
 
 		boot:function(module, options) {
 			if (!module) throw "meta4:ux:boot:oops:missing-module";
@@ -116,7 +116,12 @@ throw "deprecated"
 			})
 
 			require(widgetTypes, function() {
-//DEBUG && console.warn("UX Widgets Loaded: %o %o %o", self, options, arguments)
+				_.each(arguments, function(widget, i) {
+					if (!widget.id) throw widgetTypes[i]+ " is missing {{id}}"
+					if (!_.isFunction(widget.fn)) throw widget.id+ " not a valid Widget fn()"
+//ux.DEBUG &&
+console.warn("Widget (%s)", widget.id)
+				})
 				module.trigger("ux:boot", self, options)
 			})
 

@@ -32,5 +32,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
- 	return ux;
+    return {
+	    "id": "Debug",
+        "label": "Debug [TODO]",
+        "comment": "A widget to display events during debugging",
+        "triggers": [ ],
+        "can": [ "debug" ],
+        "mixins": [ "isTemplating", "isActionable", "isNavigator" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+
+        "fn": ux.view.Dashboard3D
+    }
 })

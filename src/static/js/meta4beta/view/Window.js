@@ -34,5 +34,17 @@ DEBUG && console.log("onShow: %o %o", this, this.body)
 		return Backbone.Marionette.LayoutView.extend(config);
 	}
 
- 	return ux;
+   return {
+        "id": "Window",
+        "label": "Window",
+        "comment": "A move-able, modal layout",
+        "emits": ["action"],
+        "mixins": [ "isTemplating", "isSortable", "isHoverPanel" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Window
+    }
 })

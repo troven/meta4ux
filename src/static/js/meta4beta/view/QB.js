@@ -74,5 +74,18 @@ DEBUG && console.log("QB (%s) init: %o %o", options.id, this, options)
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
- 	return ux;
+   return {
+	    "id": "QB",
+        "label": "QB",
+        "comment": "An interactive analytics widget",
+        "emits": [],
+        "mixins": [],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.QB
+    }
+
 })

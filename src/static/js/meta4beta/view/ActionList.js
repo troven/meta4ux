@@ -69,5 +69,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 		return Backbone.Marionette.CollectionView.extend( definition );
 	}
 
-	return ux;
+   return {
+	    "id": "ActionList",
+        "label": "ActionList",
+        "comment": "A widget that displays a collection of items and triggers an Action event when an item is selected.",
+
+        "triggers": [ "sortstart", "action", "select" ],
+        "mixins": [ "isNested", "isSortable", "isSelectable", "isHoverPanel", "isActionable", "isDroppable" ],
+        "collection": true,
+        "options": true,
+        "views": true,
+
+        "fn": ux.view.ActionList
+    }
 })

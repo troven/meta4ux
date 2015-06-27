@@ -49,4 +49,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	}
 
 
-return ux; })
+   return {
+	    "id": "MenuButton",
+        "label": "Menu Button",
+        "comment": "A drop-down menu that hides behind a Button",
+        "emits": ["action"],
+        "mixins": [ "isActionable" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.MenuButton
+    }
+})

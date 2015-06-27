@@ -14,7 +14,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"
 	ux.view.Tree = ux.view["meta4:ux:Tree"] = function(options) {
 console.log("Tree: %o", options)
 
-		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: true, isTemplating: true,
+		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: true, isTemplating: true, isSortable: true,
 			events: {
 			  'click [data-id]': 'doEventSelect'
 			},
@@ -56,5 +56,19 @@ DEBUG && console.debug("getBranch options: %o %o", this, childOptions)
 
 		return Backbone.Marionette.CollectionView.extend( treeRoot )
 	}
-    return ux;
+
+   return {
+        "id": "Tree",
+        "label": "Tree",
+        "comment": "A hierarchical widget",
+        "emits": ["action"],
+        "mixins": [ "isTemplating", "isSortable", "isHoverPanel" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Tree
+    }
+
  })

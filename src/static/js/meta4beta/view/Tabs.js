@@ -1,17 +1,5 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-   ux.meta.Tabs =  ux.meta["meta4:ux:Tabs"] = {
-        "label": "Tabs",
-        "comment": "A tabbed navigation panel for nested views",
-
-        "triggers": [ "navigate", "select" ],
-        "mixins": [ "isNested" ],
-        "collection": true,
-        "options": true,
-        "views": true
-    }
-
-
     ux.view.Tabs = ux.view["meta4:ux:Tabs"] = function(options) {
 
 		var DEBUG = options.debug || ux.DEBUG;
@@ -88,4 +76,18 @@ DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-return ux; })
+   return {
+        "id": "Tabs",
+        "label": "Tabs",
+        "comment": "A tabbed navigation panel for nested views",
+
+        "triggers": [ "navigate", "select" ],
+        "mixins": [ "isNested" ],
+        "collection": true,
+        "options": true,
+        "views": true,
+
+        "fn": ux.view.Tabs
+    }
+
+})

@@ -49,5 +49,17 @@ DEBUG && console.log("MenuList Select: %o %o", this, selection)
 		return MenuList;
 	}
 
-    return ux;
+   return {
+	    "id": "MenuList",
+        "label": "Menu List",
+        "comment": "A drop-down menu that hides behind a Button",
+        "emits": ["action"],
+        "mixins": [ "isActionable", "isNavigator" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.MenuList
+    }
 })

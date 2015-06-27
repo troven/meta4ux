@@ -96,5 +96,17 @@ console.log("Picked: %o %o -> %o", selected, model, this.collection)
 		return Backbone.Marionette.CompositeView.extend( config );
 	}
 
-	return ux;
+   return {
+	    "id": "PickList",
+        "label": "Pick List",
+        "comment": "A search-based list builder",
+        "emits": ["action"],
+        "mixins": [ "isHoverPanel", "isSelectable", "isSortable" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.PickList
+    }
 })

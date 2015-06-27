@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	ux.view["meta4:ux:HTML"] = function(options) {
+	ux.view.HTML = ux.view["meta4:ux:HTML"] = function(options) {
 		options = ux.checkOptions(options);
 		options = _.extend({editable: true, editing: false, edited: { rows: 20, cols: 120, toolbar: {} }, attached: {}, metaKey: "template", autoHide: true }, options);
 		var DEBUG = ux.DEBUG && true;
@@ -251,56 +251,52 @@ DEBUG && console.debug("HTML onToolbarInsertProperty", value, view, $this, event
 		return HTML;
 	}
 
-	//    ************************************************  ****************************************************
-	// ************************************************ PAGES ****************************************************
-	//    ************************************************ ****************************************************
-
-	ux.view["meta4:ux:HTMLPages"] = function(options) {
-		options = ux.checkOptions(options);
-		options = _.extend({editable: false, editing: false, edited: false, attached: false }, options);
-		var DEBUG = ux.DEBUG && true;
-
-		var HTML = Backbone.Marionette.ItemView.extend({
-			template: "<div class='ux_sample'><label data-id='{{id}}'>{{label}}</label><div class='ux_toggled ux_preview'>{{{template}}}</div></div>"
-		});
-//		var HTML = ux.view["meta4:ux:HTML"](options);
-		if (!HTML) throw "meta4:ux:oops:missing-widget";
-
-		var Pages = Backbone.Marionette.CompositeView.extend( _.extend({
-			itemView: HTML, tagName: "ul", className: "nav-list",
-			template: "<div><label data-id='{{id}}'>{{label}}</label><ul></ul><div>",
-			itemViewContainer: "ul",
-			events: {
-				'click [data-id]': 'doEventSelect',
-				'dblclick [data-id]': 'doActivate',
-				'dragstart': 'doEventDrag',
-			},
-			initialize: function() {
-				ux.model(options, this);
-console.debug("Init Pages:", this);
-//				this.listenTo(this.collection, "change", this.render);
-			},
-			selectItem: function(model) {
-				this.$el.find(".active").removeClass("active");
-				var $item = this.$el.find("[data-id='"+model.id+"']");
-console.debug("Select Item:", model, $item);
-				$item.addClass("active");
-			},
-			onShow: function () {
-				var self = this;
-				setTimeout(function() {
-					var $facts = ux.factualize(self, options.factualizer);
-					var $drags = self.initializeDraggable(options.draggable);
-				})
-				return this;
-			},
-			doActivate: function(event, ui) {
-console.debug("Activate Item:", model, $item);
-			},
-		}, ux.mixin.Common, ux.mixin.Draggable ));
-
-		return Pages;
-	}
+    $.fn.wysihtml5.locale = {
+        en: {
+            font_styles: {
+                normal: "Normal",
+                h1: "H 1",
+                h2: "H 2",
+                h3: "H 3",
+                p:  "Para"
+            },
+            emphasis: {
+                bold: "B",
+                italic: "I",
+                underline: "U"
+            },
+            lists: {
+                unordered: "Unordered list",
+                ordered: "Ordered list",
+                outdent: "Outdent",
+                indent: "Indent"
+            },
+            link: {
+                insert: "Insert link",
+                cancel: "Cancel"
+            },
+            image: {
+                insert: "Insert image",
+                cancel: "Cancel"
+            },
+            html: {
+                edit: "Edit HTML"
+            },
+            colours: {
+                black: "Black",
+                silver: "Silver",
+                gray: "Grey",
+                maroon: "Maroon",
+                red: "Red",
+                purple: "Purple",
+                green: "Green",
+                olive: "Olive",
+                navy: "Navy",
+                blue: "Blue",
+                orange: "Orange"
+            }
+        }
+    };
 
     $.fn.wysihtml5.locale = {
         en: {
@@ -349,4 +345,17 @@ console.debug("Activate Item:", model, $item);
         }
     };
 
- 	return ux; })
+   return {
+	    "id": "HTML",
+        "label": "HTML",
+        "comment": "A rich HTML editor based on wysihtml5",
+        "mixins": [ ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.HTML
+    }
+
+})

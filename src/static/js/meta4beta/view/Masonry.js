@@ -55,5 +55,16 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "masonry"], func
 		return Backbone.Marionette.CollectionView.extend( config );
 	}
 
-	return ux;
+   return {
+	    "id": "Masonry",
+        "label": "Image Gallery",
+        "comment": "An interactive Image gallery with animated layouts",
+        "mixins": [],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Masonry
+    }
 })

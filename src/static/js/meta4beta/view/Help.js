@@ -19,5 +19,16 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Backbone.Marionette.ItemView.extend(config);
 	}
 
- 	return ux;
+   return {
+	    "id": "Help",
+        "label": "Help [TO DO]",
+        "comment": "A widget that provides hover-over help",
+        "mixins": [ "isSelectable" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Help
+    }
 })

@@ -36,5 +36,19 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Dropzone;
 	}
 
- 	return ux; })
+    return {
+	    "id": "Dropzone",
+        "label": "Dropzone",
+        "comment": "A widget to that responds to Drop events",
+        "triggers": [],
+        "can": [ "drop" ],
+        "mixins": [ "isDroppable" ],
+        "views": false,
+        "collection": false,
+        "options": false,
+
+        "fn": ux.view.Dropzone
+    }
+
+})
 

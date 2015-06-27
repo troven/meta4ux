@@ -135,4 +135,18 @@ console.debug("Wizard onShow: %o %o", this, $(".ux_wizard_footer",this.$el) )
 		return Backbone.Marionette.LayoutView.extend(StatefulWizard)
 	}
 
-return ux;})
+   return {
+        "id": "Wizard",
+        "label": "Wizard",
+        "comment": "A state-by-state Wizard",
+        "emits": ["action"],
+        "mixins": [ "isTemplating", "isStateful" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Wizard
+    }
+
+})

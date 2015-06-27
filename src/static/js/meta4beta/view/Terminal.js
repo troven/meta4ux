@@ -189,5 +189,18 @@ console.log("complete?: %o %o %o %o", txt, cmds, found, _.keys(found))
 		return Backbone.Marionette.ItemView.extend(config);
 	}
 
- 	return ux;
+   return {
+        "id": "Terminal",
+        "label": "Terminal",
+        "comment": "A console",
+        "emits": ["action"],
+        "mixins": [ "isTemplating" ],
+        "views": false,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Terminal
+    }
+
 })

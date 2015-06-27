@@ -25,5 +25,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Backbone.Marionette.ItemView.extend(config);
 	}
 
- 	return ux;
+   return {
+        "id": "Template",
+        "label": "Template",
+        "comment": "A template displays custom HTML injected with data model",
+        "emits": ["action"],
+        "mixins": [ "isHoverPanel", "isSelectable", "isSortable", "isNavigator", "isActionable" ],
+        "views": true,
+        "collection": false,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Template
+    }
 })

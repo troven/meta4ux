@@ -54,5 +54,17 @@ DEBUG && console.debug("getPortlet options: %o %o %o", this, _model, childOption
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
- 	return ux;
+   return {
+	    "id": "Portal",
+        "label": "Portal",
+        "comment": "A portal displays a custom view for each model in a collection",
+        "emits": ["action" ,"navigate", "select"],
+        "mixins": [ "isHoverPanel", "isSelectable", "isSortable", "isNavigator", "isActionable" ],
+        "views": true,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.Portal
+    }
 })

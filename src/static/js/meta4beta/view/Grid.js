@@ -151,4 +151,17 @@ DEBUG && console.log("Grid Row Selected: %o %o", this, event );
 		return Grid;
 	}
 
- 	return ux; })
+    return {
+	    "id": "Grid",
+        "label": "Grid",
+        "comment": "A spreadsheet-like widget that allows editing of rows & columns",
+        "mixins": [ "isSelectable" ],
+        "views": false,
+        "collection": true,
+        "options": true,
+        "schema": true,
+
+        "fn": ux.view.Grid
+    }
+
+})

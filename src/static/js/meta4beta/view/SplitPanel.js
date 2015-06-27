@@ -38,4 +38,18 @@ DEBUG && console.log("doSelectDetail: (%s) %o %o -> %o", this.id, v, m, view)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-return ux; })
+   return {
+        "id": "SplitPanel",
+        "label": "Split Panel",
+        "comment": "A simple layout suited for displaying master/detail",
+        "emits": [],
+        "mixins": [ "isNavigator", "isNested" ],
+        "views": true,
+        "collection": true,
+        "options": true,
+        "schema": false,
+
+        "fn": ux.view.SplitPanel
+    }
+
+})

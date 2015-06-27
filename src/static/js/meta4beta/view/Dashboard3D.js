@@ -197,5 +197,19 @@ console.log("Select 3D Item:",this, uid, model);
 		return Dashboard3D;
 	}
 
- 	return ux; })
+    return {
+	    "id": "Dashboard3D",
+        "label": "Dashboard3D",
+        "comment": "A 3D presentation widget that controls the layout of a collection  of individual panels.",
+        "triggers": [ "transition", "select", "action" ],
+        "can": [ "read" ],
+        "mixins": [ "isNested", "isActionable" ],
+        "views": true,
+        "collection": true,
+        "options": true,
+
+        "fn": ux.view.Dashboard3D
+    }
+
+})
 
