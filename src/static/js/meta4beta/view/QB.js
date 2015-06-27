@@ -74,7 +74,9 @@ DEBUG && console.log("QB (%s) init: %o %o", options.id, this, options)
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "QB",
         "label": "QB",
         "comment": "An interactive analytics widget",

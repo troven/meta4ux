@@ -62,6 +62,8 @@ console.log("onRenderAccordion: %o", this.$el)
 		return Backbone.Marionette.CollectionView.extend( Accordion );
 	}
 
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
    return {
 	    "id": "Accordion",
         "label": "Accordion",

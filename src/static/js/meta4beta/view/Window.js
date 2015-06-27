@@ -34,7 +34,9 @@ DEBUG && console.log("onShow: %o %o", this, this.body)
 		return Backbone.Marionette.LayoutView.extend(config);
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "Window",
         "label": "Window",
         "comment": "A move-able, modal layout",

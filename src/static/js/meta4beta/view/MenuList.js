@@ -49,7 +49,9 @@ DEBUG && console.log("MenuList Select: %o %o", this, selection)
 		return MenuList;
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "MenuList",
         "label": "Menu List",
         "comment": "A drop-down menu that hides behind a Button",

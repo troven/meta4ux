@@ -110,7 +110,9 @@ console.debug("Activate Item:", model, $item);
 	}
 
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "HTMLPages",
         "label": "HTMLPages",
         "comment": "A rich HTML editor based on wysihtml5",

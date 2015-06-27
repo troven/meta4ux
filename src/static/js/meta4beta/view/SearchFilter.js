@@ -141,7 +141,9 @@ console.log("showBusy")
 		return SearchFilter;
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "SearchFilter",
         "label": "Search Filter",
         "comment": "A widget that allows searching & filtering of a collection",

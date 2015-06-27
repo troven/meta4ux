@@ -135,7 +135,9 @@ console.debug("Wizard onShow: %o %o", this, $(".ux_wizard_footer",this.$el) )
 		return Backbone.Marionette.LayoutView.extend(StatefulWizard)
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "Wizard",
         "label": "Wizard",
         "comment": "A state-by-state Wizard",

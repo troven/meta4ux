@@ -25,7 +25,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Backbone.Marionette.ItemView.extend(config);
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "Template",
         "label": "Template",
         "comment": "A template displays custom HTML injected with data model",

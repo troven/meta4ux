@@ -69,6 +69,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 		return Backbone.Marionette.CollectionView.extend( definition );
 	}
 
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
    return {
 	    "id": "ActionList",
         "label": "ActionList",

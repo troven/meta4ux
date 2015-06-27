@@ -205,7 +205,9 @@ DEBUG && console.log("onDelete: %o %o", this, _model)
 		return CRUD;
 	}
 
-    return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "CRUD",
         "label": "CRUD",
         "comment": "Manage collections with create, read, update & delete",

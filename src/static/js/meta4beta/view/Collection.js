@@ -54,7 +54,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 		return Backbone.Marionette.CollectionView.extend( config );
 	}
 
-  return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Collection",
         "label": "Collection",
         "comment": "A widget that shows a collection of items",

@@ -48,8 +48,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         return Backbone.Marionette.CompositeView.extend( definition )
 	}
 
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
 
-   return {
+	return {
 	    "id": "MenuButton",
         "label": "Menu Button",
         "comment": "A drop-down menu that hides behind a Button",

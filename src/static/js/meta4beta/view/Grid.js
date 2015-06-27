@@ -151,7 +151,9 @@ DEBUG && console.log("Grid Row Selected: %o %o", this, event );
 		return Grid;
 	}
 
-    return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Grid",
         "label": "Grid",
         "comment": "A spreadsheet-like widget that allows editing of rows & columns",

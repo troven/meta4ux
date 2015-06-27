@@ -34,7 +34,9 @@ DEBUG && console.log("Regions Activated", self)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Regions",
         "label": "Regions",
         "comment": "A widget that manages the layout of named views",

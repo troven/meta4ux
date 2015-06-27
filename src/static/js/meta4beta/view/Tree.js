@@ -57,7 +57,9 @@ DEBUG && console.debug("getBranch options: %o %o", this, childOptions)
 		return Backbone.Marionette.CollectionView.extend( treeRoot )
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "Tree",
         "label": "Tree",
         "comment": "A hierarchical widget",

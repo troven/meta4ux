@@ -38,7 +38,9 @@ DEBUG && console.log("doSelectDetail: (%s) %o %o -> %o", this.id, v, m, view)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "SplitPanel",
         "label": "Split Panel",
         "comment": "A simple layout suited for displaying master/detail",

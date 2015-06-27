@@ -54,7 +54,9 @@ DEBUG && console.debug("getPortlet options: %o %o %o", this, _model, childOption
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Portal",
         "label": "Portal",
         "comment": "A portal displays a custom view for each model in a collection",

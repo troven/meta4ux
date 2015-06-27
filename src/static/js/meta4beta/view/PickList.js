@@ -96,7 +96,9 @@ console.log("Picked: %o %o -> %o", selected, model, this.collection)
 		return Backbone.Marionette.CompositeView.extend( config );
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "PickList",
         "label": "Pick List",
         "comment": "A search-based list builder",

@@ -43,7 +43,9 @@ DEBUG && console.log("Breadcrumb: %o (%s) -> %o %o", this, view.id, view, attrs)
 		return Backbone.Marionette.CompositeView.extend(config);
 	}
 
-  return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Breadcrumbs",
         "label": "Breadcrumbs",
         "comment": "A widget used to show heirarchy between content",

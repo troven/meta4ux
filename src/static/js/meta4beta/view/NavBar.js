@@ -61,7 +61,9 @@ DEBUG && console.log("menu select", this, that)
 		return NavBar;
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "NavBar",
         "label": "Navigation Bar",
         "comment": "A list of Menu Buttons",

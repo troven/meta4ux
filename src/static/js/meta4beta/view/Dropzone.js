@@ -36,7 +36,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		return Dropzone;
 	}
 
-    return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Dropzone",
         "label": "Dropzone",
         "comment": "A widget to that responds to Drop events",

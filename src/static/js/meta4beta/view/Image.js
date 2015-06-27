@@ -12,7 +12,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		});
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Image",
         "label": "Image",
         "comment": "An simple Image viewer",

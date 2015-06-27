@@ -197,7 +197,9 @@ console.log("Select 3D Item:",this, uid, model);
 		return Dashboard3D;
 	}
 
-    return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Dashboard3D",
         "label": "Dashboard3D",
         "comment": "A 3D presentation widget that controls the layout of a collection  of individual panels.",

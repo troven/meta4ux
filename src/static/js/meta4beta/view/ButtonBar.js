@@ -49,7 +49,9 @@ DEBUG && console.debug("ButtonBar Selected: %o %o", self, that);
 		return ButtonBar;
 	}
 
-  return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "ButtonBar",
         "label": "ButtonBar",
         "comment": "A widget that displays a toolbar-style list of Buttons",

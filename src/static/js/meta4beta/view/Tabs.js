@@ -76,7 +76,9 @@ DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
 		return Backbone.Marionette.LayoutView.extend(config)
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "Tabs",
         "label": "Tabs",
         "comment": "A tabbed navigation panel for nested views",

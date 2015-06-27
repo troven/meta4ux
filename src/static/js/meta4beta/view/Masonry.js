@@ -55,7 +55,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "masonry"], func
 		return Backbone.Marionette.CollectionView.extend( config );
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "Masonry",
         "label": "Image Gallery",
         "comment": "An interactive Image gallery with animated layouts",

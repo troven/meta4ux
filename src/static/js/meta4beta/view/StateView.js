@@ -37,7 +37,9 @@ console.log("Switch currentView: %o", this.currentView)
 		return Backbone.Marionette.ItemView.extend(config);
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
         "id": "StateView",
         "label": "State View",
         "comment": "A view that depends upon a model attribute",

@@ -73,7 +73,9 @@ console.debug("OrgChart: %o", $root)
 		return OrgChart
 	}
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "OrgChart",
         "label": "Org Chart",
         "comment": "A simple hierarchical organisation chart",

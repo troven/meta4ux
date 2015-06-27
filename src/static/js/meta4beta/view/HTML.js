@@ -345,7 +345,9 @@ DEBUG && console.debug("HTML onToolbarInsertProperty", value, view, $this, event
         }
     };
 
-   return {
+	// Widget meta-data allows runtime / editor to inspect basic capabilities
+
+	return {
 	    "id": "HTML",
         "label": "HTML",
         "comment": "A rich HTML editor based on wysihtml5",
