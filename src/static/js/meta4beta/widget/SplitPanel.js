@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
     ux.view.SplitPanel = ux.view["meta4:ux:SplitPanel"] = function(options) {
-		options = ux.checkAttributes(options, ["id"]);
+		options = ux.checkOptions(options, ["id"]);
 		var DEBUG = true || ux.DEBUG;
 
 		options.template =  options.template || ux.compileTemplate("<div class='col-sm-4 split-master'></div><div class='col-sm-8 split-detail'></div>");

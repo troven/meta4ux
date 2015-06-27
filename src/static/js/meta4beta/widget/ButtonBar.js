@@ -6,7 +6,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	var DEBUG = false && ux.DEBUG;
 
 	ux.view.ButtonBar = ux.view["meta4:ux:ButtonBar"] = function(options) {
-		options = ux.checkAttributes(options);
+		options = ux.checkOptions(options);
 
 		var ButtonItem = Backbone.Marionette.ItemView.extend({ tagName: "li",
 			template: "<a data-id='{{id}}' href='#'>{{label}}</a>",

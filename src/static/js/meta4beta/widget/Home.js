@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-ux.view.Layout = ux.view.Home = ux.view["meta4:ux:Home"] = function(options) {
+	ux.view.Layout = ux.view.Home = ux.view["meta4:ux:Home"] = function(options) {
 		options = ux.checkOptions(options);
 
 		var DEBUG = options.debug || ux.DEBUG;
@@ -63,7 +63,7 @@ DEBUG && console.log("onNavigate: %o %o %o", this, go_to, view)
 	return {
 	    "id": "Home",
         "label": "Home",
-        "comment": "A widget that co-ordinates navigation between views",
+        "comment": "A layout widget that co-ordinates navigation between nested views",
         "mixins": [ "isNested", "isNavigator", "isTemplating" ],
         "views": true,
         "collection": false,

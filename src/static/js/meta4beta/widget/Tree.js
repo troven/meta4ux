@@ -20,7 +20,7 @@ console.log("Tree: %o", options)
 			},
 			initialize: function(_options) {
 				_.extend(_options, { child: {} } )
-				ux.checkAttributes(_options, [ "child"] );
+				ux.checkOptions(_options, [ "child"] );
 				ux.initialize(this, _options);
 			},
 			x_getChildView: function(_model) {

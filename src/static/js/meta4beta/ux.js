@@ -8,14 +8,15 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 	Marionette.Renderer.render = function(template, data) { return _.isFunction(template)?template(data):Handlebars.compile(template)(data); }
 
     var ux = core.ux = core.ux || { DEBUG: true }
-	ux.idAttribute = core.idAttribute || "id";
-	ux.typeAttribute = core.typeAttribute || "widget";
-	ux.labelAttribute = core.labelAttribute || "label";
+	ux.idAttribute = "id";
+	ux.typeAttribute = "widget";
+	ux.labelAttribute = "label";
 	ux.meta = ux.meta || {}
 	ux.DEBUG = false
 
+	// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
     /*
-       Hold all the View definitions in a Backbone Model
+       Cache the View definitions in a Backbone Model
     */
 	var ViewRegistry = Backbone.Model.extend({
 
@@ -39,6 +40,7 @@ throw "deprecated"
 			return view;
 		},
 
+		// instantiate a View
 		widget: function(id, _options) {
 			var widget = false;
 			// resolve the arguments
@@ -69,9 +71,33 @@ throw "deprecated"
 		},
 	})
 
+	// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+	/*
+		Cache widget meta-data.
+		Resolve embedded widget() function.
+	*/
+
+	var WidgetRegistry = Backbone.Collection.extend({
+		idAttribute: ux.idAttribute,
+		// retrieve a function that will instantiate a View
+		widget: function(id) {
+			if (_.isObject(id)) id = id[ux.typeAttribute]
+			if (!_.isString(id)) throw "meta4:ux:widget:oops:invalid-id";
+			var _widget = this.get(id);
+			if (!_widget) return null
+			var fn = _widget.get("fn")
+			if (!_.isFunction(fn)) throw "meta4:ux:widget:oops:missing-fn";
+			return fn
+		}
+	})
+
+	// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+	/*
+		Define the UX Mediator object
+	*/
 	_.extend(core.ux, {
-		views: new ViewRegistry,
-		templates: {}, view: {}, widget: {},
+		views: new ViewRegistry(),
+		templates: {}, view: {}, widgets: new WidgetRegistry,
 
 		boot:function(module, options) {
 			if (!module) throw "meta4:ux:boot:oops:missing-module";
@@ -83,10 +109,24 @@ throw "deprecated"
 				self.templates[id] = self.compileTemplate(template)
 			});
 
+			// register Template helpers
+			_.each(core.ux.templateHelpers, function(fn,name) {
+				Handlebars.registerHelper(name,fn)
+			})
+
+			this.registerWidgets(options, function() {
+//DEBUG && console.warn("UX Configured: %o %o %o", self, module, options)
+				module.trigger("ux:boot", self, options)
+			})
+
+		},
+
+		registerWidgets: function(options, cb) {
 			var widgetTypes = []
 			var viewURL = options.url
+			var self = this
 
-			// register View configurations
+			// Register View configurations
 			var registerViews = function(options, views) {
 				if (!views) return
 
@@ -97,7 +137,7 @@ throw "deprecated"
 						}
                         // try our best to resolve something
 						var widgetType = view[ux.typeAttribute] || view.widget || view.type || "Template"
-						var path = view.require?view.require:viewURL+"/js/meta4beta/view/"+widgetType+".js"
+						var path = view.require?view.require:viewURL+"/js/meta4beta/widget/"+widgetType+".js"
 //console.warn("Require: %o %o", path, widgetTypes)
 						if (path && widgetTypes.indexOf(path)<0) widgetTypes.push(path)
 						registerViews(view, view.views)
@@ -110,24 +150,21 @@ throw "deprecated"
 			registerViews(options, options.views)
 //DEBUG && console.warn("Requires Widgets: %o", widgetTypes)
 
-			// register template helpers
-			_.each(core.ux.templateHelpers, function(fn,name) {
-				Handlebars.registerHelper(name,fn)
-			})
-
+			// uses require.js to load Widgets and cache meta-data,
 			require(widgetTypes, function() {
 				_.each(arguments, function(widget, i) {
 					if (!widget.id) throw widgetTypes[i]+ " is missing {{id}}"
 					if (!_.isFunction(widget.fn)) throw widget.id+ " not a valid Widget fn()"
-//ux.DEBUG &&
-console.warn("Widget (%s)", widget.id)
+					self.widgets.add(widget)
+//ux.DEBUG && console.warn("Widget (%s) %o -> %o", widget.id, self.widgets, self.widgets.widget(widget.id))
 				})
-				module.trigger("ux:boot", self, options)
+console.warn("Loaded Widgets: %o", ux.widgets)
+				cb && cb()
 			})
 
-//DEBUG && console.warn("UX Configured: %o %o %o", self, module, options)
 		},
 
+		// Compile a string template into a Handlebars function
 		compileTemplate: function(template){
 			return Handlebars.compile(template)
 		},
@@ -185,6 +222,7 @@ throw "i18n not implemented: "+that
 			return id.replace(new RegExp("[^A-Za-z0-9]", 'g'),"_");
 		},
 
+		// given a $dom element, find the associated model 'id'
 		identity: function($el) {
 			if (!$el) throw "meta4:ux:oops:missing-dom";
 			// hunt for an ID (usually a model)
@@ -211,6 +249,11 @@ throw "deprecated"
 			$html.attr("about", that);
 		},
 
+		// called by a Widget to intialize itself
+		// injects Mixins, resolve models / collections
+		// binds events to global functions
+		// augment CSS classes
+		//
 		initialize: function(view, options) {
 			if (!view) throw "meta4:ux:oops:missing-view";
 			if (!view.render) throw "meta4:ux:oops:not-a-view";
@@ -233,12 +276,12 @@ throw "deprecated"
 			return view;
 		},
 
-		// bind models (and optional collections) by reference (string),
-		// Backbone.Model or from default options
+		// bind models (and collections) by reference (string), function an existing Backbone.Model or JSON options
 		model: function(options, modelled) {
 			return core.resolve(options, modelled)
 		},
 
+		// resolve look-up values using a variety of strategies - always returning an array of the form [{ id, label }]
 		lookup: function(values) {
 			if (_.isArray(values)) {
 				values = _.map(values, function(v) { return _.isObject(v)?v:{ id: v, label: v} })
@@ -269,21 +312,15 @@ console.log("Named Lookup: %o -> %o", values, core.fact)
 		    className = className + css
 		    if (self.$el && className) {
 		        self.$el.addClass(className)
-//console.log("Stylize: %s -> %o", className, arguments[0])
 		    }
 //		    self.className = className + css
 			return css;
-		},
-
-		checkAttributes: function( options, required ) {
-			return core.ux.checkOptions( options, required )
 		},
 
 		// enforce required options, throw an exception if undefined
 		checkOptions: function(options, required) {
 			if (!options) throw "meta4:ux:oops:missing-options";
 			required = required || [ ux.idAttribute, ux.labelAttribute];
-//DEBUG && console.log("checkOptions()", options, required)
 			for (var i = 0; i < required.length; i++) {
 				var key = required[i];
 				if (_.isUndefined(options[key])) {
@@ -307,16 +344,15 @@ console.log("Named Lookup: %o -> %o", values, core.fact)
         // cloned options makes them naively immutable
 		options = _.extend({}, { widget: "Template" }, options)
 		var _DEBUG = options.debug || ux.DEBUG
-_DEBUG && console.log("UX Widget: ", options)
+		_DEBUG && console.log("Debug UX Widget: %o", options)
 
-
-		// obtain a Backbone.View from global UX namespace
+		// obtain a Widget (aka Backbone.View) from global UX namespace
 		var widgetType = options.widget || options.type
-		var fnView = core.ux.view[widgetType];
-		if (!fnView) throw "meta4:ux:oops:unknown-widget#"+widgetType;
+		var widgetClass = core.ux.widgets.widget(widgetType);
+		if (!widgetClass) throw "meta4:ux:oops:unknown-widget#"+widgetType;
 
-		// get Widget Class
-		var Widget = fnView(options);
+		// get Widget instance
+		var Widget = widgetClass(options);
 		if (!Widget || !_.isFunction(Widget)) throw "meta4:ux:oops:invalid-widget#"+widgetType;
 
 		// Marionette needs to extend Widget rather than configure
@@ -351,6 +387,7 @@ _DEBUG && console.debug("Fetch Widget (%s @ %s): %o", options[ux.idAttribute], w
 			})
 		}
 
+		// show inline help ... TODO: reconsider this strategy
 		if (options.help) {
 			widget.on("show", function() {
 				var self = this
@@ -363,6 +400,7 @@ _DEBUG && console.debug("Help View: (%s) %o %o", options[ux.idAttribute], helpOp
 			})
 		}
 
+		// inject a 'guided tour' feature ... TODO: fix it
 		core.ux.tour(options)
 		return widget;
 	}
@@ -397,11 +435,13 @@ _DEBUG && console.debug("Help View: (%s) %o %o", options[ux.idAttribute], helpOp
 		}
 	}
 
+	// silence events
 	core.ux.muffle = function(e) {
 		e.stopImmediatePropagation()
 		e.preventDefault()
 	}
 
+	// guided tours
 	core.ux.tour = function(options) {
 		var tour = {}
 		var follow = ["views", "tabs"]
@@ -428,7 +468,9 @@ _DEBUG && console.debug("Help View: (%s) %o %o", options[ux.idAttribute], helpOp
 				$("<li data-target='#"+id+"' data-title='"+_tour.label+"'>"+_tour.comment+"</li>").appendTo($tour)
 			})
 		}
+
 		build(options)
+
 		if (!_.isEmpty(tour)) {
 			render(tour)
 
