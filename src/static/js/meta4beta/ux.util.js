@@ -1,4 +1,4 @@
-define(["ux"], function ($,_, Marionette, Handlebars, scorpio4, ux) {
+define(["ux"], function (ux) {
 
     ux.util = ux.util || {}
 

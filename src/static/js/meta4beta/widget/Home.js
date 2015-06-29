@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	ux.view.Layout = ux.view.Home = ux.view["meta4:ux:Home"] = function(options) {
+	Home = function(options) {
 		options = ux.checkOptions(options);
 
 		var DEBUG = options.debug || ux.DEBUG;
@@ -24,10 +24,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				var self = this
 DEBUG && console.log("onShow: %o %o", this, this.body)
 //				this.on("navigate", self.onNavigate);
-				if (!this.body.currentView) {
-					this.showAllNested()
-					this.attachNavigateListeners(this)
-				}
+//				if (!this.body.currentView) {
+//					this.showAllNested()
+//				}
+				this.attachNavigateListeners(this)
 			},
 			attachNavigateListeners: function(view) {
 				var self = this
@@ -70,6 +70,6 @@ DEBUG && console.log("onNavigate: %o %o %o", this, go_to, view)
         "options": true,
         "schema": false,
 
-        "fn": ux.view.Home
+        "fn": Home
     }
 })

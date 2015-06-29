@@ -19,7 +19,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 DEBUG && console.log("Regions: (%s) %o", this.id, options)
 				return this;
 			},
-			onShow: function() {
+			x_onShow: function() {
 
 				var self = this
 				setTimeout(function() {

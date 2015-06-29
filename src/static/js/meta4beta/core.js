@@ -6,14 +6,14 @@ define(["jquery", "underscore", "backbone"], function ($,_,Backbone) {
 
 	$.curCSS = $.css; // back-port jquery 1.8+
 
-
 	/* *****************************************************************************************************************
 
 	**************************************************************************************************************** */
 
 	return {
 		DEBUG: false,
-		idAttribute: "id", labelAttribute: "label", typeAttribute: "type", commentAttribute: "comment",
+		idAttribute: "id", labelAttribute: "label",
+		typeAttribute: "type", commentAttribute: "comment",
 		fact: {
 		},
 
@@ -116,7 +116,7 @@ _DEBUG && console.log("String Modelled: %o", modelled)
 _DEBUG && console.log("Array Collection", options.collection, this.fact)
 				modelled.collection = this.fact.Collection(options.collection);
 			} else if (_.isObject(options.collection) && options.collection instanceof Backbone.Collection ) {
-_DEBUG && console.log("Existing Collection: %o", options.collection)
+_DEBUG && console.log("Existing Collection: %o %o", options, options.collection)
 				modelled.collection = options.collection;
 			} else if (_.isObject(options.collection) && _.isString(options.collection.id) ) {
 //_DEBUG &&
@@ -181,7 +181,7 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 			return _options;
 		},
 
-
+		// Convenience function
 		isDefaultTrue: function(options, key) {
 			if (_.isUndefined(options)) return true;
 			return options[key]?true:false

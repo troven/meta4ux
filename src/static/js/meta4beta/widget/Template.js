@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	ux.view.Template = ux.view["meta4:ux:Template"] = function(options) {
+	var Template = function(options) {
 		options = ux.checkOptions(options, ["template"]);
 		var DEBUG = true;
 
@@ -8,7 +8,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			isTemplating: true, isActionable: true, isSelectable: true,
 			isNavigator: false, isHoverPanel: false, isNested: true,
 			isPopOver: false, isActionMenu: true,
-				template: options.template || "<div data-id='{{id}} data-trigger='{{id}}'>{{label}}</div>",
+			template: options.template || "<div data-id='{{id}} data-trigger='{{id}}'>{{label}}</div>",
 			events: {
 				"click [data-id]": "doEventSelect",
                 "click [data-trigger]": "doEventAction",
@@ -38,6 +38,6 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         "options": true,
         "schema": false,
 
-        "fn": ux.view.Template
+        "fn": Template
     }
 })

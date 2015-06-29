@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 
-	ux.view.CRUD = ux.view["meta4:ux:CRUD"] = function(options) {
+	var CRUD = function(options) {
 		options = ux.checkOptions(options, ["id", "views"]);
 
 		var DEBUG = false // && ux.DEBUG;
@@ -218,7 +218,7 @@ DEBUG && console.log("onDelete: %o %o", this, _model)
         "collection": true,
         "options": true,
 
-        "fn": ux.view.CRUD
+        "fn": CRUD
     }
 
 

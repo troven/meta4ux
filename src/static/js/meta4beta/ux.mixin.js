@@ -568,6 +568,7 @@ console.log("navigateTo (%s): %o", go_to)
 	        view._views = view._resolveNested(options.views)
 _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
             this.on("show", function() {
+console.warn("SHOW NESTED: %s", options.id)
                 view.showAllNested()
              })
 		},
@@ -576,17 +577,15 @@ _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
 			var self = this
 			if (!self.getNestedView || !self._views) throw "meta4:ux:oops:view-not-nested";
 
-		    var _DEBUG = this.options.debug || DEBUG
-
-_DEBUG && console.log("showNested: %o %o", self, self._views)
-
 			_.each(self._views, function(v,k) {
-//    			var meta = _.extend({ model: self.model || false, collection: self.collection }, v)
 				self.__showNested( self, v, k, meta )
 			})
 		},
 
 		__showNested: function(self, v, k, meta) {
+
+//_DEBUG &&
+console.log("__showNested (%s): %s", this.options.id, k)
 		    var _DEBUG = self.options.debug || DEBUG
 			if (v.el) {
 //_DEBUG && console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
@@ -600,8 +599,8 @@ _DEBUG && console.log("showNested: %o %o", self, self._views)
 				var subview = self.getNestedView(v, meta)
 				if (subview) {
 //_DEBUG && console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
-					self[k].show(subview)
 					self.listenTo(subview)
+					self[k].show(subview)
 				}
 			}
 		},
@@ -649,10 +648,10 @@ _DEBUG && console.log("showNested: %o %o", self, self._views)
 		    	if (_.isString(conf)) conf = this._views[conf] || ux.views.get(conf);
 
 		    	if (_.isObject(conf)) {
-					_.extend(conf,meta)
-					conf.id = conf.id || "_ux_"+ux._viewIDcounter++
-					widget = ux.views.widget(conf.id, _.extend({}, conf, meta) );
-// console.debug("getNested (%s): %o", conf.id, widget)
+					meta = _.extend({}, conf, meta)
+					meta.id = conf.id || "_ux_"+ux._viewIDcounter++
+					widget = ux.views.view(meta.id, meta );
+console.debug("gotNested (%s): %o", meta.id, widget)
 		    	}
 		    }
 
@@ -761,7 +760,7 @@ DEBUG && console.debug("Mixin Common(%s) %o", this.id || options.id, this)
 //			this.template = this.getTemplate(this.template || options.template)
 		},
 		show: function() {
-DEBUG && console.log("Showing: ", this)
+console.warn("Showing: ", this)
 			this.render();
 			this.triggerMethod("show")
 		},
@@ -851,7 +850,7 @@ DEBUG && console.debug("already HoverPanel (%o): %o", view, $this)
 					if (view) return
 					destroyHoverPanels()
 
-					view = ux.views.widget(hoverpanelView)
+					view = ux.views.view(hoverpanelView)
 					$this.addClass("hoverpanel")
 					$this.data('hoverpanel', view)
 					view.model = self.model

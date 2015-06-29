@@ -135,7 +135,7 @@ console.log("complete?: %o %o %o %o", txt, cmds, found, _.keys(found))
 			onWidget: function(term, arg1) {
 			    var opt = ux.views.get(arg1)
 			    opt = _.extend({}, opt, {modal: true})
-                var view = ux.views.widget(opt)
+                var view = ux.views.view(opt)
                 view.render()
                 view.triggerMethod("show")
                 this.once("opened", function() {

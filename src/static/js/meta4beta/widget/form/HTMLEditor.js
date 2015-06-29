@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
-    "html_editor", "meta4beta/view/form/FormFields"
+    "html_editor", "meta4beta/widget/form/FormFields"
 ],
     function ($, _, Backbone, Marionette, scorpio4, ux, html_editor, FormFields) {
 

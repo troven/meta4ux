@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux",
 
-    "meta4beta/view/form/Form", "meta4beta/view/form/FormFields",
-    "meta4beta/view/form/FormValidate", "meta4beta/view/form/HTMLEditor"
+    "meta4beta/widget/form/Form", "meta4beta/widget/form/FormFields",
+    "meta4beta/widget/form/FormValidate", "meta4beta/widget/form/HTMLEditor"
 ],
     function ($, _, Backbone, Marionette, ux) {
 

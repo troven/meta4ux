@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "backbone", "marionette",
-    "ux", "meta4beta/view/Form"],
+    "ux", "meta4beta/widget/Form"],
 function ($, _, Backbone, Marionette, ux, Form) {
 
 	var idAttribute = ux.idAttribute || "id";
