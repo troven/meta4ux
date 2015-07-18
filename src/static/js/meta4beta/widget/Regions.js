@@ -10,7 +10,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		var config = {
 			isNested: true, isNavigator: true,
 	 		template: options.template,
-            regions: { header: ".regions> .region-header" , body: ".regions> .region-body", footer: ".regions> .region-footer" },
+	 		className: "ux-regions",
+            regions: { header: ".regions>.region-header" , body: ".regions>.region-body", footer: ".regions>.region-footer" },
 		 	events: {
 		 		"click [data-navigate]": "doNavigate"
 		 	},

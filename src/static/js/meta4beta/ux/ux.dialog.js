@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "marionette", "Handlebars", "core", "ux_mixin"],
+define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4beta/ux/ux.mixin"],
 	function ($,_, Marionette, handlebars, core, ux) {
 
     var ux = ux = ux || {meta: {}}

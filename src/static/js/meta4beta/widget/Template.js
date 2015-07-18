@@ -8,12 +8,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			isTemplating: true, isActionable: true, isSelectable: true,
 			isNavigator: false, isHoverPanel: false, isNested: true,
 			isPopOver: false, isActionMenu: true,
-			template: options.template || "<div data-id='{{id}} data-trigger='{{id}}'>{{label}}</div>",
+			template: options.template || "<div data-id='{{id}} data-action='{{id}}'>{{label}}</div>",
 			events: {
 				"click [data-id]": "doEventSelect",
-                "click [data-trigger]": "doEventAction",
-				"click [data-action]": "doEventAction",
-				"click [data-navigate]": "doNavigate"
+				"click [data-action]": "doEventAction"
 			},
 			initialize: function(options) {
 				_.defaults(options, { model: false })

@@ -568,7 +568,6 @@ console.log("navigateTo (%s): %o", go_to)
 	        view._views = view._resolveNested(options.views)
 _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
             this.on("show", function() {
-console.warn("SHOW NESTED: %s", options.id)
                 view.showAllNested()
              })
 		},
@@ -584,8 +583,7 @@ console.warn("SHOW NESTED: %s", options.id)
 
 		__showNested: function(self, v, k, meta) {
 
-//_DEBUG &&
-console.log("__showNested (%s): %s", this.options.id, k)
+//_DEBUG && console.log("__showNested (%s): %s", this.options.id, k)
 		    var _DEBUG = self.options.debug || DEBUG
 			if (v.el) {
 //_DEBUG && console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
@@ -651,7 +649,6 @@ console.log("__showNested (%s): %s", this.options.id, k)
 					meta = _.extend({}, conf, meta)
 					meta.id = conf.id || "_ux_"+ux._viewIDcounter++
 					widget = ux.views.view(meta.id, meta );
-console.debug("gotNested (%s): %o", meta.id, widget)
 		    	}
 		    }
 

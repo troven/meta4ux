@@ -63,7 +63,7 @@ module.on("all", function(e,x) {
 
         // define the user principal
         var ProfileModel = Backbone.Model.extend({url: "/models/me"})
-        core.fact.models.set("principal", new ProfileModel(options.user) );
+        core.fact.models.set("user", new ProfileModel(options.user) );
 
         localStorage.debug = false;
         var socket = io.connect(options.url, {});

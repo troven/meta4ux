@@ -6,7 +6,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 
-	ux.view.Grid = ux.view["meta4:ux:Grid"] = function(options) {
+	var DataGrid = function(options) {
 		options = ux.checkOptions(options, ["id", "label", "collection"]);
 		options = _.extend({DEBUG: true, paging: false, selectable: false}, options);
 
@@ -100,7 +100,7 @@ DEBUG && console.debug("Init Grid Columns: %o %o", _columns, this.columns );
 //                        ux.mixin.Common.doSelect.call(this, this.model);
 //                    }
 //                } );
-console.log("Grid Header init: %o", meta);
+console.log("[DataGrid] Header init: %o", meta);
 
 				var Header = options.header || Backgrid.Header;
 				this.header = new Header(meta);
@@ -143,7 +143,7 @@ console.log("Grid Header init: %o", meta);
 			  },
 
 			doEventSelectRow: function (ui, event) {
-DEBUG && console.log("Grid Row Selected: %o %o", this, event );
+DEBUG && console.log("[DataGrid] Row Selected: %o %o", this, event );
 			}
 
 		}, ux.mixin.Common ) );
@@ -163,7 +163,7 @@ DEBUG && console.log("Grid Row Selected: %o %o", this, event );
         "options": true,
         "schema": true,
 
-        "fn": ux.view.Grid
+        "fn": DataGrid
     }
 
 })

@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	ux.view["meta4:ux:HTML"] = function(options) {
+	var HTMLPages = function(options) {
 		options = ux.checkOptions(options);
 		options = _.extend({editable: true, editing: false, edited: { rows: 20, cols: 120, toolbar: {} }, attached: {}, metaKey: "template", autoHide: true }, options);
 		var DEBUG = ux.DEBUG && true;
@@ -122,7 +122,7 @@ console.debug("Activate Item:", model, $item);
         "options": true,
         "schema": false,
 
-        "fn": ux.view.HTMLPages
+        "fn": HTMLPages
     }
 
 })
