@@ -48,7 +48,7 @@ DEBUG && console.log("GET UX: ", req.path)
 
         // live re-generation of recipe files
         // NOTE: blocking I/O inside
-        var recipe = self.handle(feature, config)
+        var recipe = self.handle(meta4, feature, config)
         recipe.url = req.protocol+"://"+req.hostname+":"+config.port+config.basePath
         res.json(recipe);
 
@@ -74,11 +74,16 @@ DEBUG && console.log("UX Asset: ", file, stat?true:false)
 // =============================================================================
 // dynamically build the UX definition
 
-exports.handle = function(feature, config) {
+exports.handle = function(meta4, feature, config) {
 
-    var recipe = { views: {}, models: {}, scripts: {}, templates: {} }
+    var recipe = { views: {}, models: {}, scripts: {}, templates: {}, server: {} }
 
-    var AcceptJSON = function(file, data) { return file.indexOf(".json")>0 }
+	// server-side features
+	recipe.server.socketio = meta4.io?{ enabled: true }:{ enabled: false }
+	recipe.server.remote = meta4.router?{ enabled: true }:{ enabled: false }
+
+	// file filters
+	var AcceptJSON = function(file, data) { return file.indexOf(".json")>0 }
     var AcceptHTML = function(file, data) { return file.indexOf(".html")>0 }
     var AcceptECMA = function(file, data) { return file.indexOf(".js")>0 }
 

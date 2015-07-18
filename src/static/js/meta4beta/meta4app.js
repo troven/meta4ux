@@ -66,31 +66,37 @@ module.on("all", function(e,x) {
         core.fact.models.set("user", new ProfileModel(options.user) );
 
         localStorage.debug = false;
-        var socket = io.connect(options.url, {});
-        socket.on("connect", function (data) {
-            console.warn("[io] connect", data);
-            alert("c")
-	        socket.on("hello", function (data) {
-	            console.warn("[io] welcome", data);
-	            alert("m")
-	        })
-        })
+		
+		if (options.server.io && options.server.io.enabled) {
+			_.defaults(options.server.io, { url: options.url })
 
-        // notification timer
-        if (options.notifications) {
+			var socket = io.connect(options.server.io.url, {});
+			socket.on("connect", function (data) {
+				console.warn("[io] connect", data);
+				socket.on("hello", function (data) {
+					console.warn("[io] welcome", data);
+				})
+			})
+			console.debug("Socket IO: %o", options.server.io)
+		}
+
+		// notification timer
+        if (options.server.gossip && options.server.gossip.enabled) {
+			_.defaults(options.server.gossip, { interval: 1 })
             var GossipCollection = Backbone.Collection.extend({url: "/models/fact/Gossip"})
             core.fact.models.set("userGossip", new GossipCollection() );
             setInterval(function() {
                 var gossip = core.fact.models.get("userGossip")
-console.debug("Gossip: %o", gossip)
+console.debug("Gossip Enabled: %o", gossip)
                 gossip.fetch()
-            }, (1000*options.notifications) )
+            }, (1000*options.server.gossip.interval) )
         }
 
         this.handleErrors(module)
 
         // Announce Module is ready
         module.trigger("boot", options)
+console.debug("boot: %o", options)
         return module;
     }
 

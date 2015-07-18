@@ -42,8 +42,9 @@ DEBUG && console.log("goHome: %o %o", this, go_to)
 			},
 			onNavigate: function(go_to) {
 				var view = this.navigateTo(go_to)
-DEBUG && console.log("onNavigate: %o %o %o", this, go_to, view)
-				view && this.attachNavigateListeners(view)
+//DEBUG && 
+	console.log("onNavigate: %o %o %o", this, go_to, view)
+//				view && this.attachNavigateListeners(view)
 //				if (this.footer && this.footer.currentView) this.footer.currentView.triggerMethod("navigate", go_to)
 				if (this.header && this.header.currentView) {
 					var _view = this._views[go_to]

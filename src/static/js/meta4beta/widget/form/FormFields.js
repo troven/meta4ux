@@ -403,7 +403,7 @@ console.log("Upload: %o %o", this.options, params)
             var file = model.get(this.options.id)
             if (!file) file = new Backbone.Model({ "url": "default_"+this.options.id+".png"})
             var url = file.get("url")
-            url = this.options.baseURL?this.options.baseURL+url:url
+            url = this.options.baseURL?this.options.baseURL+url:"./"+url
 
 console.log("Portrait: %o %o @ %s", this, model, url);
             $("img", this.$el).attr("src", url)
