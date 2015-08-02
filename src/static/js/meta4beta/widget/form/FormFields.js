@@ -103,24 +103,24 @@ DEBUG && console.log("updatedField(%s): %o %o", fieldId, value, model)
 
 // console.log("CommitField(%s): %o %o %o <- %o", self.options.id, this, model, $field, $fields.length?$fields.length+" fields": "field")
         return true;
-    }
+    };
 
     var commitGroupFields = function(event) {
-        var self = this
-        var $fields = this.$el || $(event.currentTarget)
+        var self = this;
+        var $fields = this.$el || $(event.currentTarget);
 //DEBUG &&
-console.log("CommitGroupFields: %o %o %o", this, event, $fields)
+console.log("CommitGroupFields: %o %o %o", this, event, $fields);
         $("[name]", $fields).each(function() {
-            var submodel = self.options.formModel.get(self.options.id)
+            var submodel = self.options.formModel.get(self.options.id);
              if (!submodel) {
                 submodel = new Backbone.Model();
-                self.options.formModel.set(self.options.id, submodel)
+                self.options.formModel.set(self.options.id, submodel);
              }
 // console.log("CommitGroupField: %o %o %o", self, submodel, this)
-            commitField.call(self, $(this))
-        })
+            commitField.call(self, $(this));
+        });
         return true;
-    }
+    };
 
 	var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.ItemView.extend( _.extend({
 	    tagName: "div", className: "form-group row form-field",
@@ -142,6 +142,17 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields)
             $(".message", this.$el).hide();
         }
     }, ux.mixin.Common));
+
+    // create a template
+    var FieldTemplate = function(options) {
+        options = _.extend({ label: { width: 4, label: "label", comment: "comment" }, field: { width: 8}, message: { width: 4, label: "message" } }, options)
+
+        var t = "<label class='col-sm-"+options.label.width+" control-label' title='{{"+options.label.comment+"}}'>{{"+options.label.label+"}}</label>"
+        t+="<div class='col-sm-8'>"
+        t+="<select class='col-sm-6' name='{{id}}'/>"
+        t+="</div><div class='message text-danger'>{{"+options.message.label+"}}</div>"
+        return t
+    }
 
     // Field Editors
 

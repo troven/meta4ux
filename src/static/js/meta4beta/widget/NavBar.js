@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 	// Navigation Bar
 
-	ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options) {
+	var NavBar = ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options) {
 		options = ux.checkOptions(options); // sanity check ('this', 'label')
 
 		var MenuToggle = Backbone.Marionette.CompositeView.extend( _.extend({
@@ -65,16 +65,16 @@ DEBUG && console.log("menu select", this, that)
 
 	return {
 	    "id": "NavBar",
-        "label": "Navigation Bar",
+        "label": "Navigation Toolbar",
         "comment": "A list of Menu Buttons",
-        "emits": ["action"],
+        "emits": ["action", "navigate"],
         "mixins": [ "isActionable", "isNavigator" ],
         "views": false,
-        "collection": false,
+        "collection": true,
         "options": true,
         "schema": false,
 
-        "fn": ux.view.NavBar
+        "fn": NavBar
     }
 
 })
