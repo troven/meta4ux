@@ -12,6 +12,7 @@ tmp
 
 # IntelliJ
 *.iml
+.idea
 
 # OS X
 .DS_Store
