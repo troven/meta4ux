@@ -1,4 +1,4 @@
-var self = exports = module.exports = module.exports || {};
+var self = module.exports
 
 // =============================================================================
 // framework packages
@@ -12,45 +12,70 @@ var _          = require('underscore');     // collections helper
 // =============================================================================
 // meta4 packages
 
-var helper     = require('meta4helpers');      // utilities
+var helpers     = require('meta4helpers');      // utilities
 
 // =============================================================================
 // Configure UX - load recipes from local files
 
 exports.feature = function(meta4, feature) {
 
-    assert(meta4, "feature needs meta4")
-	var router = meta4.router, config = meta4.config
-
-    assert(router, "feature arguments: router")
-    assert(feature, "feature arguments: feature")
-    assert(config, "feature arguments: config")
+	// Sanity Checks
+    assert(meta4, "feature missing {{meta4}}")
+	assert(meta4.router, "feature missing {{meta4.router}}")
+	assert(meta4.config, "feature missing {{meta4.config}}")
+	assert(meta4.vents, "feature missing {{meta4.vents}}")
 
     // we need to find lots of files ... so, are we correctly configured?
-    assert(feature.path, "{{ux}} feature not configured")
-    assert(feature.paths, "{{paths}} feature not configured")
-    assert(feature.paths.models, "{{paths.models}} feature not configured")
-    assert(feature.paths.views, "{{paths.views}} feature not configured")
-    assert(feature.paths.templates, "{{paths.templates}} feature not configured")
-    assert(feature.paths.scripts, "{{paths.scripts}} feature not configured")
+	assert(feature, "feature missing {{feature}}")
+    assert(feature.path, "feature missing {{feature.path}}")
+    assert(feature.paths, "feature missing {{feature.paths}}")
+    assert(feature.paths.models, "feature missing {{paths.models}}")
+    assert(feature.paths.views, "feature missing {{paths.views}}")
+    assert(feature.paths.templates, "feature missing {{paths.templates}}")
+    assert(feature.paths.scripts, "feature missing {{paths.scripts}}")
+	assert(feature.modelPath, "feature missing {{paths.modelPath}}")
 
-    // why??
-    assert(config.features.crud, "UX requires CRUD configuration");
-    assert(config.features.crud.home, "CRUD {{home}} is missing");
+// =============================================================================
+	var router = meta4.router, config = meta4.config
 
+	var DEBUG = feature.debug || false
 
-    var DEBUG = feature.DEBUG || false
+	// cache UX definitions
+	self.cache = helpers.mvc.reload.all(feature)
 
-DEBUG && console.log("UX path: ", feature.path)
-    router.get(feature.path, function(req, res) {
+	DEBUG && console.log("UX path: ", feature.path, _.keys(self.cache))
 
-DEBUG && console.log("GET UX: ", req.path)
+    router.get(feature.path+"/:id?", function(req, res) {
+
+        var port = req.get("X-Forwarded-Port") || req.connection.localPort
+        var host = req.get("X-Forwarded-IP") || req.protocol+"://"+req.hostname
+
+DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
 
         // live re-generation of recipe files
-        // NOTE: blocking I/O inside
-        var recipe = self.handle(meta4, feature, config)
-        recipe.url = req.protocol+"://"+req.hostname+":"+config.port+config.basePath
-        res.json(recipe);
+	    var recipe = helpers.mvc.reload.all(feature)
+
+	    // server-side features
+	    recipe.server = {}
+	    recipe.server.socketio = meta4.io?{ enabled: true }:{ enabled: false }
+	    recipe.server.remote = meta4.router?{ enabled: true }:{ enabled: false }
+
+	    // Localise recipe
+	    recipe.home = "views:home"
+	    recipe.id = req.params.id || config.name
+
+        recipe.url = host+":"+port+config.basePath
+
+	    // vent our intentions
+	    meta4.vents.emit(feature.id, "home", req.user||false, recipe||false);
+	    meta4.vents.emit(feature.id+":home", req.user||false, recipe||false);
+
+	    // rewrite model URLs
+	    _.each(recipe.models, function(model) {
+		    model.url = model.url || config.basePath+feature.modelPath+"/"+model.id
+	    })
+
+	    res.json(recipe);
 
     });
 
@@ -60,111 +85,13 @@ DEBUG && console.log("GET UX: ", req.path)
         if (path.indexOf('..') === -1) {
             var file = paths.normalize(__dirname + "/../static/"+path)
             var stat = fs.existsSync(file)
-DEBUG && console.log("UX Asset: ", file, stat?true:false)
+//DEBUG && console.log("UX Asset: ", file, stat?true:false)
             if (stat) {
                 res.sendFile(file);
-                return ;
+                return;
             }
         }
         next()
     });
 
-}
-
-// =============================================================================
-// dynamically build the UX definition
-
-exports.handle = function(meta4, feature, config) {
-
-    var recipe = { views: {}, models: {}, scripts: {}, templates: {}, server: {} }
-
-	// server-side features
-	recipe.server.socketio = meta4.io?{ enabled: true }:{ enabled: false }
-	recipe.server.remote = meta4.router?{ enabled: true }:{ enabled: false }
-
-	// file filters
-	var AcceptJSON = function(file, data) { return file.indexOf(".json")>0 }
-    var AcceptHTML = function(file, data) { return file.indexOf(".html")>0 }
-    var AcceptECMA = function(file, data) { return file.indexOf(".js")>0 }
-
-    // =============================================================================
-    // load the View definitions
-
-    var viewsDir = feature.paths.views
-    helper.files.mkdirs(viewsDir)
-    var found  = helper.files.find(viewsDir, AcceptJSON )
-
-    // create View recipe
-    _.each( found, function(data, file) {
-        try {
-            var view = JSON.parse(data)
-            view.id = view.id || path.basename(path.normalize(file), ".json")
-            recipe.views[view.id] = view
-        } catch(e) {
-            console.error("Error:", file, e)
-        }
-    })
-
-    // =============================================================================
-    // load the Model definitions
-
-    var modelsDir = feature.paths.models
-    helper.files.mkdirs(modelsDir)
-    found  = helper.files.find(modelsDir, AcceptJSON )
-
-    _.each( found, function(data, file) {
-        if (!data) return
-        try {
-            var model = JSON.parse(data)
-        } catch(e) {
-            console.log("Corrupt JSON:", file)
-        }
-
-        // only designated client models
-        if (model.isClient) {
-            model.id = model.id || path.basename(file, ".json")
-            recipe.models[model.id] = model
-        }
-
-        model.url = model.url || config.basePath+feature.crud+"/"+model.id
-//        console.log("\tmodel: ", model.id, "@", model.url)
-    })
-
-    // =============================================================================
-    // load the HTML Templates
-
-    var templatesDir = feature.paths.templates
-    helper.files.mkdirs(templatesDir)
-    found  = helper.files.find(templatesDir, AcceptHTML )
-
-    // add templates to recipe
-    var assetKey = "templates"
-    _.each( found, function(data, file) {
-        var id = file.substring(feature.paths[assetKey].length+1)
-//console.log("UX: template", id)
-
-        // strip repetitive whitespace
-        recipe.templates[assetKey+":"+id] = (""+data).replace(/\s+/g, ' ');
-    })
-
-    // =============================================================================
-    // load the client-side JS scripts
-
-    var scriptsDir = feature.paths.scripts
-    helper.files.mkdirs(scriptsDir)
-    found  = helper.files.find(scriptsDir, AcceptECMA )
-
-    // add JS scripts to recipe
-    assetKey = "scripts"
-    _.each( found, function(data, file) {
-        var id = file.substring(feature.paths[assetKey].length+1)
-//console.log("UX: script", id)
-        recipe.scripts[assetKey+":"+id] = ""+data
-    })
-
-    // UX recipe
-    recipe.home = "views:home"
-    recipe.id = config.name
-
-    return recipe
 }

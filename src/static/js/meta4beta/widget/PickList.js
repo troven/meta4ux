@@ -9,13 +9,10 @@ function ($, _, Backbone, Marionette, ux, Form) {
 	var DEBUG = true && ux.DEBUG;
 
 	ux.view.PickList = ux.view["meta4:ux:PickList"] = function(options) {
-		options = ux.checkOptions(options, ["id"]);
-		_.defaults(options, { child: { "className": "list-group-item" } })
-
-		options.childViewOptions = options.child
+		options = _.defaults(options, { child: { "className": "list-group-item" } })
 
 		var ListItem = Backbone.Marionette.ItemView.extend( _.extend({
-			tagName: "li", isHoverPanel: true, isActionable: true,
+			tagName: "li", isHoverPanel: true, isActionable: true, isTemplating: true,
 			template: options.child.template || "<span data-id='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'><span class='pull-right action-buttons'><i data-trigger='delete' class='btn btn-sm btn-info fa fa-trash' title='Remove'></i></span><label>{{"+labelAttribute+"}}</label></span>",
 			events: {
                 "click [data-action]": "doAction",
@@ -34,40 +31,40 @@ function ($, _, Backbone, Marionette, ux, Form) {
 				$item.addClass("active");
 				return this;
 			}
-		}, ux.ux.mixin.Selectable));
+		}));
 
 		var config = {
 			isSortable: true, isCommon: true,
 			isPopOver: true, isSelectable: true, isHoverPanel: true,
-			childView: ListItem, tagName: "ul",
-			template: "<div><div class='picker'></div><ul class='clearfix picked_list'></ul></div>",
+			childView: ListItem, tagName: "div",
+			template: "<div class='picker'></div><ul class='clearfix picked_list'></ul>",
 			childItemContainer: ".picked_list",
 			events: {
 				'sortstart': 'doEventDrag',
 				'click .picker .clickable': 'doPickSelection'
 			},
 			initialize: function(_options) {
+				_options = _.defaults(_options, { picker: false})
 				ux.initialize(this, _options)
-				_.defaults(_options, { picker: false})
 
-                var pickOptions = _.extend({
+                var pickerOptions = _.extend({
                     editable: true,
                     id: _options.id,
-                    placeholder: _options.picker.label || _options.comment,
                     multiple: false,
                     tags: false,
-                    formModel: this.model
-                },_options.picker)
-                pickOptions.template = "<div class='col-sm-6 clearfix'><span class='clickable btn btn-default'>{{label}}<i class='fa fa-plus'></i></span></i><div class='col-sm-6'><select class='form-control' name='{{id}}'/></div>{{comment}}</div>" || options.picker.template
+                    _form: this,
+	                formModel: this.model
+                }, _options.picker)
 
-console.log("Picker: %o", pickOptions)
-			    this.picker = new ux.view.fields.Select(pickOptions)
-				ux.initialize(this.picker, pickOptions)
+				pickerOptions.placeholder = pickerOptions.label || _options.comment
+                pickerOptions.template = pickerOptions.template || "<div class='col-sm-6 clearfix'><span class='clickable btn btn-default'>{{label}}<i class='fa fa-plus'></i></span></i><div class='col-sm-6'><select class='form-control' name='{{id}}'/></div>{{comment}}</div>"
+
+console.log("Picker: %o %o", this, pickerOptions)
+			    this.picker = new ux.view.fields.Select(pickerOptions)
+				ux.initialize(this.picker, pickerOptions)
                 this.listenTo(this.picker)
                 this.on("childview:delete", this.onDelete)
 				return this;
-			},
-			onRender: function() {
 			},
 			onShow: function() {
 			    var $picker = $(".picker", this.$el)

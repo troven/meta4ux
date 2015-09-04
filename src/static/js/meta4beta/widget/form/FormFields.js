@@ -28,19 +28,27 @@ DEBUG && console.log("renderField: %s %o %o", fieldId, value, $field)
                 $field.addClass("editable");
             }
             self.options.hidden && $field.addClass("hide");
-        })
+        });
+
         return this;
-    }
+    };
 
     var validateField = function(value, model) {
-        var validators = this.model.get("validators");
+
         model = model || this.options.formModel
         this.model.set("message", "")
         var invalid = {}
         var fieldId = this.model.get(idAttribute)
         var self = this
-//        return true; // TESTING
-// DEBUG && console.debug("validateField (%s:=%s) %o %o %o %o", fieldId, value, field, _options, validators, invalid)
+
+        var model_validators = this.model.get("validators")
+
+        // merge validation (schema/model, editor/widget)
+        var validators = []
+        validators = validators.concat( model_validators );
+        validators = validators.concat( this.validators )
+
+DEBUG && console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
 
         _.each(validators, function(validator) {
             var validate = ux.view.validators[validator]
@@ -51,11 +59,11 @@ DEBUG && console.log("renderField: %s %o %o", fieldId, value, $field)
                 if (pattern) {
                     var regexp = new RegExp(pattern)
                     valid = value.match(regexp)?true:false
-DEBUG && console.log("valid rx: %s %s -> %o", validator, pattern, valid)
+//DEBUG && console.log("valid rx: %s %s -> %o", validator, pattern, valid)
                 }
                 if (validate.fn && _.isFunction(validate.fn) ) {
                     valid = validate.fn(value, model.attributes, self.model.attributes)
-DEBUG && console.log("valid fn: %s %s -> %o", validator, validate.fn, valid)
+//DEBUG && console.log("valid fn: %s %s -> %o", validator, validate.fn, valid)
                 }
                 if (!valid) {
                     invalid = validate
@@ -94,10 +102,14 @@ DEBUG && console.log("updatedField(%s): %o %o", fieldId, value, model)
         var $field = this.$el
         var $fields = $("[name]", $field)
 
-        if (!$fields || !$fields.length) setModelField.call(self, $field, model)
-        else {
+        if (!$fields || !$fields.length) {
+            setModelField.call(self, $field, model)
+            this.triggerMethod("commit", model, $field)
+        } else {
             $fields.each(function() {
-                setModelField.call(self, $(this), model)
+                var $this = $(this)
+                setModelField.call(self, $this, model)
+                self.triggerMethod("commit", model, $this)
             })
         }
 
@@ -154,12 +166,44 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
         return t
     }
 
+    fields.ViewField = function(Field) {
+
+	    if (!Field) throw new Error("ViewField missing")
+	    var View = Backbone.Marionette.ItemView.extend({
+		    className: "form-group row form-text",
+		    template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='field-view col-sm-9'></div><div class='message text-danger'>{{message}}</div>",
+		    initialize: function(options) {
+			    var View = new Field(options)
+			    this.view = new View(options)
+		    },
+		    onRender: function() {
+			    var $el = $(".field-view", this.$el)
+			    console.log("FieldView: %o %o", this, $el)
+			    $el.append( this.view.render().$el )
+			    this.view.triggerMethod("show")
+		    }
+	    })
+	    return View
+    }
+
     // Field Editors
 
     fields.Text  = FormField.extend({
         className: "form-group row form-text",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='20' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
+
+    fields.ID = FormField.extend({
+        className: "form-group row form-text",
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='12' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+        onCommit: function(model, $field) {
+            var slug  = model.get(this.options.id)
+            if (this.options.autoGenerate && !slug) slug = core.uuid()
+            slug = core.ux.uid(slug || model.id)
+            model.set(this.options.id, slug)
+            $field.val(slug)
+        }
+    });
 
     fields.LongText = FormField.extend({
         className: "form-group row form-longtext",
@@ -198,7 +242,7 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
     fields.Date = FormField.extend({
         className: "form-group row form-date",
         validators: ["date"],
-        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='16' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Password = FormField.extend({
@@ -209,11 +253,6 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
     fields.Button = FormField.extend({
         className: "form-group row form-button",
         template: "<label class='col-sm-3 control-label'></label><div class='col-sm-2'><span data-trigger='{{id}}' class='btn btn-default' title='{{comment}}'>{{label}}</span></div>"
-    })
-
-    fields.Boolean = FormField.extend({
-        className: "form-group row form-boolean",
-        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' type='checkbox' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
     })
 
     fields.Select = Backbone.Marionette.CompositeView.extend({
@@ -241,8 +280,11 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
         },
         initialize: function(options) {
             options = _.extend({}, this.options, options)
-            this.collection = ux.lookup(options.collection || options.options)
-            ux.initialize(this,options)
+	        if (!this.collection) {
+console.log("Select Schema", options)
+		        this.collection = ux.lookup(options.collection || options.options)
+	        }
+	        ux.initialize(this,options)
         },
         commit: commitField,
         onRender: renderField,
@@ -250,15 +292,22 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
             var $select = $("select",this.$el);
             var self = this
 //DEBUG && console.log("onShow Select: %o %o", this, $select)
-            $select.select2(_.extend({ width: "element" }, this.options.select2))
+            $select.select2(_.extend({ width: "element", minimumResultsForSearch: 6 }, this.options.select2))
             $select.on("change", function() {
                 self.commit($select);
             })
         }
     })
 
+    // Synonyms
+
+    fields.Lookup = fields.Select;	// TODO: A Lookup has a Create View
+    fields.String = fields.Text
+    fields.Integer = fields.Number
+
     fields.Boolean = fields.Select.extend({
         className: "form-group row form-boolean",
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-8'><select class='col-sm-2' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
         options: { options: { true: "Yes", false: "No" } }
     })
 
@@ -277,7 +326,7 @@ DEBUG && console.log("Tag Show: %o %o", this, this.collection)
         events: { blur: "doCommit", "change": "doCommit" },
         childView: Backbone.Marionette.ItemView.extend({
             tagName: "span",
-            template: "<li><input type='checkbox' id='{{id}}' name='{{id}}' value='true'/>&nbsp;<label for='{{name}}'>{{label}}</label></li>",
+            template: "<li><input type='checkbox' name='{{id}}' value='true'/>&nbsp;<label for='{{name}}'>{{label}}</label></li>",
             onRender: renderField
         }),
         childViewContainer: ".form-group-container",
@@ -301,33 +350,60 @@ DEBUG && console.log("CommitCheckbox: %o", this)
         onRender: renderField
     })
 
-    fields.Selector = Backbone.Marionette.CompositeView.extend({
-        className: "form-group row form-selector",
-        template: "<span class='col-sm-4 control-label' title='{{comment}}'>{{label}}</span><div class='selector col-sm-8'></div><div class='message text-danger'>{{message}}</div>",
-        events: {  },
-        childEvents: { "click .selection": "commit" },
-        childViewContainer: ".selector",
+    fields.Actions = Backbone.Marionette.CollectionView.extend({
+        className: "row", isActionable: true,
+        events: {
+            "click [data-trigger]": "doEventAction"
+        },
         childView: Backbone.Marionette.ItemView.extend({
-            template: "<span data-icon='{{id}}'>{{label}}</span>", className: "selection btn btn-info",
+            tagName: "span",
+            "className": "col-sm-2",
+            template: "<button data-trigger='{{id}}' type='button' class='btn btn-default' aria-label='Left Align'><span class='glyphicon glyphicon-{{icon}}' aria-hidden='true'></span>{{label}}</button>"
         }),
         initialize: function(options) {
+            ux.initialize(this, options)
+            this.collection = this.collection || ux.lookup(options.options)
+            if (!this.collection) throw "meta4:form:oops:missing-lookup#"
+            DEBUG && console.log("Actions: %o %o %o", this, options, this.collection?this.collection.toJSON():"Missing Lookup")
+        },
+        doAction: function(action) {
+console.log("Form Action: %o %o", this, arguments)
+        }
+    })
+
+    fields.Selects = Backbone.Marionette.CompositeView.extend({
+        className: "form-group row form-selects",
+        template: "<span class='col-sm-3 control-label' title='{{comment}}'>{{label}}</span><ul class='selects list-group col-sm-9'></ul><div class='message text-danger'>{{message}}</div>",
+        events: {  },
+        childEvents: { "click .selection": "commit" },
+        childViewContainer: ".selects",
+
+	    childView: Backbone.Marionette.ItemView.extend({
+		    tagName: "li", className: "list-group-item", isTemplating: true,
+		    initialize: function(options) {
+			    ux.initialize(this, options)
+console.log("childViewInit: %o", options)
+		    },
+	    }),
+	    childViewOptions: function(model) {
+		    return _.extend({ template: "{{label}}" },this.options.child)
+	    },
+	    initialize: function(options) {
             ux.initialize(this,options)
-            var values = options.options
-            this.collection = ux.lookup(values)
+            this.collection = this.collection || ux.lookup(options.options)
 console.log("Selector %o %o %o", this, options, this.collection)
         },
         commit: function() {
             var invalid = this.validate?this.validate(value, model):{}
-DEBUG && console.log("CommitField(%s): %o %o %o %o %o", fieldId, this, model, $field, value, invalid)
+DEBUG && console.log("Commit Selects(%s): %o %o %o %o %o", fieldId, this, model, $field, value, invalid)
             if (!invalid||!invalid.message) {
-            model.set(this.options.id, value )
-DEBUG && console.log("ValidFormField(%s): %o", fieldId, value, model)
+	            model.set(this.options.id, value )
+DEBUG && console.log("Valid Selects(%s): %o", fieldId, value, model)
             } else {
-DEBUG && console.log("InvalidFormField(%s): %o", fieldId, value, model)
+DEBUG && console.log("Invalid Selects(%s): %o", fieldId, value, model)
             }
             this.triggerMethod("commit")
         },
-        x_commit: commitField,
         onRender: renderField
     })
 
@@ -362,8 +438,7 @@ console.log("formData:", k, v)
             // reset the file fields
             $inputs.replaceWith( $inputs.clone( true ) );
 
-            var params = JSON.stringify(_.pick(this.options, ["model", "", ""]) )
-console.log("Upload: %o %o", this.options, params)
+console.log("Upload: %s %o", self.model.id, this.options)
 
             // perform multi-part upload
             var then = new Date().getTime()
@@ -379,13 +454,14 @@ console.log("Upload: %o %o", this.options, params)
                     var elapsed = Math.ceil((new Date().getTime()-then)/1000)
                     var bitRate = response.data.size/elapsed
 
-                    var data = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data)
+                    var file = _.extend({ elapsed: elapsed, bitRate: bitRate },response.data);
+
 					// update model
-                    model.set(self.model.id, data )
+                    model.set(self.model.id, file )
 
                     // trigger event
-                    self.triggerMethod("upload", data)
-                    console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, data, response)
+console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, file)
+                    self.triggerMethod("upload", file)
                 },
                 error: function() {
                     self.triggerMethod("upload-failed")
@@ -396,7 +472,7 @@ console.log("Upload: %o %o", this.options, params)
 
     fields.Portrait = fields.Upload.extend({
         className: "form-group row form-portrait",
-        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><img class='clickable' title='{{comment}}' alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
+        template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><img class='clickable' title='{{comment}}' alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
         events: {
             "click img": "doUploadClick"
         },
@@ -408,18 +484,29 @@ console.log("Upload: %o %o", this.options, params)
             var $input = $('input', this.$el)
             $input.click();
         },
+        onUpload: function() {
+//            this.commit();
+//            this.triggerMethod('render');
+        },
         onRender: function() {
             var self = this
             var model = this.options._form.model
             var file = model.get(this.options.id)
-            if (!file) file = new Backbone.Model({ "url": "default_"+this.options.id+".png"})
-            var url = file.get("url")
-            url = this.options.baseURL?this.options.baseURL+url:"./"+url
+            var url = file && file.get("url")
+console.log("Portrait [render]: %o %o %o", file, url );
+            if (!url) {
+                url = "./img/icons/default_"+this.options.id+".png";
+                file = new Backbone.Model( _.extend({ "id": this.options.id, "url": url}, file) );
+console.log("Portrait [default]: %o %o @ %s -> %s", file, model, this.options.id, url);
+            } else {
+console.log("Portrait: %o %o @ %s -> %s", file, model, this.options.id, url);
+                url = this.options.baseURL?this.options.baseURL+url:"./"+url
+            }
 
-console.log("Portrait: %o %o @ %s", this, model, url);
             $("img", this.$el).attr("src", url)
 
             $("input", this.$el).change(function() {
+console.log("Portrait: input changed: %o", this)
                 self.commit();
             })
         }
@@ -431,10 +518,5 @@ console.log("Portrait: %o %o @ %s", this, model, url);
 DEBUG && console.log("Child SubView: %o %o", options, subOptions, Field);
         return Field;
     }
-
-    // synonyms
-
-    fields.String = fields.Text
-    fields.Integer = fields.Number
  	return ux;
 })

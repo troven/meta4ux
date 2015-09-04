@@ -27,7 +27,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 		view: function(id, _options) {
 			var widget = false;
 			// resolve the arguments
-            if (!id) throw "meta4:ux:oops:missing-id";
+            if (!id) throw "meta4:ux:oops:missing-view-id";
 
             // objects are cloned, then instantiated directly
 			if (_.isObject(id)) {
@@ -106,6 +106,10 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 //console.error("_: %o %o %o", this, that, this[that])
             return that?core.ux.uid(that):core.uuid();
         },
+        "raw": function( field) {
+console.log("RAW: %o %o %o", this, field, this[field])
+            return _.isUndefined(this[field])?field:this[field]
+        },
         uid: function(that) {
             return that?core.ux.uid(that):core.uuid();
         },
@@ -168,8 +172,8 @@ throw "i18n not implemented: "+that
 				Handlebars.registerHelper(name,fn)
 			})
 
+            // load all widgets
 			this.registerWidgets(options, function() {
-//DEBUG && console.warn("UX Configured: %o %o %o", self, module, options)
 				module.trigger("ux:boot", self, options)
 			})
 
@@ -286,9 +290,6 @@ throw "deprecated"
 
 //	        Backbone.View.prototype.delegateEvents.apply(this, options);
 
-//			if (view.triggerMethod) view.triggerMethod("initialize", options)
-//			else view.trigger("initialize", options)
-////_DEBUG && console.log("UX init (%s): %o %o", options.id, view, options)
 			return view;
 		},
 

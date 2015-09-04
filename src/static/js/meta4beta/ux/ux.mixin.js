@@ -516,14 +516,16 @@ console.log("doNavigate (%s): %o", go_to, this)
 //			var go_to = model.get("view") || model.id
 //			this.navigateTo(go_to)
 //		},
-		navigateTo: function(go_to) {
+		navigateTo: function(go_to, meta) {
 			var viewId = false, eventId = false;
-console.log("navigateTo (%s): %o", go_to)
+console.log("navigateTo (%s): %o", go_to, meta)
+
+			// split view@event syntax into 2 tokens
 			var where = go_to?go_to.split("@"):0
 			if (where.length>1) { viewId = where[1]; eventId = where[0]; }
 			else viewId = go_to;
 			var self = this
-			var _view = this.getNestedView(viewId)
+			var _view = this.getNestedView(viewId, meta)
 
 			// FIX: MenuButton seems to double trigger
 			if (_view) {
@@ -547,15 +549,13 @@ console.log("navigateTo (%s): %o", go_to)
 
 	ux.mixin.Templating = {
 		initializeTemplating: function(options) {
-//console.log("Init Template() ", this, options );
-			this.getTemplate = this._getTemplate
-		},
-		_getTemplate: function(t) {
-			t = t || this.options.template || this.template
-			if (!t || _.isFunction(t)) return t;
-			var template = ux.templates[t] || ux.compileTemplate(t)
-//console.log("UX getTemplate() ", this, t, template );
-			return template;
+			this.getTemplate = function(t) {
+				t = t || this.options.template || this.template
+//console.log("UX getTemplate() %o %o %o %o", this, options, t, ux.templates[t] );
+				if (!t || _.isFunction(t)) return t;
+				var template = ux.templates[t] || ux.compileTemplate(t)
+				return template;
+			}
 		}
 	}
 
@@ -793,16 +793,16 @@ console.log("UX Position: %o (%o, %o) - (%o, %o)", event, x, y, offsetX, offsetY
 
 	ux.mixin.HoverPanel = {
 		initializeHoverPanel:function(options) {
-			this.on("render", this.renderHoverPanel)
+			this.on("show", this.renderHoverPanel)
 		},
 		renderHoverPanel: function() {
 			var self = this
-			var options = _.extend({ selector: false}, this.options.hoverpanel)
+			var options = _.extend({ selector: "."}, this.options.hoverpanel)
 			if (!options.selector) return
 //DEBUG &&
-			var $process = options.selector=="."?$(this.$el):$(this.$el).find(options.selector)
-			if (!$process || $process.length==0) return
-console.debug("renderHoverPanel: ", self, options, $process)
+			var $item = options.selector=="."?$(this.$el):$(this.$el).find(options.selector)
+			if (!$item || $item.length==0) return
+console.debug("renderHoverPanel: %o %o %o", self, options, $item)
 
 			var position = function($this, event) {
 				var pageWidth = $(document).width()
@@ -824,7 +824,8 @@ console.debug("renderHoverPanel: ", self, options, $process)
 					view && view.destroy()
 					$(".hoverdetail").remove()
 				})
-			}
+			};
+
 			var $body = $("body")
 			if (!$body.hasClass("hoverpanel_active")) {
 				$body.addClass("hoverpanel_active")
@@ -833,13 +834,14 @@ console.debug("renderHoverPanel: ", self, options, $process)
 			this.on("destroy", destroyHoverPanels)
 
 			// each selected item gets it's own hover panel
-			$process.each(function() {
+			$item.each(function() {
 				var $this=$(this)
 				var showPanel = false, removePanel = false
-				var hoverpanelView = $this.attr("data-view") || options.view
+				var hoverpanelView = _.extend({}, $this.attr("data-view"), options.view);
 
+                hoverpanelView.id = hoverpanelView.id || (self.id || core.uuid() ) + "_hover_panel";
 //DEBUG &&
-console.debug("attach HoverPanel (%o)", $this)
+console.debug("attach HoverPanel (%o) -> %o", $this, hoverpanelView)
 
 				showPanel = function($event) {
 					var view = $this.data('hoverpanel')
@@ -877,7 +879,7 @@ DEBUG && console.debug("destroy HoverPanel: %o %o %o", view, this, $this)
 					$this.off("mouseleave.hoverpanel", removePanel)
 				}
 
-				$this.on("mouseenter.hoverpanel", showPanel)
+				$this.on("mouseenter", showPanel)
 			})
 		}
 	}

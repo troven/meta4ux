@@ -15,7 +15,6 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
                 "click [data-trigger]": "doAction",
                 "click [data-action]": "doAction"
             },
-
 			initialize: function(_options) {
 
 			    _.defaults(_options, { model: false, editable: true , autoCommit: true, autoValidate: true, field: { css: "row" }  } )
@@ -25,31 +24,62 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 
 				this.collection = new Backbone.Collection() // Collection of Fields
 
-                var schema = _.extend( {}, _options.views, _options.schema, this.model.schema)
+                var schema =   _options.schema || _options.views || {}
+                var col_schema = this.model&&this.model.collection?this.model.collection.schema:false
+//DEBUG&&
+console.debug("Schema Model: %o %o %o", this.model, this.model.collection, col_schema)
+				this._buildSchemaCollection( schema, col_schema )
 
-                this._buildSchemaCollection( schema )
-DEBUG && console.log("Form Init: %o %o", this, _options)
 				return this;
 			},
 
-			_buildSchemaCollection: function(schema) {
+            validate: function(ctx) {
+                var schema = this.options.schema || this.model.schema;
+                var is_valid = core.fact.validate.model(this.model.toJSON(), { schema: schema });
+console.debug("Validate Form: %o %o -> %o == %s", this.model, ctx, schema, is_valid)
+                return is_valid;
+            },
+
+			_buildSchemaCollection: function(schema, col_schema) {
 				var self = this
-				var isEditable = this.options.editable?true:false
+				col_schema = col_schema&&col_schema.toJSON()?col_schema.toJSON():[]
 
-				_.each(schema, function(field, id) {
-				    if (_.isString(field)) field = { editor: field }
+				var isEditable = this.options.editable===false?false:true
+				var merged = {}
 
-                    var editorType = field.editor || field.widget || field[ux.typeAttribute];
-                    var Field = ux.view.fields[editorType]
+				_.each(schema, function(field,id) {
+					if (_.isString(field)) field = { editor: field }
+					field.id = field.id || id
+					merged[field.id] = _.extend({},merged[field.id], field)
+                    schema[field.id] = field
+DEBUG&&console.debug("View Schema: %s %o", id, field)
+				})
 
-				    field = _.extend({ id: id, editor: editorType || "Text", validators: [],
-				        label: core.humanize(field.id || id), editable: isEditable, required: false }, field)
-                    field.isEditable = isEditable && field.isEditable
+				_.each(col_schema, function(field,id) {
+					field.id = field.id || id
+					if (field.id && merged[field.id]) {
+						merged[field.id] = _.extend({},merged[field.id], field)
+DEBUG && console.debug("Merge Schema: %s %o", field.id, field)
+					}
+				})
 
+				_.each(merged, function(field, id) {
+//console.debug("Field Schema: %s %o", id, field, field.editable)
+
+                    field.editor = field.editor || field.widget || field[ux.typeAttribute] || "Text";
+
+					field.label =  schema[field.id].label || field.label || core.humanize(field.id || id)
+					// assume editable 'unless'
+					field.editable = (field.editable===false || !isEditable)?false:true
+					field.isEditable = (isEditable && field.isEditable)?field.editable:false
+					field.required = field.required?true:false
+					field.validators = field.validators || []
                     if (field.required) field.validators.push("required")
-DEBUG && console.debug("Schema Field (%s): %o %o -> %o", id, field, field.validators, Field)
+
+//DEBUG && console.debug("Schema Field (%s): %o", id, field)
 				    self.collection.add(field);
 				})
+				return merged
 			},
 
             // get Form Field meta-data
@@ -72,7 +102,12 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
             getChildView: function(field) {
                 var editorType = field.get("editor") || field.get("widget") || field.get(ux.typeAttribute);
                 var Field = ux.view.fields[editorType]
-DEBUG && console.log("getChildView: %s %o -> %o @ %o", editorType, field, ux.view.fields, Field)
+                if (!Field) {
+	                Field = ux.view[editorType]
+	                Field = Field && ux.view.fields.ViewField( Field )
+                }
+//DEBUG &&
+console.log("getChildView: %s %o -> %o @ %o", editorType, field, ux.view.fields, Field)
 if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
                 return Field
             },

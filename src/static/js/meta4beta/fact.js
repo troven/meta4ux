@@ -1,9 +1,8 @@
 define(["jquery", "underscore", "backbone", "core", "iq", "asq"], function ($,_,Backbone, core, iq, asq) {
 
-	/* *****************************************************************************************************************
-		Fact: Data / Model Related
-	**************************************************************************************************************** */
-
+/* *****************************************************************************************************************
+	Fact: Data / Model Related
+**************************************************************************************************************** */
 
     var fact = core.fact = core.fact || {}
 
@@ -16,6 +15,7 @@ console.log("Initialize meta4models: %o", fact)
 	_.extend(fact, {
 		models: new Backbone.Model(),
         factory: {},
+
 		boot:function(module, options) {
 			var self=this;
 			self._module = module;
@@ -23,6 +23,7 @@ console.log("Initialize meta4models: %o", fact)
 			var _DEBUG = options.DEBUG || fact.DEBUG;
 			var baseURL = options.url+options.basePath
 //_DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
+
 			_.each(options.models, function(model, id) {
 				if (!_.isEmpty(model)) {
 					model.id = model.id || id
@@ -99,7 +100,7 @@ console.error("Remote Error: %s %s -> %o %o", url, id, response, arguments);
 			meta4beta: function(method, collection, options) {
 				collection.options = collection.options || {}
 
-				var _DEBUG = true || options.DEBUG || collection.options.debug || fact.DEBUG
+				var _DEBUG = options.DEBUG || collection.options.debug || fact.DEBUG
 
 			    var httpMethod = core.fact.crud._methods[method];
 
@@ -133,6 +134,7 @@ console.error("Meta4 CRUD Failed: %s %s -> %o", url, response.message, response)
 				}, error: function(response) {
 console.error("Meta4 Error: %s-> %o %o", url, response, arguments);
 					options.error && options.error(collection, response);
+						alert(url + "-> "+response.statusText)
 				} })
 				return $future;
 			},
@@ -224,8 +226,10 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 //_DEBUG && console.log("Fact Collection: %s %o ", options.id, options)
 
 			var collection = null
-			if (_.isString(options)) return core.fact.models.get(options)
-			else if (_.isFunction(options)) {
+
+			if (_.isString(options)) {
+                return core.fact.models.get(options)
+            } else if (_.isFunction(options)) {
 				options = options();
 				collection = core.fact.factory.Local( options )
 			} else if (_.isArray(options)) {
@@ -258,18 +262,22 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 
 				if (options.data && _.isArray(options.data)) {
 					collection.add(options.data)
-console.log("Instance Data: %o %o", options.data, collection, options.data.length == collection.models.length)
+_DEBUG && console.log("Instance Data: %o %o", options.data, collection, options.data.length == collection.models.length)
 				}
 			}
 
-			collection.model.schema = this._buildSchema(options.schema)
+			var id = options[fact.idAttribute]
+			if (id) {
+				collection.schema = new Backbone.Collection(collection.model.schema = this._buildSchema(options.schema))
+_DEBUG && console.log("Fact Schema: %s %o %o ", id, collection, collection.schema)
+			}
 
 			core.iq.aware(collection, options.iq || options.when);
 			if (!_.isUndefined(options.filter) && options.filter!==false) {
-//_DEBUG &&
-console.log("Filtered Collection: %o %o %o ", collection, collection.model.schema, options.filter)
+//_DEBUG && console.log("Filtered Collection: %o %o %o ", collection, collection.model.schema, options.filter)
 				return this.filter(collection, options.filter===true?{}:options.filter)
 			}
+
 _DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model.schema, options.when || "no IQ")
 			return collection;
 		},
@@ -279,8 +287,11 @@ _DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model
 			var _schema = []
 			_.each(schema, function(field, id) {
 				if (_.isString(field)) field = { id: id, type: field }
-				field = _.extend({ id: id, type: "Text", validators: [], label: field.label || field.id || id, editable: true, required: false }, field)
-
+				field = _.extend({ id: id, type: "string", validators: [], label: field.label || field.id || id, editable: true, required: false }, field)
+				if (field.required && !field.validators) {
+					var validator = core.fact.validators[field.type]
+					if (validator) field.validators = [validator]
+				}
 fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators)
 				_schema.push(field);
 			})
@@ -390,6 +401,10 @@ fact.DEBUG && console.warn("Parse Error:", that, e);
 			message: "not valid URL",
 			pattern: /^(http|https):\/\/(([A-Z0-9][A-Z0-9_\-]*)(\.[A-Z0-9][A-Z0-9_\-]*)+)(:(\d+))?\/?/i
 		},
+		"id": {
+			message: "Invalid ID [4+ characters, A-Z/0-9 no spaces]",
+			pattern: /^\S+\w{4,255}\S{1,}/
+		},
 		"number": {
 			message: "Invalid number",
 			pattern: /^[0-9]*\.?[0-9]*?$/
@@ -402,9 +417,9 @@ fact.DEBUG && console.warn("Parse Error:", that, e);
 			message: "Invalid date time",
 			pattern: /^(19[0-9]{2}|[2-9][0-9]{3})-((0(1|3|5|7|8)|10|12)-(0[1-9]|1[0-9]|2[0-9]|3[0-1])|(0(4|6|9)|11)-(0[1-9]|1[0-9]|2[0-9]|30)|(02)-(0[1-9]|1[0-9]|2[0-9]))\x20(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9]){2}$/
 		},
-		"strongPassword": {
-			message: "Password too weak. 6+ characters including at least 1 upper or lower alpha, and 1 digit.",
-			pattern: /^(?=.*\d)(?=.*[a-zA-Z])(?!.*[\W_\x7B-\xFF]).{6,64}$/
+		"password": {
+			message: "Password too weak. 6+ characters, letter & numbers.",
+			pattern: /^(?=.*\d)(?=.*[a-zA-Z])(?!.*[\W_\x7B-\xFF]).{6,255}$/
 		},
 		"creditCard": {
 			message: "Invalid credit card",
@@ -434,7 +449,7 @@ fact.DEBUG && console.warn("Parse Error:", that, e);
 			var self = this
 			var errors = []
 			options = options || { debug: true }
-			var schema = self.collection&&self.collection.options&&self.collection.options.schema?self.collection.options.schema:{}
+			var schema = options.schema || (self.collection&&self.collection.options&&self.collection.options.schema?self.collection.options.schema:{})
 			var _DEBUG = options.debug || fact.DEBUG
 //_DEBUG&&
 console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options)
@@ -445,7 +460,7 @@ console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options)
 
 			_.each(schema, function(meta,k) {
 //console.log("Validate Attr: %o %o", k, meta)
-				var v = self.get(k)
+				var v = attributes[k]
 				if (meta) {
 					// ubiquitous, so add some syntax sugar
 					if (meta.required) {
@@ -471,10 +486,9 @@ console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options)
 			var hasErrors = (errors && errors.length)
             if (hasErrors) {
 console.warn("Model Invalid: %o %o", self, errors)
-            	self.trigger("invalid", errors)
+                self.trigger && self.trigger("invalid", errors)
+                return hasErrors;
             }
-
-			return hasErrors?errors:false
 		},
 
 		attribute: function(fieldId, value, attributes, validators) {

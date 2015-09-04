@@ -80,12 +80,13 @@ DEBUG && console.log("initHeadersFooters: %o %o", this.headers, this.footers)
                 var can = this.options.can || {}
 
                 if (!can[action]===false) throw "meta4:ux:crud:oops:cannot-"+action;
-                var _view = this.getNestedView(action, meta);
-
-DEBUG && console.log("onAction (%s): %o %o", action, meta, _view)
-                 if (_view) {
-                    this.body.show(_view)
-                }
+//DEBUG &&
+                console.log("onAction (%s): %o", action, meta)
+//                var _view = this.getNestedView(action, meta);
+//
+//                 if (_view) {
+//                    this.body.show(_view)
+//                }
                 this.triggerMethod(action, meta.model)
             },
 
@@ -133,19 +134,23 @@ DEBUG && onsole.debug("HeaderFooters: %o %o", header, footer)
 
             onCreate: function() {
                 var self = this
+
                 var _collection = this.collection
 
-                // create new model
+                // create new model - attach schema
                 var _model = new _collection.model()
+                _model.schema = _collection.schema
+	            _model.collection = _collection
+	            var meta = { model: _model }
+
+                //DEBUG &&
+                console.log("onCreate: %o %o %o", this, _collection, meta)
 
 //                _collection.trigger("create",_model)
 
-                // get the appropriate view
-                var view = this.getNestedView("create") || this.getNestedView("update")
+                // get a reasonable view
+                var view = this.getNestedView("create", meta) || this.getNestedView("edit", meta) || this.getNestedView("update", meta)
                 if (!view) throw "meta4:ux:crud:oops:missing:view:create";
-
-DEBUG && console.log("onCreate: %o %o %o", this, _collection, view)
-                view.model = _model
 
                 this.once("cancel", function() { self.onRead() })
 
@@ -181,7 +186,7 @@ DEBUG && console.log("onRead: %o %o", this, view)
             onUpdate: function(selected) {
 
                 var meta = { model: selected || this.model }
-                var view = this.getNestedView("update", meta) || this.getNestedView("view", meta);
+                var view = this.getNestedView("update", meta) || this.getNestedView("edit", meta) || this.getNestedView("view", meta);
 DEBUG && console.log("onUpdate: %o %o", this, selected)
 
                 this.body.show(view);

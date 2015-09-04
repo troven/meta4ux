@@ -95,13 +95,18 @@ _DEBUG && console.log("New Local Collection (%s): %o %o %o", cid, options, model
 _DEBUG && console.log("Existing Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
 					}
 				} else if (options.collection.indexOf("!")==0) {
-				// global-collection
+				    // global-collection
 					var cid = options.collection.substring(1)
 					_collection = fact.models.get(cid)
 _DEBUG && console.log("Global Collection (%s): %o %o %o", cid, options, modelled, _collection)
 				} else {
 					var cid = options.collection
-					_collection = modelled.model.get(cid) || this.fact.models.get(cid)
+                    if (cid && modelled.model) {
+                        _collection = modelled.model.get(cid)
+                    }
+                    if (cid && !_collection) {
+                        _collection = this.fact.models.get(cid)
+                    }
 _DEBUG && console.log("Local/Global Collection (%s): %o %o %o", cid, options, modelled, _collection)
 				}
 
@@ -109,6 +114,7 @@ _DEBUG && console.log("Local/Global Collection (%s): %o %o %o", cid, options, mo
 					_collection = this.fact.factory.Local({ id: options.collection, fetch: false })
 _DEBUG && console.log("Local Collection: %o %o %o %o", options.collection, options, modelled, _collection)
 				}
+
 				// resolve any string models
 				this.ux.model( { model: modelled.model, collection: _collection }, modelled);
 _DEBUG && console.log("String Modelled: %o", modelled)
@@ -184,7 +190,7 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 		// Convenience function
 		isDefaultTrue: function(options, key) {
 			if (_.isUndefined(options)) return true;
-			return options[key]?true:false
+			return options[key]===false?false:true
 		},
 
 		/**
@@ -213,7 +219,7 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 			return s.replace(/\W+|_|-/g, " ").toLowerCase().replace(/(^[a-z]| [a-z]|-[a-z])/g, function($1) { return $1.toUpperCase() });
 		},
 
-		toQueryString(obj, prefix) {
+		toQueryString: function(obj, prefix) {
 			serialize = function(obj, prefix) {
 			  var str = [];
 			  for(var p in obj) {

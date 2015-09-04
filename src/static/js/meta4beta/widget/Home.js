@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	Home = function(options) {
+	var Home = function(options) {
 		options = ux.checkOptions(options);
 
 		var DEBUG = options.debug || ux.DEBUG;

@@ -1,5 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux",
 
+    "meta4beta/widget/PickList",
     "meta4beta/widget/form/Form", "meta4beta/widget/form/FormFields",
     "meta4beta/widget/form/FormValidate", "meta4beta/widget/form/HTMLEditor"
 ],

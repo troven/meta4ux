@@ -9,7 +9,8 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4beta/u
 
 	// setup some default constants
 
-    var ux = core.ux = core.ux || { DEBUG: true }
+    var ux = core.ux = core.ux || {}
+
 	ux.idAttribute = "id";
 	ux.typeAttribute = "widget";
 	ux.labelAttribute = "label";

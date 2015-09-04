@@ -11,7 +11,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
     var fields = ux.view.fields = ux.view.fields || {}
 
     fields.HTML = ux.view.FormField.extend({
-        template: "<div class='col-sm-12'><div class='form-control htmlEditor' placeholder='{{comment}}' cols='{{default 'cols' 40}}' rows='{{default 'rows' 5}}' name='{{id}}'></div></div><div class='message error'>{{message}}</div>",
+        template: "<div class='col-sm-12'><label class='control-label'>{{label}}</label><div class='form-control htmlEditor' placeholder='{{comment}}' cols='{{default 'cols' 40}}' rows='{{default 'rows' 5}}' name='{{id}}'></div></div><div class='message error'>{{message}}</div>",
         commit: function($field) {
             $field = $field || $("[name]", this.$el);
 
@@ -22,6 +22,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
             if (!invalid || !invalid.message) {
 console.log("Commit HTML(%s) %o %o", fieldId, $field, value)
                 model.set(fieldId, value)
+                this.triggerMethod("commit", model, $field);
             }
             return invalid
         },

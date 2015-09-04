@@ -1,14 +1,13 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
 	var Template = function(options) {
-		options = ux.checkOptions(options, ["template"]);
 		var DEBUG = true;
 
 		var config = {
 			isTemplating: true, isActionable: true, isSelectable: true,
 			isNavigator: false, isHoverPanel: false, isNested: true,
 			isPopOver: false, isActionMenu: true,
-			template: options.template || "<div data-id='{{id}} data-action='{{id}}'>{{label}}</div>",
+			template: options.template || "<div class='panel-title' data-action='{{id}}'>{{label}}</div>",
 			events: {
 				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doEventAction"

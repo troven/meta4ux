@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 	var labelAttribute = ux.labelAttribute || "label";
 	var commentAttribute = ux.commentAttribute || "comment"
 
-	ux.view.Collection = ux.view.List = ux.view["meta4:ux:Collection"] = function(options) {
+	ux.view.Collection = ux.view["meta4:ux:Collection"] = function(options) {
 		options = ux.checkOptions(options, ["id"]);
 		_.defaults(options, { child: {} })
 		var DEBUG = options.debug || ux.DEBUG;
@@ -42,7 +42,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 				ux.initialize(this, _options)
 				this.childView.template = _options || child.template
 				if (_options.empty) {
-					this.emptyView = ListItem
+					this.emptyView = Item
 					this.emptyView.template = _options || empty.template
 					this.emptyViewOptions = function() { return _.extend({ "template": ""}, _options.empty) }
 				}
