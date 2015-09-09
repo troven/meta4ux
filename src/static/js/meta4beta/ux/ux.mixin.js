@@ -479,7 +479,7 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
 			var meta = _.extend({}, { model: model || this.model, collection: this.collection }, $this.data() )
 
 			// call both action forms
-			this.trigger( "action:"+action, meta )
+			this.triggerMethod( "action:"+action, meta )
 			this.triggerMethod("action", action, meta )
 console.log("trigger [action:%s] %o %o", action, this, meta );
 
@@ -635,7 +635,7 @@ _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
 
 		getNestedView: function(conf, meta) {
 			if (!conf) return false;
-		    var widget = false
+    	    var widget = false
             meta = meta || {}
             if (meta.model===false) meta.model = this.model
 
@@ -643,6 +643,8 @@ _DEBUG && console.log("Init Nested(%s) %o %o", view.id, options, view._views)
 		    	widget = conf(meta);
 		    	conf = {}
 		    } else {
+
+                // try to resolve locally then globally
 		    	if (_.isString(conf)) conf = this._views[conf] || ux.views.get(conf);
 
 		    	if (_.isObject(conf)) {
