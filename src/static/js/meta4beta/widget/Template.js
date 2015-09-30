@@ -16,8 +16,28 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				_.defaults(options, { model: false })
 				ux.initialize(this, options)
 				this.template = (this.model&&this.model.get("template")) || options.template || this.template;
-			}
-		}
+			},
+            _renderTemplate: function() {
+                var template = this.getTemplate();
+
+                if (!template) {
+                    throw new Error("Missing template: "+options.id);
+                }
+
+                var data = this.model.toJSON();
+                // ensure we have an ID field (especially for @)
+                data.id = data.id || data[this.model.idAttribute]
+                data = this.mixinTemplateHelpers(data);
+                console.log("Render Template: %o -> %o", this.model, data)
+
+                // Render and add to $el
+                var html = Marionette.Renderer.render(template, data, this);
+                this.attachElContent(html);
+
+                return this;
+            }
+
+        }
 
 		return Backbone.Marionette.ItemView.extend(config);
 	}

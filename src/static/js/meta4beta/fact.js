@@ -62,7 +62,7 @@ console.warn("Instance Data - Ignore Remote %s %s %o %o", collection.id, method,
 				if (!url) throw "meta4:fact:register:oops:missing-url";
 
 				var self = this
-				var data = {}
+				var data = _.extend({}.options);
 //				if (httpMethod == "GET") {
 //					var filterOn = (options.filter===true?options:options.filter)
 //					if (filterOn) {
@@ -487,7 +487,7 @@ console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options)
             if (hasErrors) {
 console.warn("Model Invalid: %o %o", self, errors)
                 self.trigger && self.trigger("invalid", errors)
-                return hasErrors;
+                return errors;
             }
 		},
 

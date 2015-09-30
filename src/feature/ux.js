@@ -55,16 +55,21 @@ DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
         // live re-generation of recipe files
 	    var recipe = helpers.mvc.reload.all(feature)
 
+        _.each(recipe.models, function(model) {
+            recipe.models[model.id]= _.pick(model, [ "id", "label", "collection", "schema",
+                "isServer", "isClient", "can", "prefetch", "debug", "idAttribute", "type", "defaults" ]);
+        });
+
 	    // server-side features
-	    recipe.server = {}
-	    recipe.server.socketio = meta4.io?{ enabled: true }:{ enabled: false }
-	    recipe.server.remote = meta4.router?{ enabled: true }:{ enabled: false }
+	    recipe.server = {};
+	    recipe.server.socketio = meta4.io?{ enabled: true }:{ enabled: false };
+	    recipe.server.remote = meta4.router?{ enabled: true }:{ enabled: false };
 
 	    // Localise recipe
-	    recipe.home = "views:home"
-	    recipe.id = req.params.id || config.name
+	    recipe.home = "views:home";
+	    recipe.id = req.params.id || config.name;
 
-        recipe.url = host+":"+port+config.basePath
+        recipe.url = host+":"+port+config.basePath;
 
 	    // vent our intentions
 	    meta4.vents.emit(feature.id, "home", req.user||false, recipe||false);

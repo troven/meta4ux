@@ -113,6 +113,9 @@ console.log("RAW: %o %o %o", this, field, this[field])
         uid: function(that) {
             return that?core.ux.uid(that):core.uuid();
         },
+        url: function(field) {
+            return encodeURIComponent(this[field]||field)
+        },
         md5: function(that) {
             return md5(that)
         },

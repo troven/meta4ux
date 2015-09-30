@@ -426,6 +426,11 @@ DEBUG && console.log("Invalid Selects(%s): %o", fieldId, value, model)
             })
             if (!uploadCount) return;
 
+            if (!model || !model.url) {
+console.log("Model is missing: %o", model.toJSON() )
+                return;
+            }
+
             // copy all attributes, except ours
             _.each(model.attributes, function(v,k) {
                 if (!self.model.id==k) formData.append(k,v)
@@ -444,7 +449,7 @@ console.log("Upload: %s %o", self.model.id, this.options)
             var then = new Date().getTime()
 
             var opts = {}
-            if (model.collection && model.collection.options) opts = model.collection.options.upload
+            if (model.collection && model.collection.options) opts = model.collection.options.upload || opts
             opts.id = model.id || model.cid
             url = url+"?"+core.toQueryString(opts)
 
