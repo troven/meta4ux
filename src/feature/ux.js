@@ -13,6 +13,7 @@ var _          = require('underscore');     // collections helper
 // meta4 packages
 
 var helpers     = require('meta4helpers');      // utilities
+//var features    = require('features');          // meta4features
 
 // =============================================================================
 // Configure UX - load recipes from local files
@@ -27,18 +28,47 @@ exports.feature = function(meta4, feature) {
 
     // we need to find lots of files ... so, are we correctly configured?
 	assert(feature, "feature missing {{feature}}")
-    assert(feature.path, "feature missing {{feature.path}}")
-    assert(feature.paths, "feature missing {{feature.paths}}")
-    assert(feature.paths.models, "feature missing {{paths.models}}")
-    assert(feature.paths.views, "feature missing {{paths.views}}")
-    assert(feature.paths.templates, "feature missing {{paths.templates}}")
-    assert(feature.paths.scripts, "feature missing {{paths.scripts}}")
-	assert(feature.modelPath, "feature missing {{paths.modelPath}}")
 
 // =============================================================================
 	var router = meta4.router, config = meta4.config
 
-	var DEBUG = feature.debug || false
+    console.log("UX1: %j", feature)
+
+    // configure UX
+    feature = _.extend({
+        path: "/ux",
+        "order": 40,
+        modelPath: "/models",
+        requires: "meta4ux",
+        home: config.home,
+        crud: {},
+        paths: {
+            models: config.home+"/models/meta",
+            data: config.home+"/models/data",
+            templates: config.home+"/templates/client",
+            scripts: config.home+"/scripts",
+            views: config.home+"/views"
+        }
+    }, feature);
+
+    console.log("UX2: %j", feature)
+
+    // CRUD path for UX
+    feature.crud = feature.crud || self.__features.crud.path
+
+    var DEBUG = feature.debug || false
+
+// =============================================================================
+
+    assert(feature.path, "feature missing {{feature.path}}");
+    assert(feature.paths, "feature missing {{feature.paths}}");
+    assert(feature.paths.models, "feature missing {{paths.models}}");
+    assert(feature.paths.views, "feature missing {{paths.views}}");
+    assert(feature.paths.templates, "feature missing {{paths.templates}}");
+    assert(feature.paths.scripts, "feature missing {{paths.scripts}}");
+    assert(feature.modelPath, "feature missing {{paths.modelPath}}");
+
+// =============================================================================
 
 	// cache UX definitions
 	self.cache = helpers.mvc.reload.all(feature)
@@ -77,26 +107,31 @@ DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
 
 	    // rewrite model URLs
 	    _.each(recipe.models, function(model) {
-		    model.url = model.url || config.basePath+feature.modelPath+"/"+model.id
+		    model.url = model.url || recipe.url+feature.modelPath+"/"+model.id
 	    })
 
 	    res.json(recipe);
 
     });
 
+    var assetHome = paths.normalize(feature.home);
+
     // embedded static files
     router.get('/*', function(req,res,next) {
-        var path = req.params[0];
-        if (path.indexOf('..') === -1) {
-            var file = paths.normalize(__dirname + "/../static/"+path)
+        var file = req.path;
+        if (!file || file == "/") file = "/index.html";
+        file = paths.normalize(assetHome+file)
+
+        var insideHomeDir = file.indexOf(assetHome);
+        if (insideHomeDir == 0) {
             var stat = fs.existsSync(file)
-//DEBUG && console.log("UX Asset: ", file, stat?true:false)
             if (stat) {
+                console.log("UX Asset Found : (%s) %s -> %s -> %s", insideHomeDir, file, assetHome, req.path)
                 res.sendFile(file);
                 return;
             }
+            next && next();
         }
-        next()
     });
 
 }
