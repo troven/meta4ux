@@ -1,6 +1,6 @@
 {
   "name": "meta4ux",
-  "version": "0.6.44",
+  "version": "0.6.45",
   "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
   "main": "src/index.js",
   "keywords": [
