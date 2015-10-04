@@ -29,7 +29,9 @@ exports.feature = function(meta4, feature) {
 	assert(feature, "feature missing {{feature}}");
 
 // =============================================================================
-	var router = meta4.router, config = meta4.config;
+	var router = express.Router(), config = meta4.config;
+
+    meta4.app.use(router);
 
     // configure UX
     feature = _.extend({
