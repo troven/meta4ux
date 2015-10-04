@@ -13,7 +13,6 @@ var _          = require('underscore');     // collections helper
 // meta4 packages
 
 var helpers     = require('meta4helpers');      // utilities
-//var features    = require('features');          // meta4features
 
 // =============================================================================
 // Configure UX - load recipes from local files
@@ -21,18 +20,16 @@ var helpers     = require('meta4helpers');      // utilities
 exports.feature = function(meta4, feature) {
 
 	// Sanity Checks
-    assert(meta4, "feature missing {{meta4}}")
-	assert(meta4.router, "feature missing {{meta4.router}}")
-	assert(meta4.config, "feature missing {{meta4.config}}")
-	assert(meta4.vents, "feature missing {{meta4.vents}}")
+    assert(meta4, "feature missing {{meta4}}");
+	assert(meta4.router, "feature missing {{meta4.router}}");
+	assert(meta4.config, "feature missing {{meta4.config}}");
+	assert(meta4.vents, "feature missing {{meta4.vents}}");
 
     // we need to find lots of files ... so, are we correctly configured?
-	assert(feature, "feature missing {{feature}}")
+	assert(feature, "feature missing {{feature}}");
 
 // =============================================================================
-	var router = meta4.router, config = meta4.config
-
-    console.log("UX1: %j", feature)
+	var router = meta4.router, config = meta4.config;
 
     // configure UX
     feature = _.extend({
@@ -40,7 +37,7 @@ exports.feature = function(meta4, feature) {
         "order": 40,
         modelPath: "/models",
         requires: "meta4ux",
-        home: config.home,
+        home: __dirname+"/../static/",
         crud: {},
         paths: {
             models: config.home+"/models/meta",
@@ -51,12 +48,10 @@ exports.feature = function(meta4, feature) {
         }
     }, feature);
 
-    console.log("UX2: %j", feature)
-
     // CRUD path for UX
-    feature.crud = feature.crud || self.__features.crud.path
+    feature.crud = feature.crud || self.__features.crud.path;
 
-    var DEBUG = feature.debug || false
+    var DEBUG = feature.debug || false;
 
 // =============================================================================
 
@@ -71,19 +66,19 @@ exports.feature = function(meta4, feature) {
 // =============================================================================
 
 	// cache UX definitions
-	self.cache = helpers.mvc.reload.all(feature)
+	self.cache = helpers.mvc.reload.all(feature);
 
-	DEBUG && console.log("UX path: ", feature.path, _.keys(self.cache))
+	DEBUG && console.log("UX path: ", feature.path, _.keys(self.cache));
 
     router.get(feature.path+"/:id?", function(req, res) {
 
-        var port = req.get("X-Forwarded-Port") || req.connection.localPort
-        var host = req.get("X-Forwarded-IP") || req.protocol+"://"+req.hostname
+        var port = req.get("X-Forwarded-Port") || req.connection.localPort;
+        var host = req.get("X-Forwarded-IP") || req.protocol+"://"+req.hostname;
 
-DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
+DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   );
 
         // live re-generation of recipe files
-	    var recipe = helpers.mvc.reload.all(feature)
+	    var recipe = helpers.mvc.reload.all(feature);
 
         _.each(recipe.models, function(model) {
             recipe.models[model.id]= _.pick(model, [ "id", "label", "collection", "schema",
@@ -107,8 +102,8 @@ DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
 
 	    // rewrite model URLs
 	    _.each(recipe.models, function(model) {
-		    model.url = model.url || recipe.url+feature.modelPath+"/"+model.id
-	    })
+		    model.url = model.url || recipe.url+feature.modelPath+"/"+model.id;
+	    });
 
 	    res.json(recipe);
 
@@ -119,19 +114,17 @@ DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   )
     // embedded static files
     router.get('/*', function(req,res,next) {
         var file = req.path;
-        if (!file || file == "/") file = "/index.html";
-        file = paths.normalize(assetHome+file)
+        file = paths.normalize(assetHome+file);
 
         var insideHomeDir = file.indexOf(assetHome);
         if (insideHomeDir == 0) {
-            var stat = fs.existsSync(file)
+            var stat = fs.existsSync(file);
+//            console.log("UX Asset: (%s) %s -> %s -> %s %j", insideHomeDir, file, assetHome, req.path, stat)
             if (stat) {
-                console.log("UX Asset Found : (%s) %s -> %s -> %s", insideHomeDir, file, assetHome, req.path)
                 res.sendFile(file);
                 return;
             }
             next && next();
         }
     });
-
-}
+};
