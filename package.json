@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "express": "~4.x.x",
-    "meta4helpers": "~0.1.12",
+    "meta4helpers": "~0.1.9",
     "underscore": "~1.8.3"
   },
   "devDependencies": {}
