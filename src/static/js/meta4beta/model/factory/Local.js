@@ -1,13 +1,15 @@
-define(["underscore", "backbone", "fact", "meta4beta/model/Default"], function (_, Backbone, fact) {
+define(["underscore", "backbone", "core", "meta4beta/model/factory/Default"], function (_, Backbone, core) {
 
-    fact.factory.Local = function(_options) {
+    var fact = core.fact;
+
+    return function(_options) {
         _options = _options || {}
 
-        var options = fact.mutate(_options)
+        var options = core.fact.mutate(_options)
         var _DEBUG = options.debug || fact.DEBUG
 
         var Model = Backbone.DocumentModel.extend({
-            sync: fact.crud.local,
+            sync: fact.sync.local,
             mutators: options.mutators,
             defaults: options.defaults,
             validate: fact.validate.model,
@@ -15,7 +17,7 @@ define(["underscore", "backbone", "fact", "meta4beta/model/Default"], function (
         })
 
         var Collection = Backbone.DocumentCollection.extend({
-            sync: fact.crud.local,
+            sync: fact.sync.local,
             model: Model
         });
 

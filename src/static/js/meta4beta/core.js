@@ -12,19 +12,14 @@ define(["jquery", "underscore", "backbone"], function ($,_,Backbone) {
 
 	return {
 		DEBUG: false,
-		idAttribute: "id", labelAttribute: "label",
-		typeAttribute: "type", commentAttribute: "comment",
-		fact: {
-		},
+		idAttribute: "id", labelAttribute: "label", typeAttribute: "type", commentAttribute: "comment",
+		fact: { factory: {}, sync: {} }, iq: {},
 
-		ux: {
+        ux: {
 			i18n: {},
 			types: {},
 			mixin: {},
 			view: { field: {} }
-		},
-
-		iq: {
 		},
 
 		NS: {
@@ -211,6 +206,15 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 		urn: function(prefix) {
 			return (prefix || core[idAttribute])+"#"+this.uuid();
 		},
+
+        url: function(path) {
+		    var ix = path.indexOf("://");
+            if (ix<0) throw new Error("Missing URL protocol: "+path);
+            var proto = path.substring(0,ix+3);
+            var remain = path.substring(ix+3);
+            remain = remain.replace("\\", "/").replace("//", "/");
+            return proto+remain;
+         },
 
 		/**
 		 	Turn camel-cased strings into a capitalised, space-separated string

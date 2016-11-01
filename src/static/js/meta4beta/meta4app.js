@@ -1,9 +1,6 @@
 define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
-    "bootstrap", "socket_io",
+    "bootstrap",
     "jquery_cookie",
-    "meta4beta/model/Default",
-    "meta4beta/model/Local",
-    "meta4beta/model/File",
 
 //    "meta4beta/widget/Debug",
 //    "meta4beta/widget/Accordion",
@@ -37,7 +34,7 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
     "meta4beta/widget/Template",
     "meta4beta/widget/Form",
     "meta4beta/widget/Home"
-], function ($,_, core, ux, fact, iq, mobility, bootstrap, io) {
+], function ($,_, core, ux, fact, iq, mobility, bootstrap, jqcookie) {
 
 	var newApp = new Marionette.Application({});
 
@@ -52,14 +49,15 @@ define(["jquery", "underscore", "core", "ux", "fact", "iq", "mobility",
         var module = _.extend(newApp.module(options.id, options), core );
         module.id=options.id
 
-module.on("all", function(e,x) {
+        module.on("all", function(e,x) {
             newApp.trigger.apply(newApp, arguments)
-})
+        });
+
         // Boot the Module's dynamic architecture
-        module.mobility.boot(module, options)
-        module.iq.boot(module, options)
-        module.fact.boot(module, options)
-        module.ux.boot(module, options)
+        mobility.boot(module, options)
+        iq.boot(module, options)
+        fact.boot(module, options)
+        ux.boot(module, options)
 
         // define the user principal
         var ProfileModel = Backbone.Model.extend({url: "/models/me"})

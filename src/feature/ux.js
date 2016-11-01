@@ -8,6 +8,7 @@ var paths      = require('path');           // file path helper
 var assert     = require('assert');         // assertions
 var express    = require('express');        // call express
 var _          = require('underscore');     // collections helper
+var debug      = require('debug');          // debug
 
 // =============================================================================
 // meta4 packages
@@ -70,14 +71,14 @@ exports.feature = function(meta4, feature) {
 	// cache UX definitions
 	self.cache = helpers.mvc.reload.all(feature);
 
-	DEBUG && console.log("UX path: ", feature.path, _.keys(self.cache));
+	debug("UX path: ", feature.path, _.keys(self.cache));
 
     router.get(feature.path+"/:id?", function(req, res) {
 
         var port = req.get("X-Forwarded-Port") || req.connection.localPort;
         var host = req.get("X-Forwarded-IP") || req.protocol+"://"+req.hostname;
 
-DEBUG && console.log("GET UX: ", req.path, " -> ", host, port   );
+debug("GET UX: ", req.path, " -> ", host, port   );
 
         // live re-generation of recipe files
 	    var recipe = helpers.mvc.reload.all(feature);

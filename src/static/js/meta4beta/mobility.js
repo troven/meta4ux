@@ -1,13 +1,10 @@
-define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone,scorpio4) {
-
-	var idAttribute = scorpio4.idAttribute || "_id";
-	var typeAttribute = scorpio4.typeAttribute || "_type";
+define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone, core) {
 
 	/* *****************************************************************************************************************
 		Mobility 
 	**************************************************************************************************************** */
 
-    scorpio4.mobility = _.extend({
+    return {
 
 		boot: function(module, options) {
 			if (!module) throw "meta4:fact:register:oops:missing-module";
@@ -82,6 +79,5 @@ define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone,scor
 	            { fileName: name }
 	        );
 	    }
-    })
-    return scorpio4;
+    };
 });
