@@ -1,6 +1,6 @@
 {
   "name": "meta4ux",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "meta4 API for MVP user experience",
   "main": "src/index.js",
   "keywords": [
