@@ -56,14 +56,14 @@ function ($, _, Backbone, Marionette, ux, Form) {
 	                formModel: this.model
                 }, _options.picker)
 
-				pickerOptions.placeholder = pickerOptions.label || _options.comment
+				pickerOptions.placeholder = pickerOptions.label || _options.comment;
                 pickerOptions.template = pickerOptions.template || "<div class='col-sm-6 clearfix'><span class='clickable btn btn-default'>{{label}}<i class='fa fa-plus'></i></span></i><div class='col-sm-6'><select class='form-control' name='{{id}}'/></div>{{comment}}</div>"
 
 console.log("Picker: %o %o", this, pickerOptions)
-			    this.picker = new ux.view.fields.Select(pickerOptions)
-				ux.initialize(this.picker, pickerOptions)
-                this.listenTo(this.picker)
-                this.on("childview:delete", this.onDelete)
+			    this.picker = new ux.view.fields.Select(pickerOptions);
+				ux.initialize(this.picker, pickerOptions);
+                this.listenTo(this.picker);
+                this.on("childview:delete", this.onDelete);
 				return this;
 			},
 			onShow: function() {

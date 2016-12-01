@@ -88,7 +88,7 @@ DEBUG && console.warn("validateField (%s): %o %o %o", fieldId, validators, inval
         return
       }
 
-      var value = $field.val()
+      var value = $field.val();
       var invalid = this.validate?this.validate(value, model):{}
       if (!invalid || !invalid.message) {
           model.set(fieldId, value )
@@ -137,11 +137,15 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
 	var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.ItemView.extend( _.extend({
 	    tagName: "div", className: "form-group row form-field",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label>",
+        events: {
+            "focus [name]": "onFocus",
+            "blur [name]": "onBlur"
+        },
         onRender: renderField,
         validate: validateField,
         commit: commitField,
         initialize: function(options) {
-            ux.initialize(this,options)
+            ux.initialize(this,options);
         },
         onInvalid: function(invalid) {
             this.model.set("message", invalid.message)
@@ -196,12 +200,16 @@ console.log("CommitGroupFields: %o %o %o", this, event, $fields);
     fields.ID = FormField.extend({
         className: "form-group row form-text",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='12' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
-        onCommit: function(model, $field) {
-            var slug  = model.get(this.options.id)
-            if (this.options.autoGenerate && !slug) slug = core.uuid()
-            slug = core.ux.uid(slug || model.id)
-            model.set(this.options.id, slug)
-            $field.val(slug)
+        onBlur: function(e) {
+            var idAttribute = this.options.id || idAttribute;
+            var $field = $(e.currentTarget);
+            var slug  = this.model.get(idAttribute);
+            if ( this.options.required && !slug) slug = core.uuid();
+            if (slug) {
+                slug = core.ux.uid(slug);
+                this.model.set(idAttribute, slug);
+                $field.val(slug);
+            }
         }
     });
 
@@ -302,8 +310,8 @@ console.log("Select Schema", options)
     // Synonyms
 
     fields.Lookup = fields.Select;	// TODO: A Lookup has a Create View
-    fields.String = fields.Text
-    fields.Integer = fields.Number
+    fields.String = fields.Text;
+    fields.Integer = fields.Number;
 
     fields.Boolean = fields.Select.extend({
         className: "form-group row form-boolean",
@@ -390,19 +398,19 @@ console.log("childViewInit: %o", options)
 	    },
 	    initialize: function(options) {
             ux.initialize(this,options)
-            this.collection = this.collection || ux.lookup(options.options)
+            this.collection = this.collection || ux.lookup(options.options);
 console.log("Selector %o %o %o", this, options, this.collection)
         },
         commit: function() {
             var invalid = this.validate?this.validate(value, model):{}
 DEBUG && console.log("Commit Selects(%s): %o %o %o %o %o", fieldId, this, model, $field, value, invalid)
             if (!invalid||!invalid.message) {
-	            model.set(this.options.id, value )
-DEBUG && console.log("Valid Selects(%s): %o", fieldId, value, model)
+	            model.set(this.options.id, value );
+DEBUG && console.log("Valid Selects(%s): %o", fieldId, value, model);
             } else {
-DEBUG && console.log("Invalid Selects(%s): %o", fieldId, value, model)
+DEBUG && console.log("Invalid Selects(%s): %o", fieldId, value, model);
             }
-            this.triggerMethod("commit")
+            this.triggerMethod("commit");
         },
         onRender: renderField
     })
@@ -475,7 +483,7 @@ console.log("Uploaded: %s @ %s -> %o %o", self.model.id, url, model, file)
         }
     })
 
-    fields.Portrait = fields.Upload.extend({
+        fields.Image  =  fields.Portrait = fields.Upload.extend({
         className: "form-group row form-portrait",
         template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><img class='clickable' title='{{comment}}' alt='{{comment}}'/><input style='display:none' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
         events: {

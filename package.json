@@ -1,7 +1,7 @@
 {
   "name": "meta4ux",
-  "version": "0.7.1",
-  "description": "An SPA front-end for JSON-based executable 'meta4' wire-frames",
+  "version": "0.8.0",
+  "description": "meta4 API for MVP user experience",
   "main": "src/index.js",
   "keywords": [
     "meta4",
@@ -15,7 +15,7 @@
     "mvc",
     "mvp"
   ],
-  "author": "Troven <meta4@troven.com.au> (http://meta4beta.com/)",
+  "author": "Troven <cto@troven.com.au> (https://troven.com.au/about/meta4/)",
   "repository": {
     "type": "git",
     "url": "https://github.com/troven/meta4ux.git"
@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "express": "~4.x.x",
-    "meta4helpers": "~0.2.0",
+    "meta4common": "~0.5.0",
     "underscore": "~1.8.3"
   },
   "devDependencies": {}

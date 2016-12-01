@@ -3,7 +3,7 @@
   "version": "0.8.0",
   "homepage": "https://github.com/troven/meta4ux",
   "authors": [
-    "Lee Curtis <lee.curtis@troven.com.au>"
+    "Troven Software <cto@troven.com.au>"
   ],
   "description": "executable JSON wireframes",
   "main": "src/index.js",

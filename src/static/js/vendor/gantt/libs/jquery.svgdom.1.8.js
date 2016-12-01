@@ -1,4 +1,4 @@
-﻿/* http://keith-wood.name/svg.html
+/* http://keith-wood.name/svg.html
  jQuery DOM compatibility for jQuery SVG v1.4.5.
  Written by Keith Wood (kbwood{at}iinet.com.au) April 2009.
  Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and

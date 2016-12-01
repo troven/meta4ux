@@ -118,7 +118,8 @@ if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
             },
 
             doBlurFieldEvent: function(e) {
-DEBUG && console.log("doBlurFieldEvent: %o %o", this, e)
+DEBUG && console.log("doBlurFieldEvent: %o %o", this, e);
+                this.triggerMethod("blur");
                 if (!this.options.autoCommit) return this;
                 this._commitField($(e.currentTarget));
                 return this;
