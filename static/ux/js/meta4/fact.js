@@ -147,6 +147,7 @@ _DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model
 			var self = this
 			var _schema = [];
 			_.each(schema, function(field, id) {
+                field = field || {};
 				if (_.isString(field)) field = { id: id, type: field }
 				field = _.extend({ id: id, type: "string", validators: [], label: field.label || field.id || id, editable: true, required: false }, field)
 				if (field.required && !field.validators) {

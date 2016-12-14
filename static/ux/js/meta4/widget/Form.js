@@ -14,15 +14,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	return {
 	    "id": "Form",
         "label": "Form",
-        "comment": "Manage data capture& validation using a collection of fields",
+        "comment": "Manage data capture &amp; validation using a collection of fields",
         "mixins": false,
         "views": true,
         "collection": true,
         "options": true,
         "schema": true,
-
         "fn": ux.view.Form
-    }
+    };
 
 })
 

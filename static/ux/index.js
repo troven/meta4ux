@@ -151,19 +151,19 @@ require(['splash'], function(splash) {
 
     // Configuration for Meta4 web API
     var options = { autoBoot: true, DEBUG: true,
-        id: "meta4ux",
+        id: "meta4",
         url: "/ux/view/home",
         parse: function(r) { return r; }
     }
 
-    console.log("meta4: %o ", options)
-    splash.open({ url: "splash.html", waitForClick: true})
+    console.log("meta4: %o ", options);
+    splash.open({ url: "splash.html", waitForClick: true});
 
     // Load and start the meta4 code
     // handle global/fatal errors
     try {
         require(['meta4app'], function (meta4) {
-            console.log("Starting meta4: %o", options)
+            console.log("Starting meta4: %o", options);
             try {
                 meta4.start( options )
 
@@ -171,21 +171,21 @@ require(['splash'], function(splash) {
 
                     // display a Home View
                     if (options.home) {
-                        console.log("home: %s %o", options.id, options.home)
-                        var home = ux.Home(options.home)
-                        home.triggerMethod("show")
+                        console.log("home: %s %o", options.id, options.home);
+                        var home = ux.Home(options.home);
+                        home.triggerMethod("show");
                         splash.close();
                     } else {
-                        alert("Application is Homeless.")
+                        alert("Application is Homeless.");
                     }
                 })
             } catch(e) {
                 var yorn = confirm(e+"\n\nApplication failed to boot. Try again?")
-                yorn && (window.location = window.location.href)
+                yorn && (window.location = window.location.href);
             }
         });
     } catch(e) {
         var yorn = confirm(e+"\n\nApplication failed to download . Try again?")
-        yorn && (window.location = window.location.href)
+        yorn && (window.location = window.location.href);
     }
 })

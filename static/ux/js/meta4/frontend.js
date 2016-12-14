@@ -1,6 +1,6 @@
 
-scorpio4 = {}
-scorpio4.centralize = function($this) {
+meta4 = {}
+meta4.centralize = function($this) {
     var $parent = $("body")
     var pWidth = $parent.width()
     var pHeight = $parent.height()
@@ -12,7 +12,7 @@ scorpio4.centralize = function($this) {
     return $this.position()
 }
 
-scorpio4.overlay = function($this) {
+meta4.overlay = function($this) {
     var $body = $("body")
     var $overlay = $("<div class='overlay'/>").appendTo($body)
     $overlay.css({ "z-index": 1000, position: absolute, top: 0, left: 0, opacity: "10%" })
@@ -20,7 +20,7 @@ scorpio4.overlay = function($this) {
     $this.css({ "z-index": 100+parseInt($overlay.css("z-index")), opacity: "100%" })
 }
 
-scorpio4.oauth = function() {
+meta4.oauth = function() {
     var $oauth = $("[data-provider]")
     var subscription = $oauth.attr("subscription")
 

@@ -15,8 +15,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 			tagName: "li", className: "list-group-item clickable",
 			template: options.child.template || "<div data-id='{{"+ux.idAttribute+"}}' data-trigger='{{"+ux.idAttribute+"}}' title='{{"+ux.commentAttribute+"}}'>{{"+ux.labelAttribute+"}}</div>",
 
-			isSelectable: true, isDroppable: true,
-			isHoverPanel: true, isTemplating: true, isPopOver: true,
+			isSelectable: true, isDroppable: false,
+			isHoverPanel: false, isTemplating: true, isPopOver: false,
 			isActionable: true, isActionMenu: true,
 			events: {
                 "click [data-trigger]": "doEventAction",

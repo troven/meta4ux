@@ -175,6 +175,8 @@ throw "i18n not implemented: "+that
 				Handlebars.registerHelper(name,fn)
 			})
 
+            console.log("Widget options: %o", options);
+
             // load all widgets
 			this.registerWidgets(options, function() {
 				module.trigger("ux:boot", self, options)
@@ -183,9 +185,9 @@ throw "i18n not implemented: "+that
 		},
 
 		registerWidgets: function(options, cb) {
-			var widgetTypes = []
-			var viewURL = options.url
-			var self = this
+			var widgetTypes = [];
+			var viewURL = "" //options.url;
+			var self = this;
 
 			// Register View configurations
 			var registerViews = function(options, views) {
@@ -198,7 +200,7 @@ throw "i18n not implemented: "+that
 						}
                         // try our best to resolve something
 						var widgetType = view[ux.typeAttribute] || view.widget || view.type || "Template"
-						var path = view.require?view.require:viewURL+"/js/meta4/widget/"+widgetType+".js"
+						var path = view.require?view.require:viewURL+"js/meta4/widget/"+widgetType+".js"
 						// add require.js paths
 						if (path && widgetTypes.indexOf(path)<0) widgetTypes.push(path)
 						// views and tabs
