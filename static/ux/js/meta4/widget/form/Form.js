@@ -24,11 +24,13 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 
 				this.collection = new Backbone.Collection() // Collection of Fields
 
+                console.debug("Form Editors: %o", _.keys(ux.view.fields) );
+
                 var schema =   _options.schema || _options.views || {}
                 var col_schema = this.model&&this.model.collection?this.model.collection.schema:false
 //DEBUG&&
-console.debug("Schema Model: %o %o %o", this.model, this.model.collection, col_schema)
-				this._buildSchemaCollection( schema, col_schema )
+				this._buildSchemaCollection( schema, col_schema );
+                console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
 
 				return this;
 			},
@@ -100,7 +102,7 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
             //      @param model : the field meta-data as a BB model
 
             getChildView: function(field) {
-                var editorType = field.get("editor") || field.get("widget") || field.get(ux.typeAttribute);
+                var editorType = field.get(ux.editorAttribute) || field.get(ux.typeAttribute);
                 var Field = ux.view.fields[editorType]
                 if (!Field) {
 	                Field = ux.view[editorType]

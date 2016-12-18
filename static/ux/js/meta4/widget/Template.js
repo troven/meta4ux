@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
 	var Template = function(options) {
-		var DEBUG = true;
+		var DEBUG = options.debug || ux.DEBUG;
 
 		var config = {
 			isTemplating: true, isActionable: true, isSelectable: true,
@@ -26,9 +26,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
                 var data = this.model.toJSON();
                 // ensure we have an ID field (especially for @)
-                data.id = data.id || data[this.model.idAttribute]
+                data.id = data.id || data[this.model.idAttribute];
                 data = this.mixinTemplateHelpers(data);
-                console.log("Render Template: %o -> %o", this.model, data)
+                DEBUG && console.log("Render Template: %o -> %o", this.model, data);
 
                 // Render and add to $el
                 var html = Marionette.Renderer.render(template, data, this);

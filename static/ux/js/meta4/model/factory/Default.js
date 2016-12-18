@@ -8,11 +8,11 @@ define(["underscore", "backbone", "core",
         var fact = core.fact;
 
         // internal constants
-        var _DEBUG = options.debug || fact.DEBUG
+        var _DEBUG = options.debug || fact.DEBUG;
         var storeType = options.store || "file"
         var storeURL = options.url || "models/"+storeType
 
-        console.log("Default Factory: (%s) %o => %o", options.id, options, fact);
+        _DEBUG && console.log("Default Factory: (%s) %o => %o", options.id, options, fact);
 
         // define our collection's Model
 

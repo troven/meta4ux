@@ -94,7 +94,7 @@ console.debug("Gossip Enabled: %o", gossip)
 
         // Announce Module is ready
         module.trigger("boot", options)
-console.debug("boot: %o", options)
+console.debug("booted: %s views, %s models, %s templates, %s scripts", _.keys(options.views).length, _.keys(options.models).length, _.keys(options.templates).length, _.keys(options.scripts).length);
         return module;
     }
 

@@ -6,7 +6,9 @@
         italic: 'Курзив',
         underline: 'Подвучено',
         clear: 'Уклони стилове фонта',
-        height: 'Висина линије'
+        height: 'Висина линије',
+        strikethrough: 'Прецртано',
+        size: 'Величина фонта'
       },
       image: {
         image: 'Слика',
@@ -21,6 +23,13 @@
         selectFromFiles: 'Изабери из датотеке',
         url: 'Адреса слике',
         remove: 'Уклони слику'
+      },
+      video: {
+        video: 'Видео',
+        videoLink: 'Веза ка видеу',
+        insert: 'Уметни видео',
+        url: 'URL видео',
+        providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion или Youku)'
       },
       link: {
         link: 'Веза',
@@ -39,7 +48,7 @@
       },
       style: {
         style: 'Стил',
-        normal: 'Нормални',
+        p: 'Нормални',
         blockquote: 'Цитат',
         pre: 'Код',
         h1: 'Заглавље 1',

@@ -7,7 +7,9 @@
         underline: 'Understrek',
         clear: 'Fjern formatering',
         height: 'Linjehøyde',
-        name: 'Skrifttype'
+        name: 'Skrifttype',
+        strikethrough: 'Gjennomstrek',
+        size: 'Skriftstørrelse'
       },
       image: {
         image: 'Bilde',
@@ -22,6 +24,13 @@
         selectFromFiles: 'Velg fra filer',
         url: 'Bilde-URL',
         remove: 'Fjern bilde'
+      },
+      video: {
+        video: 'Video',
+        videoLink: 'Videolenke',
+        insert: 'Sett inn video',
+        url: 'Video-URL',
+        providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion eller Youku)'
       },
       link: {
         link: 'Lenke',
@@ -40,7 +49,7 @@
       },
       style: {
         style: 'Stil',
-        normal: 'Normal',
+        p: 'p',
         blockquote: 'Sitat',
         pre: 'Kode',
         h1: 'Overskrift 1',

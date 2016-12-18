@@ -6,7 +6,7 @@ define(["underscore", "backbone", "core", "meta4/model/factory/Default"], functi
         _options = _options || {}
 
         var options = core.fact.mutate(_options)
-        var _DEBUG = options.debug || fact.DEBUG
+        var _DEBUG = options.debug || fact.DEBUG;
 
         var Model = Backbone.DocumentModel.extend({
             sync: fact.sync.local,

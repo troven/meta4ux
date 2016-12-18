@@ -18,7 +18,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4/ux/ux
         if (_.isString(options)) options = ux.views.get(options)
 		if (!options) throw "meta4:ux:oops:unknown-home";
 
-		var _DEBUG = options.debug
+		var _DEBUG = options.debug?true:false;
 
 		if (!options[ux.idAttribute]) {
 _DEBUG && console.log("UX Widget (%s): %o", [ux.typeAttribute], options)
@@ -35,16 +35,18 @@ _DEBUG && console.log("UX Widget (%s): %o", [ux.typeAttribute], options)
 
 		home.on("action", function(action) {
 			alert("action:"+action)
-		})
+		});
+
 		home.on("navigate", function(go_to) {
 			alert("navigate:"+go_to)
-		})
+		});
 
         // render & show
-        home.render()
-_DEBUG && console.log("UX Home (%s): %o", options[ux.idAttribute], options)
-        home.triggerMethod("show")
-        return home
+        home.render();
+        home.triggerMethod("show");
+
+        _DEBUG && console.log("UX Home (%s): %o", options[ux.idAttribute], options);
+        return home;
     }
 
 	// Modals

@@ -1,13 +1,16 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux",
-
     "meta4/widget/PickList",
-    "meta4/widget/form/Form", "meta4/widget/form/FormFields",
-    "meta4/widget/form/FormValidate", "meta4/widget/form/HTMLEditor"
+    "meta4/widget/form/Form",
+    "meta4/widget/form/FormFields",
+    "meta4/widget/form/FormValidate",
+    "meta4/widget/form/HTMLEditor"
 ],
-    function ($, _, Backbone, Marionette, ux) {
+    function ($, _, Backbone, Marionette, ux, PickList, Form, FormFields, FormValidate, HTMLEditor) {
 
     ux.view.fields = ux.view.fields || {}
     ux.view.validators = ux.view.validators || {}
+
+    if (!HTMLEditor) throw new Error("Missing HTMLEditor");
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities
 

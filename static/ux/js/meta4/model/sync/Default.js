@@ -1,12 +1,12 @@
 define(["underscore", "backbone", "core"], function (_, Backbone, core) {
 
     var fact = core.fact;
-    console.log("Default Sync: %o", fact);
 
     return function(method, collection, options) {
-        collection.options = collection.options || {}
 
-        var _DEBUG = options.DEBUG || collection.options.debug || fact.DEBUG
+        collection.options = collection.options || {};
+
+        var _DEBUG = options.DEBUG || collection.options.debug || fact.DEBUG;
 
         var httpMethod = core.fact.sync._methods[method];
 

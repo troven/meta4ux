@@ -34,7 +34,7 @@ require.config({
 
         full_calendar: "vendor/fullcalendar/fullcalendar.min",
         jmpress: "vendor/jmpress/jmpress.custom",
-        html_editor: "vendor/summernote/dist/summernote",
+        html_editor: "vendor/summernote/summernote",
         jquery_orgchart: "vendor/jquery-orgchart/jquery.orgchart",
         md5: "vendor/md5/md5",
         bootstrap_tour: "vendor/bootstrap-tour/bootstrap-tour",
@@ -156,14 +156,13 @@ require(['splash'], function(splash) {
         parse: function(r) { return r; }
     }
 
-    console.log("meta4: %o ", options);
     splash.open({ url: "splash.html", waitForClick: true});
 
     // Load and start the meta4 code
     // handle global/fatal errors
     try {
         require(['meta4app'], function (meta4) {
-            console.log("Starting meta4: %o", options);
+            console.log("starting %s @ %s", options.id, options.url);
             try {
                 meta4.start( options )
 

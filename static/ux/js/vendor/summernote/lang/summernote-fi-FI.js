@@ -7,7 +7,9 @@
         underline: 'Alleviivaa',
         clear: 'Tyhjennä muotoilu',
         height: 'Riviväli',
-        name: 'Kirjasintyyppi'
+        name: 'Kirjasintyyppi',
+        strikethrough: 'Yliviivaus',
+        size: 'Kirjasinkoko'
       },
       image: {
         image: 'Kuva',
@@ -22,6 +24,13 @@
         selectFromFiles: 'Valitse tiedostoista',
         url: 'URL-osoitteen mukaan',
         remove: 'Poista kuva'
+      },
+      video: {
+        video: 'Video',
+        videoLink: 'Linkki videoon',
+        insert: 'Lisää video',
+        url: 'Videon URL-osoite?',
+        providers: '(YouTube, Vimeo, Vine, Instagram, DailyMotion tai Youku)'
       },
       link: {
         link: 'Linkki',
@@ -40,7 +49,7 @@
       },
       style: {
         style: 'Tyyli',
-        normal: 'Normaali',
+        p: 'Normaali',
         blockquote: 'Lainaus',
         pre: 'Koodi',
         h1: 'Otsikko 1',

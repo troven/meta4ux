@@ -9,9 +9,14 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
         var fields = ux.view.fields = ux.view.fields || {}
 
         var renderField = function() {
-            var self = this
+            if (this.options.hidden) {
+                this.$el.hide();
+                return this;
+            }
+            var $fields = $("[name]", this.$el);
+            var self = this;
 //DEBUG && console.log("renderField: %o", self)
-            $("[name]", this.$el).each(function() {
+            $fields.each(function() {
                 var $field = $(this)
                 var fieldId = $field.attr("name")
                 var value = self.options.formModel.get(fieldId)

@@ -13,9 +13,11 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4/ux/ux
 
 	ux.idAttribute = "id";
 	ux.typeAttribute = "widget";
+    ux.editorAttribute = "editor";
 	ux.labelAttribute = "label";
-	ux.meta = ux.meta || {}
-	ux.DEBUG = false
+
+	ux.meta = ux.meta || {};
+	ux.DEBUG = false;
 
 	return ux
 });

@@ -795,16 +795,23 @@ console.log("UX Position: %o (%o, %o) - (%o, %o)", event, x, y, offsetX, offsetY
 
 	ux.mixin.HoverPanel = {
 		initializeHoverPanel:function(options) {
-			this.on("show", this.renderHoverPanel)
+            if (!this.isHoverPanel || !options.isHoverPanel) {
+                return this;
+            }
+
+            this.on("show", this.renderHoverPanel);
 		},
 		renderHoverPanel: function() {
+            if (!this.isHoverPanel || !options.isHoverPanel) {
+                return this;
+            }
 			var self = this
-			var options = _.extend({ selector: "."}, this.options.hoverpanel)
+			var options = _.extend({ selector: "."}, this.options.hoverpanel);
 			if (!options.selector) return
 //DEBUG &&
 			var $item = options.selector=="."?$(this.$el):$(this.$el).find(options.selector)
 			if (!$item || $item.length==0) return
-console.debug("renderHoverPanel: %o %o %o", self, options, $item)
+console.debug("renderHoverPanel (%s): %o %o %o", this.options.id, self, options, $item)
 
 			var position = function($this, event) {
 				var pageWidth = $(document).width()

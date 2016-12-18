@@ -8,7 +8,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
 	var labelAttribute = ux.labelAttribute || "label";
 	var DEBUG = true
 
-    var fields = ux.view.fields = ux.view.fields || {}
+    var fields = ux.view.fields = _.extend({},ux.view.fields);
 
     fields.HTML = ux.view.FormField.extend({
         template: "<div class='col-sm-12'><label class='control-label'>{{label}}</label><div class='form-control htmlEditor' placeholder='{{comment}}' cols='{{default 'cols' 40}}' rows='{{default 'rows' 5}}' name='{{id}}'></div></div><div class='message error'>{{message}}</div>",
@@ -27,16 +27,19 @@ console.log("Commit HTML(%s) %o %o", fieldId, $field, value)
             return invalid
         },
         onRender: function() {
-            var self = this
+            var self = this;
             $field = $("[name]", this.$el);
-            $field.html(this.options.formModel.get(this.options[idAttribute]))
+            $field.html(this.options.formModel.get(this.options[idAttribute]));
 
-            var _options = _.extend({airMode: false, onblur: function() {
-                console.log("HTML commit() %o", self, $field)
-                self.commit($field)
-            }},this.options.options )
-// console.log("Render HTML Editor() %o", _options)
-            $(".htmlEditor", this.$el).summernote(_options)
+            var _options = _.extend({airMode: false,
+                onblur: function() {
+                    console.log("HTML commit() %o", self, $field)
+                    self.commit($field)
+            }}, this.options.options );
+
+            var $editor = $(".htmlEditor", this.$el);
+            $editor.summernote(_options);
+            console.log("Rendered HTML (%s) %o", this.options.id, $editor);
         }
     })
 

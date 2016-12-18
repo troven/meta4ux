@@ -5,7 +5,6 @@ define(["jquery", "underscore", "backbone", "core", "iq", "asq", "meta4/model/in
 **************************************************************************************************************** */
 
     var fact = core.fact;
-    console.log("Core Facts: %o", fact);
 
 	_.extend(fact, {
 		models: new Backbone.Model(),
@@ -16,13 +15,13 @@ define(["jquery", "underscore", "backbone", "core", "iq", "asq", "meta4/model/in
 			self.options = options;
 			var _DEBUG = options.DEBUG || fact.DEBUG;
 			var baseURL = options.url+options.basePath
-//_DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
+_DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
 
 			_.each(options.models, function(model, id) {
 				if (!_.isEmpty(model)) {
-					model.id = model.id || id
-//_DEBUG && console.log("Boot Model: %s @ %s -> %o", id, model.url, model)
+					model.id = model.id || id;
 					var collection = self.register(model);
+_DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, collection);
 				}
 			})
 		},
@@ -73,7 +72,6 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 			var model = new _Model();
 
 			core.iq.aware(model, options.iq || options.when );
-
 
 			return model
 		},
@@ -139,7 +137,7 @@ _DEBUG && console.log("Fact Schema: %s %o %o ", id, collection, collection.schem
 				return this.filter(collection, options.filter===true?{}:options.filter)
 			}
 
-_DEBUG && console.log("Fact Collection: %o %o %o ", collection, collection.model.schema, options.when || "no IQ")
+_DEBUG && console.log("Fact %s Collection: %o %o %o ", options.id, collection, collection.model.schema, options.when || "no IQ")
 			return collection;
 		},
 
