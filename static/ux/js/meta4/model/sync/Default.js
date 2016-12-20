@@ -18,8 +18,8 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
             return;
         }
 
-        var data = method=="read"?collection.options.filter||{}:collection.toJSON()
-        _DEBUG && console.log("Meta4 CRUD (%s): %o %o %o %o", method, url, collection, data, options);
+        var data = method=="read"?collection.options.filter||{}:collection.toJSON();
+        _DEBUG && console.log("Meta4 CRUD (%s / %s): %o %o %o %o", method, httpMethod, url, collection, data, options);
 
         var $future = $.ajax( { url: url, type: httpMethod,
             dataType: "json", data: data && JSON.stringify(data),
@@ -31,15 +31,15 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
                 } else if (response.status) {
                     console.error("Meta4 CRUD Failed: %s %s -> %o", url, response.message, response);
                     options.error && options.error(response);
-                    collection.trigger("error", response)
+                    collection.trigger("error", response);
                 } else {
-                    core.fact.models.trigger("error", collection, options, response)
+                    core.fact.models.trigger("error", collection, options, response);
                 }
             }, error: function(response) {
                 console.error("Meta4 Error: %s-> %o %o", url, response, arguments);
                 options.error && options.error(collection, response);
-                alert(url + "-> "+response.statusText)
-            } })
+                alert(url + "-> "+response.statusText);
+            } });
         return $future;
     };
 
