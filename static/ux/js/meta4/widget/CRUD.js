@@ -136,7 +136,7 @@ DEBUG && console.debug("HeaderFooters: %o %o", header, footer)
             },
 
             onCreate: function() {
-                var self = this
+                var self = this;
 
                 var _collection = this.collection;
 
@@ -158,19 +158,20 @@ DEBUG && console.log("onCreate: %o %o %o", this, _collection, meta)
                 this.once("cancel", function() { self.onRead() })
 
                 this.once("save", function() {
-                    console.log("onCreateModel: %o %o %o", _collection, view, arguments)
-                    _collection.add(_model)
+                    console.log("onSave: %o %o %o", _collection, view, arguments);
+                    _collection.add(_model);
                 })
 
                 view.collection.once("error", function(response) {
-                    console.log("Create Error: %o", response)
-                    ux.Alert({ message: "Error: "+response.message})
-                    self.onRead()
-                })
+                    console.log("Create Error: %o", response);
+                    ux.Alert({ message: "Error: "+response.message});
+                    self.onRead();
+                });
 
                 this.body.show(view);
                 this.showHeaderFooters("create", { model: _model, collection: _collection} )
             },
+
             onRead: function() {
                 var can = this.options.can
                 var self = this
@@ -184,8 +185,8 @@ DEBUG && console.log("onRead: %o %o", this, view)
                 } else {
                     this.destroy()
                 }
-
             },
+
             onUpdate: function(selected) {
 
                 var meta = { model: selected || this.model }
@@ -194,8 +195,8 @@ DEBUG && console.log("onUpdate: %o %o", this, selected)
 
                 this.body.show(view);
                 this.showHeaderFooters("update", meta )
-
             },
+
             onDelete: function() {
                 if (!this.can.delete) return;
                 var _model = this.body.currentView.model
@@ -206,7 +207,7 @@ DEBUG && console.log("onDelete: %o %o", this, _model)
                     this.onRead()
                 }
                 return y_or_n
-            },
+            }
 
 		}  ) )
 

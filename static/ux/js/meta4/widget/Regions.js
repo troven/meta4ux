@@ -16,8 +16,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		 		"click [data-navigate]": "doNavigate"
 		 	},
 			initialize: function(options) {
-				ux.initialize(this, options)
-DEBUG && console.log("Regions: (%s) %o", this.id, options)
+				ux.initialize(this, options);
+DEBUG && console.log("Regions: (%s) %o -> %o", this.id, options, this.$el);
 				return this;
 			},
 			x_onShow: function() {

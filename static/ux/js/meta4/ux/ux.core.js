@@ -198,10 +198,10 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
                 css = css + (v.css?" "+v.css:"") // concat all CSS modification
                 className = v.className?v.className:className // last matching takes precedence
             })
-            var self = arguments[0]
-            className = className + css
+            var self = arguments[0];
+            className = className + css;
             if (self.$el && className) {
-                self.$el.addClass(className)
+                self.$el.addClass(className);
             }
 //		    self.className = className + css
             return css;

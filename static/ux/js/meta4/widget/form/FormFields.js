@@ -292,8 +292,10 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             initialize: function(options) {
                 options = _.extend({}, this.options, options)
                 if (!this.collection) {
-                    console.log("Select Schema", options)
+                    console.log("Form Select Lookup", options)
                     this.collection = ux.lookup(options.collection || options.options)
+                } else {
+                    console.log("Form Select Collection", options)
                 }
                 ux.initialize(this,options)
             },

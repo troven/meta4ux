@@ -68,44 +68,49 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4/ux/ux
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
     // guided tours
     ux.tour = function(options) {
-        var tour = {}
-        var follow = ["views", "tabs"]
+        if (!options.tour) {
+            return;
+        }
+
+        var tour = {};
+        var follow = ["views", "tabs"];
         var $tour = $("#tourguide");
+
         if (!$tour||!$tour.length) {
-            $tour = $("<ol id='tourguide'></ol>").appendTo("body")
+            $tour = $("<ol id='tourguide'></ol>").appendTo("body");
         }
 
         var build = function(options) {
             if (_.isObject(options.tour)) {
-                tour[options[ux.idAttribute]] = _.extend({label: "", comment: ""},options.tour)
+                tour[options[ux.idAttribute]] = _.extend({label: "", comment: ""},options.tour);
             } else if (_.isString(options.tour)) {
-                var id = options.tour.id || options[ux.idAttribute]
-                tour[options[ux.idAttribute]] = { label: "", comment: options.tour }
+                var id = options.tour.id || options[ux.idAttribute];
+                tour[options[ux.idAttribute]] = { label: "", comment: options.tour };
             }
             _.each(follow, function(next) {
-                if (options[next]) build(options[next])
+                if (options[next]) build(options[next]);
             })
-            return tour
+            return tour;
         }
 
         var render = function(_tours) {
             _.each(_tours, function(_tour, id) {
                 $("<li data-target='#"+id+"' data-title='"+_tour.label+"'>"+_tour.comment+"</li>").appendTo($tour)
-            })
+            });
         }
 
         build(options);
 
         if (!_.isEmpty(tour)) {
-            render(tour)
+            render(tour);
 
             $tour.featureTour({
                 cookieMonster: false,
                 cookieName: "tourGuide",
                 nextOnClose: true,
                 debug: true
-            })
-            console.log("Feature Tour: %o -> %o %o", $tour, options, tour)
+            });
+            console.log("Feature Tour: %o -> %o %o", $tour, options, tour);
         }
     }
 
