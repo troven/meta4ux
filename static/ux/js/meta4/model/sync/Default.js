@@ -36,8 +36,11 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
                     core.fact.models.trigger("error", collection, options, response);
                 }
             }, error: function(response) {
-                console.error("Meta4 Error: %s-> %o %o", url, response, arguments);
+                console.error("sync failed: %s-> %o %o", url, response, arguments);
                 options.error && options.error(collection, response);
+
+                collection.trigger("error", response);
+
                 alert(url + "-> "+response.statusText);
             } });
         return $future;

@@ -99,16 +99,21 @@ DEBUG && console.log("onAction (%s): %o", action, meta)
 
             onSave: function(model) {
                 var self = this;
-                model = model || self.body.currentView.model
-                if (!model) return
+                model = model || self.body.currentView.model;
+                if (!model) throw "Missing model for view: "+self.id;
                 model.once("sync", function() {
-DEBUG && console.log("onSaved: %o %o", this, arguments)
-                    self.onRead()
+//DEBUG &&
+console.log("onSaved: %o %o", this, arguments);
+                    self.onRead();
+                });
+
+                model.once("error", function() {
+                    console.log("onError: %o %o", this, arguments);
                 })
 
 //                model.validate && model.validate()
 DEBUG && console.log("onSave: %o %o valid: %s", this, model, model.isValid())
-                if (model.isValid())  model.save()
+                if (model.isValid())  model.save();
             },
 
             showHeaderFooters: function(action, meta) {

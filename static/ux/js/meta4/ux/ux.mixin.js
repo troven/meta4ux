@@ -481,7 +481,7 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
 			// call both action forms
 			this.triggerMethod( "action:"+action, meta )
 			this.triggerMethod("action", action, meta )
-console.log("trigger [action:%s] %o %o", action, this, meta );
+console.log("triggered [action:%s] %o %o", action, this, meta );
 
 			// trigger navigate?
 			var go_to = $this.attr("data-navigate")

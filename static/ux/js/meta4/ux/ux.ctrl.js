@@ -50,10 +50,13 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
             core.ux.Modal(view)
         }
 
+        var collection_options = view.collection?view.collection.options:{};
+        console.log("view %s %o collection: %o -> %o", view.id, view, view.collection, collection_options);
+
         // refresh remote collections
-        var fetch = (options.fetch==false?false:true) || (view.collection && view.collection.options.fetch==false?false:true);
-        var prefetch = (options.prefetch?true:false) || (view.collection && view.collection.options.prefetch?true:false);
-        var collections_id = view.collection?view.collection.options.id:false;
+        var collections_id = view.collection?view.collection.id:false;
+        var fetch = (options.fetch==false?false:true) || (collections_id && view.collection.options.fetch==false?false:true);
+        var prefetch = (options.prefetch?true:false)  || (collections_id && view.collection.options.prefetch?true:false);
 
         if (collections_id && fetch) {
             console.log("fetch? %s -> %s / v: (%s) %s -> %s / m: (%s) %s -> %s",
