@@ -1,0 +1,158 @@
+define(["underscore", "marionette", "core", "ux", "fact", "iq", "oops"],
+    function (_, M, meta4, ux, fact, iq, oops) {
+
+        // lazy boot loader
+        return function(options) {
+
+            var newApp = new M.Application(options||{});
+
+            newApp.bootModule = function(options) {
+
+                if (!options) throw new core.oops.Arguments("meta4:app:boot:oops:missing-options");
+                if (!options.id) throw new core.oops.Arguments("meta4:app:boot:oops:missing-module-id");
+
+                var DEBUG = options.debug || meta4.DEBUG;
+                localStorage.debug = DEBUG;
+
+                options.requires && require(options.requires);
+
+                var module = newApp.module(options.id, options);
+
+                module.id=options.id;
+                module.meta4 = meta4;
+
+                console.debug("Module: %s -> %o", module.id, _.keys(module));
+
+                module.on("all", function(e,x) {
+//                    console.log("MODULE/APP EVENT: %s -> %o", e, x);
+                    newApp.trigger.apply(newApp, arguments);
+                });
+
+                var Controllers = {
+                    default: {
+                        home: function() {
+                            // display a Home View
+                            if (options.home) {
+                                console.log("home: %s %o", options.id, options.home);
+                                var home = module.meta4.ux.Home(options.home, module);
+                                home.module = module;
+                                home.triggerMethod("show");
+                            } else {
+                                alert("Module is Homeless.");
+                            }
+                            console.log("MODULE HOME: %o -> %o", this, arguments);
+                        },
+                        profile: function() {
+                            console.log("MODULE PROFILE");
+                        },
+                        logout: function() {
+                            console.log("MODULE LOGOUT");
+                        }
+                    }
+                };
+
+                module.controller = Controllers.default;
+
+                module.on("ux:boot", function(module, options) {
+                    Backbone.history.start();
+                    module.controller.home();
+                });
+
+                module.router = new M.AppRouter({ controller: module.controller, appRoutes: { "home": "home", "profile": "profile" } });
+                module.router.onRoute = function(name, path, args) {
+                    console.log("On Route: %s %s -> %o", name, path, args);
+                };
+
+                module.on("home", function(go_to) {
+                    console.log("MODULE HOME: %s", go_to);
+                    module.controller.home();
+                });
+
+                module.on("navigate", function(go_to) {
+                    console.log("MODULE Navigate: %o -> %o", arguments, this);
+                });
+
+                // Boot the Module's dynamic architecture
+                iq.boot(module, options);
+                fact.boot(module, options);
+                ux.boot(module, options);
+
+                // define the user principal
+                var ProfileModel = Backbone.Model.extend( { url: "/models/me" } );
+
+                meta4.fact.models.set("user", new ProfileModel(options.user) );
+
+                if (options.server.io && options.server.io.enabled) {
+                    _.defaults(options.server.io, { url: options.url })
+
+                    var socket = io.connect(options.server.io.url, {});
+                    socket.on("connect", function (data) {
+                        console.warn("[io] connect", data);
+                        socket.on("hello", function (data) {
+                            console.warn("[io] welcome", data);
+                        })
+                    })
+                    console.debug("Socket IO: %o", options.server.io)
+                }
+
+                // notification timer
+                if (options.server.gossip && options.server.gossip.enabled) {
+                    _.defaults(options.server.gossip, { interval: 1 })
+                    var GossipCollection = Backbone.Collection.extend({url: "/models/fact/Gossip"})
+                    meta4.fact.models.set("userGossip", new GossipCollection() );
+                    setInterval(function() {
+                        var gossip = meta4.fact.models.get("userGossip")
+                        console.debug("Gossip Enabled: %o", gossip)
+                        gossip.fetch()
+                    }, (1000*options.server.gossip.interval) )
+                }
+
+                // generic module error handler
+                this.handleErrors(module);
+
+                // Announce Module is ready
+                module.trigger("boot", options);
+                console.debug("booted: %s views, %s models, %s templates, %s scripts", _.keys(options.views).length, _.keys(options.models).length, _.keys(options.templates).length, _.keys(options.scripts).length);
+                return module;
+            };
+
+            newApp.handleErrors = function(module) {
+
+                module.meta4.fact.models.on("error", function(c,o,r) {
+                    console.error("OOPS! server went away. It'll be back ASAP.")
+                })
+
+            };
+
+            newApp.addInitializer(function(options) {
+                var self = this;
+                if (!options.url) throw "meta4:app:boot:oops:missing-boot-url";
+                var DEBUG = options.debug || meta4.DEBUG;
+
+                DEBUG && console.log("Boot Loader: %o -> %s", options, options.url);
+
+                $.ajax({url: options.url, dataType: "json", type: "GET", data: JSON.stringify(options),
+                    contentType: "application/json; charset=utf-8",
+                    success: function(resp) {
+
+                        var parse = options.parse || function(resp) { return resp?resp.data:false };
+                        var result = parse(resp);
+
+                        if (!result) {
+                            console.error("No Response: %o", resp);
+                            self.trigger("boot:missing");
+                            return;
+                        }
+
+                        // Boot  Module
+                        var m_options = result;
+                        var module = self.bootModule(m_options);
+                    }
+                });
+            });
+
+            console.log("New App: %o", newApp);
+
+            return newApp;
+        }
+    });

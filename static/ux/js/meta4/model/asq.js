@@ -22,7 +22,7 @@ define(["underscore"], function (_) {
         match: function(data, query) {
             var self = this
 			var matched = true
-            var _query = query.attributes?query.attributes:query
+            var _query = query.attributes?query.attributes:query;
 			_.each(_query, function(v,k,o) {
 				if (k == "*") {
 					// any key
@@ -60,13 +60,14 @@ console.log("*= %o %o %o", v, k1, data, r, m)
 			} else {
 				matched = matched && self.test(k, data[k], v)
 			}
-console.log("eval: %s %o = %o -> %o", k, v, data[k], matched)
-			return matched
+//console.log("eval: %s %o = %o -> %o", k, v, data[k], matched)
+			return matched;
         },
 
 		test: function(test, v, data) {
+            if (_.isString(this.fn[test])) { return this.fn[this.fn[test]](v,data) }
             if (this.fn[test]) { return this.fn[test](v,data) }
-            return v == data
+            return v == data;
 		},
 
 		fn: {
@@ -80,12 +81,18 @@ console.log("eval: %s %o = %o -> %o", k, v, data[k], matched)
 //console.log("$contains: %o %o -> %s", a,b, r)
 				return r;
 			},
-			"=": function(a,b) { return a === b },
+			"=": function(a,b) { return a == b },
+            "==": function(a,b) { return a === b },
 			$eq: function(a,b) { return a == b },
 			$ne: function(a,b) { return a != b },
+            "!=": function(a,b) { return a != b },
 			$le: function(a,b) { return a <= b },
+            "<=": function(a,b) { return a <= b },
 			$lt: function(a,b) { return a < b },
+            "<": function(a,b) { return a < b },
 			$ge: function(a,b) { return a >= b },
+            ">=": function(a,b) { return a >= b },
+            ">": function(a,b) { return a > b },
 			$gt: function(a,b) { return a > b }
 		},
 

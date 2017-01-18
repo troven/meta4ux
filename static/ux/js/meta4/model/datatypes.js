@@ -11,6 +11,7 @@ define(["underscore", "core"], function (_, core) {
                     return "<urn:local:"+that.ID+">";
                 } else return "<"+that+">";
             },
+
             to: function(that, source) {
                 if (_.isString(that)) {
                     return "\""+that+"\"";

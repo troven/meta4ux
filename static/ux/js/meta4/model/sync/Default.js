@@ -14,35 +14,48 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
         if (!url) throw "meta4:fact:register:oops:missing-url";
 
         if (collection.options && collection.options.data) {
-            console.warn("Meta4 Instance Disables Remote: %s %o", collection.options.id, collection);
+            console.warn("Instance Disables Remote: %s %o", collection.options.id, collection);
             return;
         }
 
+        if (collection.busy) {
+            var elapsed = new Date().getTime()-collection.busy;
+            _DEBUG && console.log("Busy: %s for %s ms", collection.options.id, elapsed);
+            return false;
+        }
+
         var data = method=="read"?collection.options.filter||{}:collection.toJSON();
-        _DEBUG && console.log("Meta4 CRUD (%s / %s): %o %o %o %o", method, httpMethod, url, collection, data, options);
+        _DEBUG && console.log("Sync (%s / %s): %o %o %o %o", method, httpMethod, url, collection, data, options);
+
+        collection.busy = new Date().getTime();
+        collection.trigger("busy");
 
         var $future = $.ajax( { url: url, type: httpMethod,
             dataType: "json", data: data && JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             success: function(response) {
+                collection.busy = false;
+                collection.trigger("done");
                 if (response && response.status == "success" ) {
-                    _DEBUG && console.log("Meta4 CRUD Success: %s %s -> %o %o", url, response.status, collection, response);
+                    _DEBUG && console.log("CRUD Success: %s %s -> %o", url, response.status, response.data);
                     options.success(response.data);
-                } else if (response.status) {
-                    console.error("Meta4 CRUD Failed: %s %s -> %o", url, response.message, response);
+                } else {
+                    console.error("CRUD Failed: %s %s -> %o", url, response.message, response);
                     options.error && options.error(response);
                     collection.trigger("error", response);
-                } else {
-                    core.fact.models.trigger("error", collection, options, response);
                 }
             }, error: function(response) {
+                collection.busy = false;
+
                 console.error("sync failed: %s-> %o %o", url, response, arguments);
                 options.error && options.error(collection, response);
 
                 collection.trigger("error", response);
 
                 alert(url + "-> "+response.statusText);
-            } });
+            }
+        });
+
         return $future;
     };
 

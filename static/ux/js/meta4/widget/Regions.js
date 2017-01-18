@@ -5,9 +5,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkOptions(options, ["id", "views"]);
 		var DEBUG = options.debug || ux.DEBUG; // master DEBUG
 
-		options.template =  options.template || ux.compileTemplate("<div class='regions'><div class='region-header'></div><div class='region-body'></div><div class='region-footer'></div></div>");
+		options.template =  options.template || 
+            ux.compileTemplate("<div class='regions'><div class='region-header clearfix'></div><div class='region-body clearfix'></div><div class='region-footer clearfix'></div></div>");
 
-		var config = {
+		var view_defn = {
 			isNested: true, isNavigator: true,
 	 		template: options.template,
 	 		className: "ux-regions",
@@ -16,23 +17,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		 		"click [data-navigate]": "doNavigate"
 		 	},
 			initialize: function(options) {
-				ux.initialize(this, options);
-DEBUG && console.log("Regions: (%s) %o -> %o", this.id, options, this.$el);
+DEBUG && console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);
 				return this;
-			},
-			x_onShow: function() {
-
-				var self = this
-				setTimeout(function() {
-DEBUG && console.log("Regions Activated", self)
-					if (!self.body || !self.body.currentView) {
-						self.showAllNested( {model: self.model, collection: self.collection} )
-					}
-				}, 2)
-			},
+			}
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config)
+		return Backbone.Marionette.LayoutView.extend(view_defn)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

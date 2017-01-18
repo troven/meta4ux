@@ -19,17 +19,18 @@ DEBUG && console.log("SplitPanel: (%s) %o %o", this.id, this, _options)
 				return this;
 			},
 			onRender: function() {
-			    this.showNested()
-			    var self = this
+			    this.showNested();
+			    var self = this;
 DEBUG && console.log("onRender: (%s) %o", this.id, this)
 
                 var master = this.master.currentView
-			    master.on("childview:select", function() {
-			        self.doSelectDetail.apply(self, arguments)
+			    master.on("select", function() {
+			        self.doSelectDetail.apply(self, arguments);
 			    })
 			},
 			doSelectDetail: function(v,m) {
-			    var view = this.getNestedView("selected", { model: m })
+			    var view = this.getNestedView(["selected", "detail", "master"], { model: m })
+                ;
 DEBUG && console.log("doSelectDetail: (%s) %o %o -> %o", this.id, v, m, view)
 			    view && this.detail.show(view)
 			}

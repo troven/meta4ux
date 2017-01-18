@@ -1,104 +1,47 @@
 define(["jquery", "underscore", "marionette", "Handlebars", "core",
-    "meta4/ux/ux.dialog", "meta4/ux/ux.mixin", "meta4/ux/ux.util", "meta4/ux/ux.ctrl", "meta4/ux/ux.registry", "md5"
+    "meta4/ux/ux.mixin", "meta4/ux/templateHelpers", "meta4/ux/ux.util", "meta4/ux/ux.widget", "meta4/ux/ux.registry", "oops", "md5"
+], function ($,_, Marionette, Handlebars, core, ux, TemplateHelpers, ux_util, ux_widget, ux_registry, Oops, md5) {
 
-], function ($,_, Marionette, Handlebars, core, ux, ux_mixin, ux_util, ux_ctrl, ux_registry, md5) {
-
-
-    // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-    /*
-     Moustache template helper.
-     */
-
-    var TemplateHelpers = {
-        now: function() {
-            return new Date();
-        },
-        _: function(that) {
-//console.error("_: %o %o %o", this, that, this[that])
-            return that?core.ux.uid(that):core.uuid();
-        },
-        "raw": function( field) {
-            console.log("RAW: %o %o %o", this, field, this[field])
-            return _.isUndefined(this[field])?field:this[field]
-        },
-        uid: function(that) {
-            return that?core.ux.uid(that):core.uuid();
-        },
-        url: function(field) {
-            return encodeURIComponent(this[field]||field)
-        },
-        md5: function(that) {
-            return md5(that)
-        },
-        hash: function(that) {
-            return md5(that)
-        },
-        i18n: function(that) {
-            throw "i18n not implemented: "+that
-        },
-        gravatar: function(that) {
-            return "http://www.gravatar.com/avatar/"+md5(that.trim().toLowerCase())
-        },
-        img: function(that, className) {
-            if (_.isObject(that)) {
-//console.log("icon: %o %o", this,that)
-                return this.img;
-            }
-            className = _.isString(className)?className:"pull-right"
-            return "<img height='48' class='"+className+"' src='/www/assets/images/"+that+".png'/>"
-        },
-        toString: function( x ){
-            if ( x === void 0 ) return 'undefined';
-            if (_.isArray(x)) return "[]"+x;
-            if (_.isObject(x)) return "{}"+x;
-            return x.toString();
-        },
-        lookup: function( field, collection ) {
-            var models = core.fact.models.get(collection)
-            if (!models) return "no models @ "+collection
-            var model = models.get(this)
-            if (!model) return "no "+this+" in "+collection;
-            return model.get(field);
-        },
-        default: function( field, _default ) {
-            return _.isUndefined(this[field])?_default:this[field]
-        }
-    }
-
-    // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
-    /*
-     Define the UX Mediator object
-     */
+/*
+    Define the UX Mediator object
+*/
 
     _.extend(ux, {
-        views: new core.ux.ViewRegistry(),
-        widgets: new core.ux.WidgetRegistry(),
-        templates: {},
         view: {},
 
         boot:function(module, options) {
-            if (!module)
-                throw new Error("meta4:ux:boot:oops:missing-module");
+            if (!module) throw new Error("meta4:ux:boot:oops:missing-module");
+
             var self = this;
-            self._module = module;
+
+            core.oops = new Oops(options.errors);
+
+            module.views = new core.ux.ViewRegistry();
+            module.widgets = new core.ux.WidgetRegistry();
+            module.templates = {};
 
             // compile HTML templates
             _.each(options.templates, function(template, id) {
-                self.templates[id] = self.compileTemplate(template)
+                module.templates[id] = self.compileTemplate(template);
             });
 
             // register Template helpers
             _.each(core.ux.templateHelpers, function(fn,name) {
-                Handlebars.registerHelper(name,fn)
-            })
+                Handlebars.registerHelper(name,fn);
+            });
 
-            // load all widgets
-            core.ux.widgets.requires(options, function() {
-                module.trigger("ux:boot", self, options)
-            })
+            console.log("UX: boot: %o", options.views);
 
+            // discover used widgets
+            var widgetTypes = module.views.register(options.views);
+
+            // lazy-load the widgets
+            module.widgets.requires(widgetTypes, function() {
+                module.trigger("home", options);
+            });
+
+            return self;
         },
-
 
         // Compile a string template into a Handlebars function
         compileTemplate: function(template){
@@ -117,6 +60,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
         // given a $dom element, find the associated model 'id'
         identity: function($el) {
             if (!$el) throw "meta4:ux:oops:missing-dom";
+            if (!$el.find || !$el.attr) throw "meta4:ux:oops:invalid-dom";
             // hunt for an ID (usually a model)
             var $id = false, id = false
             $id = $el.find("[data-id]")
@@ -127,18 +71,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             id = $id.attr("id")
             if (id) return id;
 
-            console.warn("Missing Identity: %o", $el)
-            return null;
-        },
-
-        // attach 'this' attributes as HTML 'id' and RDFA 'about'
-        identify: function($html, options) {
-            throw "deprecated"
-            var that = options.get?options.get(ux.idAttribute):options[ux.idAttribute];
-            var id = core.ux.uid(that);
-            $html.attr("id", id);
-            $html.attr("data-id", that);
-            $html.attr("about", that);
+            throw new Error("meta4:ux:oops:missing-dom-id");
         },
 
         // can be called by a Widget to intialize itself
@@ -147,21 +80,35 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
         // augment CSS classes
         //
 
-        initialize: function(view, options) {
-            if (!view) throw new Error("meta4:ux:oops:missing-view");
-            if (!view.render) throw new Error("meta4:ux:oops:not-a-view");
+        initialize: function(view, options, navigator) {
+            if (!view) throw new ux.oops.Error("meta4:ux:oops:missing-view");
+            if (!view.render) throw new ux.oops.Error("meta4:ux:oops:not-a-view");
             if (!options) throw new Error("meta4:ux:oops:missing-options");
             var _DEBUG = options.debug || ux.DEBUG;
+
+            if (view.navigator) throw ux.oops.Error("meta4:ux:oops:re-initialized#"+view.id);
+
+            view.navigator = navigator?navigator:false;
             core.ux.model(options, view);
 
             this.events = _.extend({}, this.events, this.options?this.options.events:{}, options.events);
-            this.ui = _.extend({}, this.ui, options.ui);
+            this.ui = _.extend( {}, this.ui, options.ui );
 
+            // apply mixins
             core.ux.mixer.call(view, options);
-            core.iq.aware(view, options.when || options.iq);
+
+            // bind "when:" events
+            core.iq.aware(view, options.when);
+
+            // apply css - incl className hueristics
             core.ux.stylize(view, options);
 
-//	        Backbone.View.prototype.delegateEvents.apply(this, options);
+            // nested views
+            if (options._views) this._views = options._views;
+
+            // announce
+            view.trigger("initialized");
+            navigator && navigator.trigger("view", view);
 
             return view;
         },
@@ -171,7 +118,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             return core.resolve(options, modelled);
         },
 
-        // resolve look-up values using a variety of strategies - always returning an array of the form [{ id, label }]
+        // resolve look-up values using a variety of strategies - returns Collection of { id, label }
         lookup: function(values) {
             if (_.isArray(values)) {
                 values = _.map(values, function(v) { return _.isObject(v)?v:{ id: v, label: v} });
@@ -192,11 +139,11 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
         // augment view with absolute 'className' or cumulative 'css' styles
         stylize: function() {
-            var css = ""
-            var className = ""
+            var css = "";
+            var className = "";
             _.each(arguments, function(v) {
-                css = css + (v.css?" "+v.css:"") // concat all CSS modification
-                className = v.className?v.className:className // last matching takes precedence
+                css = css + (v.css?" "+v.css:""); // concat all CSS modification
+                className = v.className?v.className:className; // last matching takes precedence
             })
             var self = arguments[0];
             className = className + css;

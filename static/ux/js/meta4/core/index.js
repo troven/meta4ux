@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone"], function ($,_,Backbone) {
+define(["jquery", "underscore", "backbone", "meta4/util/strings"], function ($,_,Backbone, strings) {
 
 	/* *****************************************************************************************************************
 		Prototype Inheritance
@@ -10,7 +10,7 @@ define(["jquery", "underscore", "backbone"], function ($,_,Backbone) {
 
 	**************************************************************************************************************** */
 
-	return {
+	return _.extend({
 		DEBUG: false,
 		idAttribute: "id", labelAttribute: "label", typeAttribute: "type", commentAttribute: "comment",
 		fact: { factory: {}, sync: {} }, iq: {},
@@ -76,23 +76,23 @@ _DEBUG && console.debug("View Model (%s): %o %o", modelled.id, _options, modelle
 			if (_.isString(options.collection)) {
 				// recursively re-model ... check if a sub-model first
 
-				var _collection = false
+				var _collection = false;
 
 				// nested-collection
 				if (options.collection.indexOf(".")==0) {
-					var cid = options.collection.substring(1)
-					_collection = modelled.model.get(cid)
+					var cid = options.collection.substring(1);
+					_collection = modelled.model.get(cid);
 					if (!_collection) {
 						_collection = new Backbone.Collection()
-_DEBUG && console.log("New Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
-						modelled.model.set(cid, _collection)
+_DEBUG && console.log("New Local Collection (%s): %o %o %o", cid, options, modelled, _collection);
+						modelled.model.set(cid, _collection);
 					} else {
 _DEBUG && console.log("Existing Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
 					}
 				} else if (options.collection.indexOf("!")==0) {
 				    // global-collection
-					var cid = options.collection.substring(1)
-					_collection = fact.models.get(cid)
+					var cid = options.collection.substring(1);
+					_collection = fact.models.get(cid);
 _DEBUG && console.log("Global Collection (%s): %o %o %o", cid, options, modelled, _collection)
 				} else {
 					var cid = options.collection
@@ -186,59 +186,8 @@ _DEBUG && console.log("Function Collection", options.collection, this.fact)
 		isDefaultTrue: function(options, key) {
 			if (_.isUndefined(options)) return true;
 			return options[key]===false?false:true
-		},
-
-		/**
-			Utilities to deal with Strings (including special cases for 'id' strings)
-		**/
-
-		/**
-		 	Generate a reasonably unique UUID
-		**/
-		uuid: function() {
-			function _id() { return (((1+Math.random())*0x10000)|0).toString(16).substring(1); };
-			return (_id()+"-"+_id()+"-"+_id()+"-"+_id()+"-"+_id()+"-"+_id()+"-"+_id()+"-"+_id());
-		},
-
-		/**
-		 	Generate a scoped UUID by pre-pending a prefix
-		**/
-		urn: function(prefix) {
-			return (prefix || core[idAttribute])+"#"+this.uuid();
-		},
-
-        url: function(path) {
-		    var ix = path.indexOf("://");
-            if (ix<0) throw new Error("Missing URL protocol: "+path);
-            var proto = path.substring(0,ix+3);
-            var remain = path.substring(ix+3);
-            remain = remain.replace("\\", "/").replace("//", "/");
-            return proto+remain;
-         },
-
-		/**
-		 	Turn camel-cased strings into a capitalised, space-separated string
-		**/
-		humanize: function(s) {
-			return s.replace(/\W+|_|-/g, " ").toLowerCase().replace(/(^[a-z]| [a-z]|-[a-z])/g, function($1) { return $1.toUpperCase() });
-		},
-
-		toQueryString: function(obj, prefix) {
-			serialize = function(obj, prefix) {
-			  var str = [];
-			  for(var p in obj) {
-			    if (obj.hasOwnProperty(p)) {
-			      var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-			      str.push(typeof v == "object" ?
-			        serialize(v, k) :
-			        encodeURIComponent(k) + "=" + encodeURIComponent(v));
-			    }
-			  }
-			  return str.join("&");
-			}
-			return serialize(obj, prefix)
 		}
 
-	}
+	},strings);
 
 });

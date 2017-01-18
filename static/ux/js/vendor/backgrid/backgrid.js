@@ -1,22 +1,27 @@
 /*!
-  backgrid
+  backgrid 0.3.7
   http://github.com/wyuenho/backgrid
 
-  Copyright (c) 2014 Jimmy Yuen Ho Wong and contributors <wyuenho@gmail.com>
+  Copyright (c) 2016 Jimmy Yuen Ho Wong and contributors <wyuenho@gmail.com>
   Licensed under the MIT license.
 */
 
-(function (factory) {
+(function (root, factory) {
 
-  // CommonJS
-  if (typeof exports == "object") {
-    module.exports = factory(module.exports,
-                             require("underscore"),
-                             require("backbone"));
-  }
-  // Browser
-  else factory(this, this._, this.Backbone);
-}(function (root, _, Backbone) {
+  if (typeof define === "function" && define.amd) {
+    // AMD (+ global for extensions)
+    define(["underscore", "backbone"], function (_, Backbone) {
+      return (root.Backgrid = factory(_, Backbone));
+    });
+  } else if (typeof exports === "object") {
+    // CommonJS
+    var Backbone = require("backbone");
+    Backbone.$ = Backbone.$ || require("jquery");
+    module.exports = factory(require("underscore"), Backbone);
+  } else {
+    // Browser
+    root.Backgrid = factory(root._, root.Backbone);
+  }}(this, function (_, Backbone) {
 
   "use strict";
 
@@ -63,7 +68,7 @@ function lpad(str, length, padstr) {
 
 var $ = Backbone.$;
 
-var Backgrid = root.Backgrid = {
+var Backgrid = {
 
   Extension: {},
 
@@ -276,7 +281,7 @@ _.extend(NumberFormatter.prototype, {
   fromRaw: function (number, model) {
     if (_.isNull(number) || _.isUndefined(number)) return '';
 
-    number = number.toFixed(~~this.decimals);
+    number = parseFloat(number).toFixed(~~this.decimals);
 
     var parts = number.split('.');
     var integerPart = parts[0];
@@ -864,9 +869,16 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
                     }
                   });
 
-    if (Backgrid.callByNeed(column.editable(), column, model)) $el.addClass("editable");
-    if (Backgrid.callByNeed(column.sortable(), column, model)) $el.addClass("sortable");
-    if (Backgrid.callByNeed(column.renderable(), column, model)) $el.addClass("renderable");
+    this.updateStateClassesMaybe();
+  },
+
+  updateStateClassesMaybe: function () {
+    var model = this.model;
+    var column = this.column;
+    var $el = this.$el;
+    $el.toggleClass("editable", Backgrid.callByNeed(column.editable(), column, model));
+    $el.toggleClass("sortable", Backgrid.callByNeed(column.sortable(), column, model));
+    $el.toggleClass("renderable", Backgrid.callByNeed(column.renderable(), column, model));
   },
 
   /**
@@ -874,9 +886,13 @@ var Cell = Backgrid.Cell = Backbone.View.extend({
      model's raw value for this cell's column.
   */
   render: function () {
-    this.$el.empty();
+    var $el = this.$el;
+    $el.empty();
     var model = this.model;
-    this.$el.text(this.formatter.fromRaw(model.get(this.column.get("name")), model));
+    var columnName = this.column.get("name");
+    $el.text(this.formatter.fromRaw(model.get(columnName), model));
+    $el.addClass(columnName);
+    this.updateStateClassesMaybe();
     this.delegateEvents();
     return this;
   },
@@ -1399,7 +1415,15 @@ var SelectCellEditor = Backgrid.SelectCellEditor = CellEditor.extend({
   },
 
   /** @property {function(Object, ?Object=): string} template */
-  template: _.template('<option value="<%- value %>" <%= selected ? \'selected="selected"\' : "" %>><%- text %></option>', null, {variable: null}),
+  template: _.template(
+    '<option value="<%- value %>" <%= selected ? \'selected="selected"\' : "" %>><%- text %></option>',
+    null,
+    {
+        variable    : null,
+        evaluate    : /<%([\s\S]+?)%>/g,
+        interpolate : /<%=([\s\S]+?)%>/g,
+        escape      : /<%-([\s\S]+?)%>/g
+    }),
 
   setOptionValues: function (optionValues) {
     this.optionValues = optionValues;
@@ -2011,7 +2035,9 @@ var EmptyRow = Backgrid.EmptyRow = Backbone.View.extend({
 
     var td = document.createElement("td");
     td.setAttribute("colspan", this.columns.length);
-    td.appendChild(document.createTextNode(_.result(this, "emptyText")));
+    var span = document.createElement("span");
+    span.innerHTML = _.result(this, "emptyText");
+    td.appendChild(span);
 
     this.el.className = "empty";
     this.el.appendChild(td);
@@ -2164,8 +2190,6 @@ var HeaderCell = Backgrid.HeaderCell = Backbone.View.extend({
  */
 var HeaderRow = Backgrid.HeaderRow = Backgrid.Row.extend({
 
-  requiredOptions: ["columns", "collection"],
-
   /**
      Initializer.
 
@@ -2289,7 +2313,7 @@ var Body = Backgrid.Body = Backbone.View.extend({
       this.columns = new Columns(this.columns);
     }
 
-    this.row = options.row || Row;
+    this.row = options.row || this.row || Row;
     this.rows = this.collection.map(function (model) {
       var row = new this.row({
         columns: this.columns,
@@ -2309,14 +2333,19 @@ var Body = Backgrid.Body = Backbone.View.extend({
     this.listenTo(collection, "reset", this.refresh);
     this.listenTo(collection, "backgrid:sort", this.sort);
     this.listenTo(collection, "backgrid:edited", this.moveToNextCell);
+
+    this.listenTo(this.columns, "add remove", this.updateEmptyRow);
   },
 
   _unshiftEmptyRowMayBe: function () {
     if (this.rows.length === 0 && this.emptyText != null) {
-      this.rows.unshift(new EmptyRow({
+      this.emptyRow = new EmptyRow({
         emptyText: this.emptyText,
         columns: this.columns
-      }));
+      });
+
+      this.rows.unshift(this.emptyRow);
+      return true
     }
   },
 
@@ -2404,7 +2433,9 @@ var Body = Backgrid.Body = Backbone.View.extend({
     // removeRow() is called directly
     if (!options) {
       this.collection.remove(model, (options = collection));
-      this._unshiftEmptyRowMayBe();
+      if (this._unshiftEmptyRowMayBe()) {
+        this.render();
+      }
       return;
     }
 
@@ -2413,9 +2444,22 @@ var Body = Backgrid.Body = Backbone.View.extend({
     }
 
     this.rows.splice(options.index, 1);
-    this._unshiftEmptyRowMayBe();
+    if (this._unshiftEmptyRowMayBe()) {
+      this.render();
+    }
 
     return this;
+  },
+
+  /**
+     Rerender the EmptyRow which empties the DOM element, creates the td with the
+     updated colspan, and appends it back into the DOM
+  */
+
+  updateEmptyRow: function () {
+    if (this.emptyRow != null) {
+      this.emptyRow.render();
+    }
   },
 
   /**
@@ -2494,7 +2538,7 @@ var Body = Backgrid.Body = Backbone.View.extend({
      Triggers a Backbone `backgrid:sorted` event from the collection when done
      with the column, direction and a reference to the collection.
 
-     @param {Backgrid.Column} column
+     @param {Backgrid.Column|string} column
      @param {null|"ascending"|"descending"} direction
 
      See [Backbone.Collection#comparator](http://backbonejs.org/#Collection-comparator)
@@ -2586,6 +2630,9 @@ var Body = Backgrid.Body = Backbone.View.extend({
     var i = this.collection.indexOf(model);
     var j = this.columns.indexOf(column);
     var cell, renderable, editable, m, n;
+
+    // return if model being edited in a different grid
+    if (j === -1) return this;
 
     this.rows[i].cells[j].exitEditMode();
 
@@ -2760,7 +2807,7 @@ var Grid = Backgrid.Grid = Backbone.View.extend({
     // Convert the list of column objects here first so the subviews don't have
     // to.
     if (!(options.columns instanceof Backbone.Collection)) {
-      options.columns = new Columns(options.columns);
+      options.columns = new Columns(options.columns || this.columns);
     }
     this.columns = options.columns;
 
@@ -2879,5 +2926,5 @@ var Grid = Backgrid.Grid = Backbone.View.extend({
   }
 
 });
-return Backgrid;
+  return Backgrid;
 }));

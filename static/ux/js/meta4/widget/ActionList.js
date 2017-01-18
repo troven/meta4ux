@@ -8,62 +8,70 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	var commentAttribute = ux.commentAttribute || "comment"
 	var DEBUG = true; // && ux.DEBUG;
 
-	ux.view.ActionList = ux.view["meta4:ux:ActionList"] = function(options) {
+	ux.view.ActionList = ux.view["meta4:ux:ActionList"] = function(options, navigator) {
 		_.defaults(options, { child: {} })
+
+
+        var EmptyView  = Backbone.Marionette.ItemView.extend({
+            isTemplating: true, isActionable: true,
+            initialize: function(_options) {
+                ux.initialize(this, _options, navigator);
+            }
+        });
 
 		var ListItem = Backbone.Marionette.ItemView.extend({
 			tagName: "li", className: "list-group-item clickable",
-			template: options.child.template || "<div data-id='{{"+ux.idAttribute+"}}' data-trigger='{{"+ux.idAttribute+"}}' title='{{"+ux.commentAttribute+"}}'>{{"+ux.labelAttribute+"}}</div>",
+			template: options.child.template || "<a href='' title='{{"+options.child[ux.commentAttribute]+"}}'>{{"+options.child[ux.labelAttribute]+"}}</a>",
 
 			isSelectable: true, isDroppable: false,
 			isHoverPanel: false, isTemplating: true, isPopOver: false,
-			isActionable: true, isActionMenu: true,
+			isActionable: true, isActionMenu: true, isNavigator: false,
 			events: {
-                "click [data-trigger]": "doEventAction",
 				"click": "doEventSelect",
-				"dblClick [data-id]": "doEventSelect",
+				"dblClick": "doEventSelect",
 			},
 			initialize: function(_options) {
-				ux.initialize(this, _options)
-			},
-			onRender: function() {
-			    var $actions = $("[data-actions]")
-			    if (!$actions||!$actions.length) return;
+				ux.initialize(this, _options, navigator);
 			}
 		});
 
 		var definition = {
-			isSortable: true, isCommon: true, isActionable: true,
-			isPopOver: true, isSelectable: true, isHoverPanel: true,
+			isSortable: false, isCommon: true, isActionable: true, isNested: true,
+            isPopOver: false, isSelectable: true, isHoverPanel: false,
 			childView: ListItem, tagName: "ul",
 			className: "list-group",
 			sortable: {
 				connectWith: false
 			},
 			events: {
-				'sortstart': 		    "doEventDrag",
-				"click [data-id]": 	    "doEventSelect",
-				"click [data-trigger]": "doEventAction"
+				"sortstart": "doEventDrag",
 			},
-			childEvents: function() {
-//console.debug("childEvents: %o %o", event, this);
-				return {}
-			},
-//			childEvents: ListItem.events,
+            childEvents: {
+                "select": function(view, model, event) {
+                    console.log("ActionList: select: %o %o %o", this, view, model?model:"Skip: no model");
+                    if (!model) return;
+                    // bubble navigate to ActionList parent
+                   this.triggerMethod("select", model);
+                }
+            },
 			childViewOptions: function(model, index) {
-				return _.extend({ model: model, when: this.options.when }, this.options.child)
+				var _childViewOptions = _.extend({ model: model }, this.options.child);
+//console.log("_childViewOptions: %o", _childViewOptions);
+                return _childViewOptions;
 			},
 			initialize: function(_options) {
-				ux.initialize(this, _options)
-				this.childView.template = _options.child && _options.child.template
+//				ux.initialize(this, _options);
+				this.childView.template = _options.child && _options.child.template;
 				if (_options.empty) {
-					this.emptyView = ListItem
-					this.emptyView.template = _options || empty.template
-					this.emptyViewOptions = function() { return _.extend({ "template": ""}, _options.empty) }
+					this.emptyView = EmptyView;
+					this.emptyView.template = _options || empty.template;
+					this.emptyViewOptions = function() {
+					    return _.extend({ "template": ""}, _options.empty);
+					}
 				}
-
+				console.log("ACTION LIST: init: %o", this);
 				return this;
-			},
+			}
 		}
 
 		return Backbone.Marionette.CollectionView.extend( definition );

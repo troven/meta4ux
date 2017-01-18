@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone,core) {
+define(["jquery", "underscore", "backbone", "marionette", "core"], function ($,_,Backbone, M, core) {
 
 	var idAttribute = core.idAttribute
 	var typeAttribute = core.typeAttribute
@@ -11,25 +11,31 @@ define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone,core
 	core.iq = _.extend({}, Backbone.Events, {
         fn: {},
         _apis: {},
-        boot: function(module, options) {
-            var self = this
-			self._module = module;
+
+        boot: function(navigator, options) {
+            var self = this;
+
+            console.log("IQ BOOT: %o -> %o", navigator, options);
+
             _.each(options.scripts, function(script,id) {
-                self.fn[id] = self.compileScript(script)
-                module.on(id, self.fn[id]);
-            })
+                self.fn[id] = self.compileScript(script);
+                navigator.on(id, self.fn[id]);
+
+            });
 
             _.each(options.controllers, function(then, when) {
                 if(!self.fn[then]) self.fn[then]=function(){console.warn('missing fn() '+then, this); this.triggerMethod(then, this, arguments) }
-                module.on(when, function() {
-DEBUG && console.log("IQ When: ", when, then, arguments)
+                navigator.on(when, function() {
+DEBUG && console.log("IQ When: ", when, then, arguments);
                     self.fn[then].apply(arguments[0], [arguments[1]]);
                 })
             })
 
-            options.timers && self.timers(module, options.timers)
+            options.timers && self.timers(navigator, options.timers);
 
-DEBUG && console.log("IQ Booted: ", self, module, options)
+            DEBUG && console.log("Module IQ: %s -> %j", navigator.id, options);
+
+            return self;
         },
 
         get: function(thisFN) {
@@ -65,7 +71,7 @@ DEBUG && console.log("newFunction:", script, script_src)
 		},
 
 		upload: function(files, onSuccess, onError) {
-console.debug("Uploading Files:", this, this._module.options, files)
+console.debug("Uploading Files:", this, this._navigator.options, files)
 		},
 
         remote: function(url, data) {
@@ -76,38 +82,69 @@ console.debug("Uploading Files:", this, this._module.options, files)
 
 		// ensure IQ behaviour is Event-driven and aware of it's environment
 		aware: function(vents, iqFn) {
-            if (!vents) throw "meta4:iq:oops:missing-event-source"
-            if (!_.isObject(vents)) throw "meta4:iq:oops:invalid-event-source"
-            if (!vents.on) throw "meta4:iq:oops:not-event-source"
-			if (!iqFn) return
+            if (!vents) throw new Error("meta4:iq:oops:missing-event-source");
+            if (!_.isObject(vents)) throw new Error("meta4:iq:oops:invalid-event-source");
+            if (!vents.on) throw new Error("meta4:iq:oops:not-event-source");
+			if (!iqFn) return;
 
 			// bind local 'iq' events events to fn()
             _.each(iqFn, function(fnId,key) {
                 if (_.isString(fnId)) {
                     var fn = core.iq.get(fnId);
-//DEBUG &&
-console.log("when [%s] %o -> %s %o", key, vents, fnId, fn)
                     if (fn) {
-                        vents.on(key, function() { console.log("IQ when: %s", key); fn.apply(vents,arguments) })
+//DEBUG && console.log("aware [%s] %o -> %s %o", key, vents, fnId, fn)
+                        vents.on(key, function() {
+//                            DEBUG && console.log("WHEN %o WHEN: %s -=> %s -> %o", this, key, fnId, fn);
+                            fn.apply(vents,arguments);
+                        })
+                    } else {
+                        throw new Error("meta4:iq:oops:missing-fn#"+fnId);
                     }
                 }
             })
 			return vents
 		},
 
-		timers: function(module, timers) {
+        bubble: function(event, when, then) {
+            when.on(event, function() {
+                var args = [];
+                args.push(event);
+                args.concat(arguments);
+                console.log("BUBBLE [%s]: %o %o", event, when, then);
+//                then.trigger.apply(when, args);
+            });
+        },
+
+		timers: function(navigator, timers) {
 			var self = this;
 			// setup timers (in seconds)
 			if (_.isArray(timers)) {
 				_.each(timers, function(seconds) {
 					setInterval(function() {
-					    var event = "meta4:timer:"+seconds;
-						module.trigger(event);
+					    var event = "timer:"+seconds;
+						navigator.trigger(event);
 					}, seconds*1000);
 				});
 			}
-		}
-	});
+		},
+
+        Controller: function(type, options, done) {
+            if (!type) throw new Error("meta4:ctrl:oops:missing-type");
+            if (!options) throw new Error("meta4:ctrl:oops:invalid-options#"+type);
+            if (!done) throw new Error("meta4:ctrl:oops:invalid-callback#"+type);
+
+            var DEBUG = options.debug?true:false;
+
+            console.log("Requires %o controller", type);
+
+            define(["meta4/iq/"+type], function(controller) {
+                console.log("New Controller: %s -> %o", type, options);
+                var ctrl = new controller(options);
+                done(controller);
+            });
+        }
+
+    });
 
     return core.iq;
 });

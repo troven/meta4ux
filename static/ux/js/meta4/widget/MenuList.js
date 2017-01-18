@@ -3,49 +3,41 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	var idAttribute = ux.idAttribute || "id";
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
-	var DEBUG = false || ux.DEBUG;
 
-	ux.view.MenuList = ux.view["meta4:ux:MenuList"] = function(options) {
+	ux.view.MenuList = ux.view["meta4:ux:MenuList"] = function(options, module) {
 		options = ux.checkOptions(options, ["id", "collection"]);
-		_.defaults(options, { child: {} })
 
-		var MenuItem = Backbone.Marionette.ItemView.extend({ tagName: "li",
-            isTemplating: true,
-			initialize: function(_options) {
-				ux.initialize(this,_options)
+        var DEBUG = true; // options.debug || ux.DEBUG;
+        var isVertical = options.isVertical || options.isStacked || false;
+
+
+        var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
+            events: { "click": "doSelect"},
+            tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{label}}'>{{label}}</a>",
+            initialize: function(_options) {
+                ux.initialize(this, _options);
+                console.log("MenuItem: %o --> %o", this, _options);
             },
-			template: "<a data-id='{{id}}' data-navigate='{{id}}' title='{{comment}}' href='#'><i class='fa fa-{{icon}}'></i><span>{{label}}</span></a>",
-		});
+            doSelect: function() {
+                this.trigger("select", this.model);
+            }
+        }, ux.mixin ) );
 
-		var MenuList = Backbone.Marionette.CollectionView.extend( {
-			isSelectable: false, isNavigator: true, isPopOver: false,
-			childView: MenuItem,
-			className: "nav nav-pills menu-list", tagName: "ul",
-			childViewContainer: "ul",
-			events: {
-			  'click [data-navigate]': 'doNavigate'
-			},
-			initialize: function(_options) {
-				ux.initialize(this,_.defaults(_options, { model: true} ))
+        var MenuList = Backbone.Marionette.CollectionView.extend({
+            isNavigator: true,
+            childView: MenuItem, tagName: "ul", className: "nav nav-pills "+(isVertical?"nav-stacked":""),
+            childEvents: {
+                "select": function(view, model, event) {
+                    this.$el.find(".active").removeClass("active");
+                    this.selected = model;
+                    console.log("MenuList: selected: %o %o %o", this, view, model);
+                    // bubble navigate to ActionList parent
+                    this.triggerMethod("select", model);
+                    view.$el.addClass("active");
+                }
+            }
+        });
 
-				if (_options.child) {
-DEBUG && console.log("MenuList Child Options: %o %o", this, _options.child)
-				    this.options.childViewOptions = _options.child
-				}
-
-				if (_options.empty) {
-					this.emptyView = MenuItem
-					this.emptyView.template = _options || empty.template
-					this.emptyViewOptions = function() { return _.extend({ "template": ""}, _options.empty) }
-				}
-			},
-			onSelect: function(selection) {
-				if (!selection) throw "meta4:ux:oops:missing-selection";
-DEBUG && console.log("MenuList Select: %o %o", this, selection)
-				this.trigger("navigate", selection)
-				return this;
-			}
-		});
 		return MenuList;
 	}
 

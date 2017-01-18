@@ -5,8 +5,26 @@
   Copyright (c) 2013 Jimmy Yuen Ho Wong and contributors
   Licensed under the MIT @license.
 */
+(function (root, factory) {
 
-(function (window, $, _, Backbone, Backgrid)  {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(["underscore", "backgrid"], factory);
+  } else if (typeof exports === 'object') {
+    // CommonJS
+    require("select2");
+    module.exports = factory(require("underscore"),
+                             require("backgrid"));
+  } else {
+    // Browser globals
+    factory(root._, root.Backgrid);
+  }
+
+}(this, function (_, Backgrid)  {
+
+  "use strict";
+
+  var exports = {};
 
   /**
      Select2CellEditor is a cell editor that renders a `select2` select box
@@ -19,16 +37,19 @@
      @class Backgrid.Extension.Select2CellEditor
      @extends Backgrid.SelectCellEditor
    */
-  var Select2CellEditor = Backgrid.Extension.Select2CellEditor = Backgrid.SelectCellEditor.extend({
+  var Select2CellEditor =
+      exports.Select2CellEditor =
+      Backgrid.Extension.Select2CellEditor = Backgrid.SelectCellEditor.extend({
 
     /** @property */
     events: {
-      "close": "save",
       "change": "save"
     },
 
     /** @property */
-    select2Options: null,
+    select2Options: {
+      openOnEnter: false
+    },
 
     initialize: function () {
       Backgrid.SelectCellEditor.prototype.initialize.apply(this, arguments);
@@ -40,8 +61,7 @@
        edit mode.
      */
     setSelect2Options: function (options) {
-      this.select2Options = _.extend({containerCssClass: "select2-container"},
-                                     options || {});
+      this.select2Options = _.extend(options || {});
     },
 
     /**
@@ -53,7 +73,6 @@
     render: function () {
       Backgrid.SelectCellEditor.prototype.render.apply(this, arguments);
       this.$el.select2(this.select2Options);
-      this.delegateEvents();
       return this;
     },
 
@@ -62,13 +81,10 @@
     */
     postRender: function () {
       var self = this;
-      this.$el.parent()
-        .find("." + this.select2Options.containerCssClass)
-        .on("blur", function (e) {
-          if (!e.relatedTarget) self.close(e);
-        })
-        .on("keydown", this.close)
-        .attr("tabindex", -1).focus();
+      self.$el.on("select2:close", function (e) {
+        e.type = "blur";
+        self.close(e);
+      }).select2("focus");
     },
 
     remove: function () {
@@ -85,7 +101,7 @@
      @class Backgrid.Extension.Select2Cell
      @extends Backgrid.SelectCell
    */
-  Backgrid.Extension.Select2Cell = Backgrid.SelectCell.extend({
+  exports.Select2Cell = Backgrid.Extension.Select2Cell = Backgrid.SelectCell.extend({
 
     /** @property */
     className: "select2-cell",
@@ -118,4 +134,6 @@
 
   });
 
-}(window, jQuery, _, Backbone, Backgrid));
+  return exports;
+
+}));

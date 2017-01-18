@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "backbon
     var typeAttribute = ux.typeAttribute || "widget";
     var labelAttribute = ux.labelAttribute || "label";
 
-    ux.view.Wizard = ux.view["meta4:ux:Wizard"] = function(options) {
+    ux.view.Wizard = ux.view["meta4:ux:Wizard"] = function(options, navigator) {
         options = ux.checkOptions(options);
         var DEBUG = options.debug || ux.DEBUG;
 
@@ -69,23 +69,23 @@ DEBUG && console.debug("Footer: Button: %s %o -> %o", k, v, $button)
 //				this.options.views.header.allowMissingEl = true
 //				this.options.views.footer.allowMissingEl = true
 
-                ux.initialize(this, _options)
+                ux.initialize(this, _options, navigator);
                 if (!this.model) {
-                    this.model = new this.collection.model()
-console.debug("New Model: %o -> %o", this.collection, this.model)
+                    this.model = new this.collection.model();
+console.debug("New Model: %o -> %o", this.collection, this.model);
                 }
 
                 // initial transition to 'start'
                 _options.transitions = _.extend({
                     init: { initialized: 'start' }
-                }, _options.transitions)
+                }, _options.transitions);
 
                 // merge global transitions with sub-view transitions
                 _.each(_options.views, function(view,k) {
                     if (view.transitions) {
                         _options.transitions[k] =  _.extend(view.transitions, _options.transitions[k])
                     }
-                })
+                });
 
                 // initialize state machine
                 this.transitions = _options.transitions;
@@ -94,13 +94,13 @@ console.debug("New Model: %o -> %o", this.collection, this.model)
 
                 this.startStateMachine();
 
-                DEBUG && console.debug("Init Wizard: %o %o", this, options)
+                DEBUG && console.debug("Init Wizard: %o %o", this, options);
                 return this;
             },
             onTransition: function(from, to) {
                 if (!this.body) {
                     // we're probably finished - or broken
-DEBUG && console.debug("No Body: %o -> %o", from, to);
+DEBUG && console.debug("onTransition: No Body: %o -> %o", from, to);
                     return;
                 }
 
@@ -116,7 +116,7 @@ DEBUG && console.debug("No Body: %o -> %o", from, to);
 
                     if (currentView.validate) {
                         var is_invalid = currentView.validate(this.model);
-DEBUG && console.debug("View Valid: %o -> %o", tx, is_invalid);
+DEBUG && console.debug("onTransition: View Valid: %o -> %o", tx, is_invalid);
                         if (is_invalid) {
                             setTimeout(function() {
                                 // ensure state fully transitioned before backtrack
@@ -129,13 +129,14 @@ DEBUG && console.debug("View Valid: %o -> %o", tx, is_invalid);
                 }
 
                 // check model is valid?
+                console.debug("Valid Model?: %o ", this.model);
                 var is_invalid = this.model.validate();
 
                 var view = this.getNestedView(to);
                 view.model = this.model;
 DEBUG && console.debug("onTransition: %s -> %s == %o / %o -> %o", from, to, tx, currentView, view);
 
-DEBUG && console.debug("To View (%s): %o %o", to, view, attrs);
+DEBUG && console.debug("onTransition: View (%s): %o %o", to, view, attrs);
 
                 if (view && view.render) {
                     self.body && self.body.show(view);
@@ -171,11 +172,11 @@ console.debug("onPrevious: %o %o", this, arguments)
 
                 var is_invalid = this.model.validate();
                 var isCloseOnFinish = core.isDefaultTrue(self.options, "closeOnFinish");
-console.debug("onFinish: %o %o %o", is_invalid, isCloseOnFinish, state)
+console.debug("onFinish: %o %o %o", is_invalid, isCloseOnFinish, state);
 
                 this.model.save();
                 if (!is_invalid && isCloseOnFinish) {
-                    this.destroy()
+                    this.destroy();
                 }
             },
             onShow: function() {
@@ -188,7 +189,8 @@ console.debug("onFinish: %o %o %o", is_invalid, isCloseOnFinish, state)
 
                 setTimeout(function() {
                     self.trigger('initialized');
-                }, 100)
+                }, 100);
+
                 DEBUG && console.debug("onShow: %o %o %o", this, $(".ux_wizard_footer",this.$el), this.options.views.footer );
             }
         },Backbone.StateMachine );

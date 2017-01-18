@@ -7,3 +7,15 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+.hover-button .btn {
+    display: none;
+}
+.hover-button:hover .btn {
+    display: inline;
+}
+
+.form-group img {
+    max-width: 128px;
+    min-width: 128px;
+}

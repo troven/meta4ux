@@ -9,28 +9,45 @@ define(["jquery", "underscore", "backbone", "core"], function ($,_,Backbone, cor
 		boot: function(module, options) {
 			if (!module) throw "meta4:fact:register:oops:missing-module";
 			if (!navigator) throw "meta4:fact:register:oops:missing-phonegap-navigator";
-			this._module = module
 
-			this.documentTriggers();
+			this.documentTriggers(module);
 
 		    if (options.geo) this.geo(module, options.geo)
 		},
 
-		documentTriggers: function() {
-		    this.onDocumentTrigger("menubutton", "menu")
-		    this.onDocumentTrigger("searchbutton", "search")
-		    this.onDocumentTrigger("backbutton", "home")
+		documentTriggers: function(module) {
+		    this.onDocumentTrigger(module, "menubutton", "menu");
+		    this.onDocumentTrigger(module, "searchbutton", "search");
+		    this.onDocumentTrigger(module, "backbutton", "home");
 
-		    this.onDocumentTrigger("offline")
-		    this.onDocumentTrigger("online")
-		    this.onDocumentTrigger("pause", "locked")
-		    this.onDocumentTrigger("resume", "resume")
-		},
+		    this.onDocumentTrigger(module, "offline");
+		    this.onDocumentTrigger(module, "online");
+		    this.onDocumentTrigger(module, "pause", "locked");
+		    this.onDocumentTrigger(module, "resume", "resume");
 
-        onDocumentTrigger: function(from, to) {
-			if (!document) return
-			var self = this
-			document.addEventListener(from, function() { self._module.trigger(to||from) }, false)
+            window.addEventListener('orientationchange', function() {
+                module.orientation = getSimpleOrientation(module);
+                module.trigger("orientation");
+            });
+
+            module.orientation = this.getSimpleOrientation(module);
+            module.trigger("orientation");
+        },
+
+        getSimpleOrientation: function(module) {
+            switch(window.orientation)
+            {
+                case -90:
+                case 90:
+                    return 1; // landscape
+                default:
+                    return 0; // portrait
+            };
+        },
+
+        onDocumentTrigger: function(module, from, to) {
+			if (!document) return;
+			document.addEventListener(from, function() { module.trigger(to||from) }, false);
         },
 
 		geo: function(vent, geo_conf) {

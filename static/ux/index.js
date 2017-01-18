@@ -41,16 +41,19 @@ require.config({
         jquery_terminal: "vendor/jquery.terminal/js/jquery.terminal-min",
 
 // Meta4
-        core: "meta4/core",
-        fact: "meta4/fact",
-        ux: "meta4/ux",
+        core: "meta4/core/index",
+        fact: "meta4/core/fact",
+        ux: "meta4/ux/index",
+        iq: "meta4/core/iq",
+
         ux_mixin: "meta4/ux.mixin",
         ux_dialog: "meta4/ux.dialog",
-        iq: "meta4/iq",
-        asq: "meta4/asq",
-        meta4app: "meta4/meta4app",
-        splash: "meta4/splash",
-        mobility: "meta4/mobility",
+        asq: "meta4/model/asq",
+        meta4app: "meta4/spa",
+        splash: "meta4/util/splash",
+        mobility: "meta4/util/mobility",
+        ctrl: "meta4/ctrl/index",
+        oops: "meta4/core/oops",
 
 // QB
         colorbrewer: "vendor/dc/colorbrewer",
@@ -147,44 +150,67 @@ require.config({
 
     }
 });
+// load splash first ..
+
 require(['splash'], function(splash) {
 
+    // reload the SPA boot page
+    var Reload = function() { (window.location = window.location.href) };
+
     // Configuration for Meta4 web API
-    var options = { autoBoot: true, DEBUG: true,
-        id: "meta4",
-        url: "/ux/view/home",
-        parse: function(r) { return r; }
-    }
+    var options = {
+        boot: { autoBoot: true, debug: true,
+            id: "meta4",
+            url: "/ux/view/home",
+            el: "#home"
+        },
+        parse: function(r) { return r; },
+        splash: { url: "splash.html", waitForClick: true, disabled: false }
+    };
 
-    splash.open({ url: "splash.html", waitForClick: true});
+    // show a loading screen
+    (!options.splash.disabled) && splash.open( options.splash );
 
-    // Load and start the meta4 code
     // handle global/fatal errors
     try {
-        require(['meta4app'], function (meta4) {
-            console.log("starting %s @ %s", options.id, options.url);
-            try {
-                meta4.start( options )
+        require(['meta4app'], function (SinglePageApp) {
 
-                meta4.on("ux:boot", function(ux, options) {
+            if (!options.boot.url) throw new oops.Error("meta4:app:oops:missing-boot-url");
+            console.log("booting %s @ %s", options.boot.id, options.boot.url);
 
-                    // display a Home View
-                    if (options.home) {
-                        console.log("home: %s %o", options.id, options.home);
-                        var home = ux.Home(options.home);
-                        home.triggerMethod("show");
-                        splash.close();
-                    } else {
-                        alert("Application is Homeless.");
+            // load application payload
+
+            $.ajax({url: options.boot.url, dataType: "json", type: "GET", contentType: "application/json; charset=utf-8",
+                success: function(resp) {
+                    var result = options.parse(resp);
+                    if (!result) {
+                        throw oops.Error("meta4:app:oops:invalid-payload")
+                        newApp.trigger("boot:missing");
+                        return;
                     }
-                })
-            } catch(e) {
-                var yorn = confirm(e+"\n\nApplication failed to boot. Try again?")
-                yorn && (window.location = window.location.href);
-            }
+                    try {
+
+                        var meta4 = new SinglePageApp();
+
+                        meta4.on("started", function() {
+                            // hide splash screen (if displayed)
+                            (!options.splash.disabled) && splash.close();
+                        });
+
+                        meta4.start(result);
+
+                    } catch(e) {
+                        console.log("BOOT ERROR: %o", e);
+                        throw e;
+                        // var yorn = confirm(e+"\n\nApplication failed to boot. Try again?");
+                        // yorn && Reload();
+                    }
+                }
+            });
         });
     } catch(e) {
-        var yorn = confirm(e+"\n\nApplication failed to download . Try again?")
-        yorn && (window.location = window.location.href);
+        console.log("DOWNLOAD ERROR: %o", e);
+        var yorn = confirm(e+"\n\nApplication failed to download . Try again?");
+        yorn && Reload();
     }
 })

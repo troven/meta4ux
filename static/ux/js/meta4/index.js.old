@@ -1,0 +1,38 @@
+//    "meta4/widget/Debug",
+//    "meta4/widget/Accordion",
+//    "meta4/widget/ActionList",
+//    "meta4/widget/Breadcrumbs",
+//    "meta4/widget/CRUD",
+//    "meta4/widget/CRUD2",
+//    "meta4/widget/Dashboard3D",
+//    "meta4/widget/Form",
+//    "meta4/widget/Grid",
+//    "meta4/widget/Help",
+//    "meta4/widget/HBF",
+//    "meta4/widget/ListTree",
+//    "meta4/widget/List",
+//    "meta4/widget/MenuButton",
+//    "meta4/widget/MenuList",
+//    "meta4/widget/NavBar",
+//    "meta4/widget/OrgChart",
+//    "meta4/widget/Panel",
+//    "meta4/widget/PickList",
+//    "meta4/widget/Portal",
+//    "meta4/widget/QB",
+//    "meta4/widget/SplitPanel",
+//    "meta4/widget/Switch",
+//    "meta4/widget/Tabs",
+//    "meta4/widget/Template",
+//    "meta4/widget/Terminal",
+//    "meta4/widget/Toolbar",
+
+define(["meta4/spa"], function (SinglePageApp) {
+
+    console.log("pre-loading ...");
+
+    if (!SinglePageApp) throw "meta4:app:boot:oops:missing-bootloader";
+    var app = new SinglePageApp();
+    if (!app) throw "meta4:app:boot:oops:invalid-app";
+
+    return app;
+});

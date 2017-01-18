@@ -1,7 +1,7 @@
 define(["underscore", "backbone", "core",
-    "meta4/model/sync/Default",
+    "meta4/model/sync/Default", "meta4/model/validates",
     "backbone_documentmodel", "backbone_filtered", "vendor/backbone-mutators/backbone.mutators",
-], function (_, Backbone, core, DefaultSync) {
+], function ( _, Backbone, core, DefaultSync, validates ) {
 
     return function(options) {
 
@@ -12,7 +12,9 @@ define(["underscore", "backbone", "core",
         var storeType = options.store || "file"
         var storeURL = options.url || "models/"+storeType
 
-        _DEBUG && console.log("Default Factory: (%s) %o => %o", options.id, options, fact);
+        _DEBUG && console.log("Default Factory: (%s) => %o -> %o", options.id, fact, validates);
+
+        if (!validates.model) throw new Error("meta4:fact:register:oops:missing-model-validate");
 
         // define our collection's Model
 
@@ -23,7 +25,7 @@ define(["underscore", "backbone", "core",
             sync: fact.sync.Default,
             mutators: options.mutators,
             defaults: options.defaults,
-            validate: fact.validate.model,
+            validate: validates.model,
             idAttribute: options.idAttribute||fact.idAttribute
         })
 
@@ -38,9 +40,9 @@ define(["underscore", "backbone", "core",
         // new instance of Default collection
 
         var collection = new Collection();
-        collection.options = _.omit(options, ["data"])
+        collection.options = _.omit(options, ["data"]);
 
-        _DEBUG && console.log("Remote Collection (%s): %o %o @ %s", options.id, options, collection, storeURL)
+        _DEBUG && console.log("DocumentModel: (%s): @ %s", options.id, storeURL);
         return collection;
     }
 

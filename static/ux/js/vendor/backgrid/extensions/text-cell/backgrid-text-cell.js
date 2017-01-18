@@ -5,8 +5,23 @@
   Copyright (c) 2013 Jimmy Yuen Ho Wong and contributors
   Licensed under the MIT @license.
 */
+(function (root, factory) {
 
-(function (window, $, _, Backbone, Backgrid)  {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['underscore', 'backgrid'], factory);
+  } else if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = factory(require("underscore"),
+                             require("backgrid"));
+  } else {
+    // Browser globals
+    factory(root._, root.Backgrid);
+  }
+
+}(this, function (_, Backgrid)  {
+
+  var exports = {};
 
   /**
      Renders a form with a text area and a save button in a modal dialog.
@@ -14,16 +29,18 @@
      @class Backgrid.Extension.TextareaEditor
      @extends Backgrid.CellEditor
   */
-  var TextareaEditor = Backgrid.Extension.TextareaEditor = Backgrid.CellEditor.extend({
+  var TextareaEditor = exports.TextareaEditor = Backgrid.Extension.TextareaEditor = Backgrid.CellEditor.extend({
 
     /** @property */
     tagName: "div",
 
     /** @property */
-    className: "modal hide fade",
+    className: "modal fade",
 
     /** @property {function(Object, ?Object=): string} template */
-    template: _.template('<form><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h3><%- column.get("label") %></h3></div><div class="modal-body"><textarea cols="<%= cols %>" rows="<%= rows %>"><%- content %></textarea></div><div class="modal-footer"><input class="btn" type="submit" value="Save"/></div></form>'),
+    template: function (data) {
+      return '<div class="modal-dialog"><div class="modal-content"><form><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button><h3>' + data.column.get("label")  + '</h3></div><div class="modal-body"><textarea cols="' + data.cols + '" rows="' + data.rows + '">' + data.content + '</textarea></div><div class="modal-footer"><input class="btn btn-primary" type="submit" value="Save"/></div></form></div></div>';
+    },
 
     /** @property */
     cols: 80,
@@ -33,10 +50,11 @@
 
     /** @property */
     events: {
-      "submit": "save",
-      "hide": "cancel",
-      "hidden": "close",
-      "shown": "focus"
+      "keydown textarea": "clearError",
+      "submit": "saveOrCancel",
+      "hide.bs.modal": "saveOrCancel",
+      "hidden.bs.modal": "close",
+      "shown.bs.modal": "focus"
     },
 
     /**
@@ -66,17 +84,22 @@
     },
 
     /**
-       Event handler. Saves the text in the text area to the model.
+       Event handler. Saves the text in the text area to the model when
+       submitting. When cancelling, if the text area is dirty, a confirmation
+       dialog will pop up. If the user clicks confirm, the text will be saved to
+       the model.
 
-       Triggers a Backbone `backgrid:error` event along with the editor as the
-       parameter if the value cannot be converted. Classes listening to the
-       `backgrid:error` event, usually the Cell classes, should respond
-       appropriately, usually by rendering some kind of error feedback.
+       Triggers a Backbone `backgrid:error` event from the model along with the
+       model, column and the existing value as the parameters if the value
+       cannot be converted.
 
        @param {Event} e
     */
-    save: function (e) {
-      if (e) e.preventDefault();
+    saveOrCancel: function (e) {
+      if (e && e.type == "submit") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
 
       var model = this.model;
       var column = this.column;
@@ -85,31 +108,31 @@
 
       if (_.isUndefined(newValue)) {
         model.trigger("backgrid:error", model, column, val);
+
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }
-      else {
+      else if (!e || e.type == "submit" ||
+               (e.type == "hide" &&
+                newValue !== (this.model.get(this.column.get("name")) || '').replace(/\r/g, '') &&
+                confirm("Would you like to save your changes?"))) {
+
         model.set(column.get("name"), newValue);
         this.$el.modal("hide");
       }
+      else if (e.type != "hide") this.$el.modal("hide");
     },
 
     /**
-       Event handler. Revert the text in the model after asking for confirmation
-       if dirty, otherwise just close the editor.
-
-       @param {Event} e
-    */
-    cancel: function (e) {
-
-      var content = this.formatter.toRaw(this.$el.find("textarea").val());
-
-      // Dirty
-      if (content !== (this.model.get(this.column.get("name")) || '').replace(/\r/g, '') &&
-          window.confirm("Would you like to save your changes?")) {
-        e.preventDefault();
-        e.stopPropagation();
-        return this.save();
+       Clears the error class on the parent cell.
+     */
+    clearError: _.debounce(function () {
+      if (!_.isUndefined(this.formatter.toRaw(this.$el.find("textarea").val()))) {
+        this.$el.parent().removeClass("error");
       }
-    },
+    }, 150),
 
     /**
        Triggers a `backgrid:edited` event along with the cell editor as the
@@ -140,7 +163,7 @@
      @class Backgrid.Extension.TextCell
      @extends Backgrid.StringCell
   */
-  var TextCell = Backgrid.Extension.TextCell = Backgrid.StringCell.extend({
+  exports.TextCell = Backgrid.Extension.TextCell = Backgrid.StringCell.extend({
 
     /** @property */
     className: "text-cell",
@@ -150,4 +173,6 @@
 
   });
 
-}(window, jQuery, _, Backbone, Backgrid));
+  return exports;
+
+}));

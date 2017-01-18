@@ -1,57 +1,93 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	var DEBUG = true && ux.DEBUG;
+	var DEBUG = true;
 
 	// Navigation Bar
 
-	var NavBar = ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options) {
+	var NavBar = ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options, module) {
 		options = ux.checkOptions(options); // sanity check ('this', 'label')
+        if (!module) throw new Error("meta4:ux:NavBar:oops:no-module");
 
-		var MenuToggle = Backbone.Marionette.CompositeView.extend( _.extend({
-			initialize: function(_options) {
-DEBUG && console.log("MenuToggle", this, _options);
-			},
-			childView: MenuToggle,
-			childViewContainer: "ul.dropdown-menu", className: "dropdown",
-			events: { "click [data-id]": "onSelect"},
-			tagName: "li", template: "<a class='selectable dropdown-toggle' data-toggle='dropdown' data-id='{{id}}' title='{{label}}'>{{label}}</a><ul class='dropdown-menu'></ul>"
+		var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
+			events: { "click": "doSelect"},
+			tagName: "li", template: "<a href='#{{id}}' title='{{label}}'>{{label}}</a>",
+            initialize: function(_options) {
+                ux.initialize(this, _options);
+                console.log("MenuItem: %o --> %o", this, _options);
+            },
+            doSelect: function() {
+			    this.trigger("select", this.model);
+            }
 		}, ux.mixin ) );
 
-		var MenuBar = Backbone.Marionette.CollectionView.extend({ childView: MenuToggle, tagName: "ul", className: "nav" });
+        // var MenuDropDown = Backbone.Marionette.View.extend( _.extend({
+        //     initialize: function(_options) { },
+        //     childViewContainer: "ul.dropdown-menu", className: "nav-item",
+        //     events: { "click": "doSelect"},
+        //     tagName: "li", template: "<a title='{{label}}'>{{label}}</a>",
+        //     doSelect: function() {
+        //         this.trigger("select", this.model);
+        //     }
+        // }, ux.mixin ) );
 
+		var MenuList = Backbone.Marionette.CollectionView.extend({
+		    childView: MenuItem, tagName: "ul", className: "nav navbar-nav",
+            childEvents: {
+                "select": function(view, model, event) {
+                    this.$el.find(".active").removeClass("active");
+                    this.selected = model;
+                    console.log("NavBar: selected: %o %o %o", this, view, model);
+                    // bubble navigate to ActionList parent
+                    this.triggerMethod("select", model);
+                    view.$el.addClass("active");
+                }
+            }
+		});
 
 		var NavBar = Backbone.Marionette.ItemView.extend({
-			tagName: "div",
-			className: "navbar",
-			template: "<div class='navbar-inner'><b class='brand'>{{label}}</b><span class='ux_menu'></span><span class='ux_search'></span></div>",
+            isNavigator: true,
+			tagName: "nav",
+			className: "navbar navbar-default",
+			template: "<div class='container-fluid'></div><div class='navbar-header'><a href='#' class='navbar-brand'>{{label}}</a></div><div class='collapse navbar-collapse ux_navbar_menu'></div></div>",
 			searchTemplate: "<div class='navbar-search pull-right'><input id='search-query' class='search-query' type='text' placeholder='search' size='8'/></div>",
+            events: {
+                'click [data-navigate]': 'doNavigate'
+            },
+            childEvents: {
+                "select": function(view, model, event) {
+                    console.log("NavBar: select: %o %o %o", this, view, model);
+                    // bubble navigate to ActionList parent
+                    this.triggerMethod("select", model);
+                }
+            },
 			initialize: function() {
 				var self = this;
 
-				ux.model(options, this);
-DEBUG && console.log("NavBar:", this, options);
-				this.menuView = new MenuBar( { model: this.model, collection: this.collection } );
-				this.listenTo(this.menuView, "all", function(event, that, x, y, z) {
-DEBUG && console.log("On NavBar:", this, event, that);
-                    this.triggerMethod("menu:"+event, that, x, y, z);
-				})
+				ux.initialize(this, options);
+DEBUG && console.log("NavBar: init", this, options);
+
+				this.menuList = new MenuList( { model: this.model, collection: this.collection } );
+                this.menuList.on("select", function(model) {
+                    self.trigger("navigate", model.id);
+                });
 			},
 			onRender: function() {
 				var self = this;
 
-				var $menu = this.$el.find(".ux_menu");
-				$menu.replaceWith( this.menuView.render().el );
+				var $menu = this.$el.find(".ux_navbar_menu");
+				$menu.replaceWith( this.menuList.render().el );
 
 //				this.$el.find(".ux_search").replaceWith(Mustache.to_html(this["searchTemplate"], options));
 
-DEBUG && console.log("Searching:", options.search)
 				if (options.search) {
+                    DEBUG && console.log("Searching: %o", options.search);
 					var source_labels = _.pluck(options.search.toJSON(), "label");
 					$('#search-query', self.$el).typeahead({ source: source_labels });
 DEBUG && console.debug("Search:", self.$el, source_labels );
 				}
 //				this.$el.css( { position: "fixed" } );
 			},
+
 			doSelectMenu: function(that) {
 DEBUG && console.log("menu select", this, that)
 				this.trigger("select", that)
@@ -77,4 +113,4 @@ DEBUG && console.log("menu select", this, that)
         "fn": NavBar
     }
 
-})
+});

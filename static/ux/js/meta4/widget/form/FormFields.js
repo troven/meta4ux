@@ -197,12 +197,12 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
 
         fields.Text  = FormField.extend({
             className: "form-group row form-text",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='20' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='20' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.ID = FormField.extend({
             className: "form-group row form-text",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='12' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='12' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             onBlur: function(e) {
                 var idAttribute = this.options.id || idAttribute;
                 var $field = $(e.currentTarget);
@@ -218,47 +218,47 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
 
         fields.LongText = FormField.extend({
             className: "form-group row form-longtext",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='40' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><input class='form-control' placeholder='{{label}}' size='40' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.TextArea = FormField.extend({
             className: "form-group row form-textarea",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><textarea class='form-control' placeholder='{{comment}}' cols='{{default 'cols' 60}}' rows='{{default 'rows' 5}}' name='{{id}}'></textarea></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-6'><textarea class='form-control' placeholder='{{label}}' cols='{{default 'cols' 60}}' rows='{{default 'rows' 5}}' name='{{id}}'></textarea></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Number = FormField.extend({
             className: "form-group row form-number",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='number form-control' placeholder='{{comment}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='number form-control' placeholder='{{label}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             validators: ["number"]
         })
 
         fields.Currency = FormField.extend({
             className: "form-group row form-currency",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='form-control currency' placeholder='{{comment}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-2'><input class='form-control currency' placeholder='{{label}}' size='4' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             validators: ["currency"]
         })
 
         fields.Email = FormField.extend({
             className: "form-group row form-email",
             validators: ["email"],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='16' type='email' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='16' type='email' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.URL = FormField.extend({
             className: "form-group row form-url",
             validators: ["url"],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='16' type='url' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='16' type='url' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Date = FormField.extend({
             className: "form-group row form-date",
             validators: ["date"],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Password = FormField.extend({
             className: "form-group row form-password",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{comment}}' size='12' type='password' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='12' type='password' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Button = FormField.extend({
@@ -422,7 +422,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
 
         fields.Upload  = FormField.extend({
             className: "form-group row form-upload",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><input class='form-control' placeholder='{{comment}}' size='4' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4' class='col-sm-6'><input class='form-control' placeholder='{{label}}' size='4' type='file' name='{{id}}'/></div></div><div class='message text-danger'>{{message}}</div>",
             commit:  function(model, $field) {
                 var self = this
 

@@ -29,7 +29,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
         // handle columns
         var Schema2Column = function(c,k) {
-            var widget = (c.type || "string").toLowerCase()
+            var widget = (c.type ||  "string").toLowerCase();
             var editor = c.editor || c.widget
             var col = {
                 name:       c.id || c.name || k,

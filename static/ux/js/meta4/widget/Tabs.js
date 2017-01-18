@@ -4,20 +4,37 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var DEBUG = options.debug || ux.DEBUG;
 
-		options.template =  options.template || ux.compileTemplate("<div class='tabs-header'></div><div class='tab-content well-sm clearfix'></div>");
+		options.template =  options.template || ux.compileTemplate("<div class='tabs-header' role='navigation'></div><div class='tab-content well-sm clearfix'></div>");
 
         var TabItem = Backbone.Marionette.ItemView.extend({
-            tagName: "li", events: { "click": "doTabSelect" },
+            tagName: "li", events: { "click": "doSelect" },
             template: "<a href='#{{_ id}}' title='{{comment}}' data-toggle='tab'>{{label}}</a>",
-            doTabSelect: function(e) {
-DEBUG && console.log("Tab Select: %o %o", this, arguments);
-				 e.preventDefault();
-				 e.stopImmediatePropagation();
-				 this.triggerMethod("select")
-             }
-        })
+            doSelect: function() {
+                this.trigger("select", this.model);
+            }
+        });
 
-		var config = {
+        var TabSelector = Backbone.Marionette.CompositeView.extend({
+            isSelectable: true,
+            template: "<ul class='nav nav-tabs'></ul>", childViewContainer: "ul", childView: TabItem,
+            initialize: function(_options) {
+                ux.initialize(this, _options)
+                this.trigger("select", this.model);
+            },
+            childEvents: {
+                "select": function(view, model, event) {
+                    this.$el.find(".active").removeClass("active");
+                    this.selected = model;
+                    console.log("TAB: selected: %o %o %o", this, view, model);
+                    // bubble navigate to ActionList parent
+                    this.triggerMethod("select", model);
+                    view.$el.addClass("active");
+                }
+            }
+        });
+
+
+        var config = {
 			isNested: true,
 	 		template: options.template,
 		 	regions: { tabs: ".tabs-header" , body: ".tab-content" },
@@ -32,10 +49,11 @@ DEBUG && console.log("Tab Select: %o %o", this, arguments);
 				this.currentTab = _options.firstTab || _options.currentTab || _options.currentView|| _options.view
 DEBUG && console.log("Init Tabs (%o) %o", this, _options)
 
-			    this.collection = new Backbone.Collection()
+			    this.collection = this.collection || new Backbone.Collection();
 			    _.each(this._views, function(tab, id) {
-			        self.currentTab = self.currentTab || id
-			        self.collection.add({ id: id, label: tab.title || tab.label || id, comment: tab.comment || "" })
+			        self.currentTab = self.currentTab || id;
+                    var conf = { id: _options.id+"_"+id, label: tab.title || tab.label || id, comment: tab.comment || "", goto: id }
+                    self.collection.add( conf );
 			    })
 DEBUG && console.log("Resolved Tabs: %o %o %o", this, this._views, this.collection)
 
@@ -44,19 +62,17 @@ DEBUG && console.log("Resolved Tabs: %o %o %o", this, this._views, this.collecti
 			onShow: function() {
 			    var self = this
 DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
-                var Tabs = Backbone.Marionette.CompositeView.extend({
-                    template: "<div class='pull-right popover-title'>{{label}}</div><ul class='nav nav-tabs'></ul>", childViewContainer: "ul",
-                    model: this.model, childView: TabItem,
-                    collection: self.collection
+
+                var meta = { model: this.model, collection: self.collection };
+
+                var tabs = new TabSelector(meta);
+                tabs.on("select", function(model) {
+ console.log("Tab Select: %o", model);
+                    self.trigger("select", model);
+                    self.selectTab( model.get("goto") || model.id );
                 })
-                var tabs = new Tabs()
-                tabs.on("childview:select", function(e) {
-                	var model = e.model
-                	var newTab = model.attributes.id
-DEBUG && console.log("Clicked Tab (%s) %o -> %o %s", self.id, self, model, newTab)
-                    self.selectTab(newTab)
-                })
-			    this.tabs.show(tabs)
+			    this.tabs.show(tabs);
+
 			    if (self.currentTab) this.selectTab(self.currentTab)
 
 			},

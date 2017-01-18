@@ -9,7 +9,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4/ux/ux
 
 	// setup some default constants
 
-    var ux = core.ux = core.ux || {}
+    var ux = core.ux = core.ux || {};
 
 	ux.idAttribute = "id";
 	ux.typeAttribute = "widget";
@@ -19,5 +19,8 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "meta4/ux/ux
 	ux.meta = ux.meta || {};
 	ux.DEBUG = false;
 
-	return ux
+    ux.mixin = ux.mixin || {}
+    ux._viewIDcounter = 1
+
+    return ux
 });

@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone", "core", "iq", "asq", "meta4/model/index"], function ($,_,Backbone, core, iq, asq, Fact) {
+define(["jquery", "underscore", "backbone", "core", "iq", "meta4/model/asq", "meta4/model/index"], function ($,_,Backbone, core, iq, asq, Fact) {
 
 /* *****************************************************************************************************************
 	Fact: Data / Model Related
@@ -10,10 +10,10 @@ define(["jquery", "underscore", "backbone", "core", "iq", "asq", "meta4/model/in
 		models: new Backbone.Model(),
 
         boot:function(module, options) {
-			var self=this;
-			self._module = module;
+			var self = this;
+
 			self.options = options;
-			var _DEBUG = options.DEBUG || fact.DEBUG;
+			var _DEBUG = options.debug || fact.DEBUG;
 			var baseURL = options.url+options.basePath
 _DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
 
@@ -23,10 +23,21 @@ _DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
 					var collection = self.register(model);
 _DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, collection);
 				}
-			})
+			});
+
+            self.models = module.models = module.models || self.models;
+
+            iq.bubble('error', self.models, navigator);
+
+            module.Filter = self.filter;
+            module.Collection = self.Collection;
+            module.Model= self.Model;
+
+            return self;
 		},
 
 		register: function(options) {
+		    var self = this;
 			if (!options) throw "meta4:fact:register:oops:missing-options";
 			if (!_.isObject(options)) "meta4:fact:register:oops:invalid-options";
 
@@ -34,14 +45,14 @@ _DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, c
 			var id = options[fact.idAttribute];
             if (!id) throw "meta4:fact:register:oops:missing-"+fact.idAttribute;
 
-			var collection = fact.models.get(id)
+			var collection = self.models.get(id)
 			if (collection) {
 console.warn("Duplicate Collection: %s %o %o", id, fact.models, options)
 				throw "meta4:fact:register:duplicate#"+id;
 			}
 
 			if (options.singleton) {
-				collection = fact.Model(options);
+				collection = self.Model(options);
 //console.error("Singleton (%s): %o %o", id, options, collection)
 				if (!collection) throw "meta4:fact:register:invalid-singleton#"+id;
 			} else {
@@ -60,7 +71,11 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 			}
 
 			fact.models.set(id, collection);
-			return collection;
+            iq.bubble('error', collection, self.models);
+            iq.bubble('busy', collection, self.models);
+            iq.bubble('done', collection, self.models);
+
+            return collection;
 		},
 
 		Model: function (options) {
@@ -84,6 +99,7 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 
 			var collection = null
 
+            // resolve collection (string, function, options
 			if (_.isString(options)) {
                 return fact.models.get(options)
             } else if (_.isFunction(options)) {
@@ -123,12 +139,12 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 					collection.add(options.data)
 _DEBUG && console.log("Instance Data: %o %o", options.data, collection, options.data.length == collection.models.length)
 				}
-			}
+			} else  throw new Error("meta4:fact:collection:oops:invalid-collection-reference");
 
 			var id = options[fact.idAttribute]
 			if (id) {
 				collection.schema = new Backbone.Collection(collection.model.schema = this._buildSchema(options.schema))
-_DEBUG && console.log("Fact Schema: %s %o %o ", id, collection, collection.schema)
+_DEBUG && console.log("Schema: %s %o %o ", id, collection, collection.schema)
 			}
 
 			core.iq.aware(collection, options.iq || options.when);
@@ -137,7 +153,7 @@ _DEBUG && console.log("Fact Schema: %s %o %o ", id, collection, collection.schem
 				return this.filter(collection, options.filter===true?{}:options.filter)
 			}
 
-_DEBUG && console.log("Fact %s Collection: %o %o %o ", options.id, collection, collection.model.schema, options.when || "no IQ")
+_DEBUG && console.log("%s Collection: %o %o %o ", options.id, collection, collection.model.schema, options.when || "no IQ")
 			return collection;
 		},
 
@@ -169,34 +185,40 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 
 		filter: function(collection, query) {
 			if (!collection) throw "meta4:oops:fact:missing-filter-collection"
-			if (!query || _.isEmpty(query)) {
-				query = collection.filters || new Backbone.Model()
+
+			if (query===true || !query || _.isEmpty(query)) {
+				query = collection.filters || new Backbone.Model();
 			}
-// console.log("Attached Filter: %o %o", collection, query)
-			var fn = asq.compile(query)
+
+ console.log("FILTER: %o -> %o", collection, query);
+			var fn = asq.compile(query);
 			var filtered = fact.Collection([]);
-			filtered.filters = query
-			filtered.options = collection.options
-			filtered.id = "filtered_"+collection.id
+			filtered.filters = query;
+			filtered.options = collection.options;
+			filtered.id = "filtered_"+collection.id;
+            filtered.original = collection;
 
 			var refresh = function() {
-				var results = collection.filter(function(a) { return fn(a.attributes) } )
-// console.log("refresh: %o %o -> %o", query, collection, results)
-				filtered.reset(results)
+				var results = collection.filter(function(a) { return fn(a.attributes) } );
+                console.log("RE-FILTER: %o -> %o", query, results)
+				filtered.reset(results);
 //				filtered.trigger("filter", query)
-				return filtered
+				return filtered;
 			}
 
 //			filtered.__collection__ = collection
-			collection.on("add", refresh)
-			collection.on("change", refresh)
-			filtered.fetch = function(options) {
-				return collection.fetch(options)
-			}
-//			collection.on("destroy", function() { filtered.destroy() })
-			filtered.filters.on && filtered.filters.on("change", refresh)
+//			collection.on("add", refresh);
+			collection.on("change", refresh);
+            collection.on("reloaded", refresh);
 
-			return refresh();
+			filtered.fetch = function(options) {
+				return collection.fetch(options);
+			}
+            collection.refresh = refresh;
+//			collection.on("destroy", function() { filtered.destroy() })
+//			filtered.filters.on && filtered.filters.on("change", refresh);
+
+			return filtered;
 		}
 
     });
