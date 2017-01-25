@@ -14,13 +14,15 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
             events: { "click": "doSelect"},
             tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{label}}'>{{label}}</a>",
+
             initialize: function(_options) {
                 ux.initialize(this, _options);
-                console.log("MenuItem: %o --> %o", this, _options);
             },
+
             doSelect: function() {
                 this.trigger("select", this.model);
             }
+
         }, ux.mixin ) );
 
         var MenuList = Backbone.Marionette.CollectionView.extend({

@@ -148,7 +148,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             validate: validateField,
             commit: commitField,
             initialize: function(options) {
-                ux.initialize(this,options);
+                ux.initialize(this, options);
             },
             onInvalid: function(invalid) {
                 this.model.set("message", invalid.message)
@@ -256,14 +256,21 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
+        fields.Time = FormField.extend({
+            className: "form-group row form-time",
+            validators: [],
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control col-sm-2' placeholder='{{label}}' type='integer' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+        })
+
         fields.Password = FormField.extend({
             className: "form-group row form-password",
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' size='12' type='password' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Button = FormField.extend({
+            isActionable: true,
             className: "form-group row form-button",
-            template: "<label class='col-sm-3 control-label'></label><div class='col-sm-2'><span data-trigger='{{id}}' class='btn btn-default' title='{{comment}}'>{{label}}</span></div>"
+            template: "<label class='col-sm-3 control-label'></label><div class='col-sm-2'><button data-action='{{id}}' class='btn btn-default' title='{{comment}}'>{{label}}</button></div>"
         })
 
         fields.Select = Backbone.Marionette.CompositeView.extend({
@@ -314,7 +321,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
 
         // Synonyms
 
-        fields.Lookup = fields.Select;	// TODO: A Lookup has a Create View
+        fields.Lookup = fields.Select;	// TODO: A Lookup with a Create View
         fields.String = fields.Text;
         fields.Integer = fields.Number;
 

@@ -120,20 +120,27 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 					return collection;
 				}
 
-				var type = options[fact.typeAttribute]
-				if (!type) {
-					throw "meta4:fact:Collection:oops:missing-"+fact.typeAttribute;
-				}
+				if (!collection && _.isString(options.collection) && options.collection!=options.id ) {
+				    collection = fact.models.get(options.collection);
+                    console.log("FACADE: %o -> %o", options, options.collection)
+                }
 
-				// lookup by 'type' [ Local / Remote / etc ]
-				var Finder = fact.factory[type]
-				if (!Finder) throw "meta4:fact:Collection:oops:missing-finder#"+type;
+                if (!collection) {
+                    var type = options[fact.typeAttribute];
+                    if (!type) {
+                        throw "meta4:fact:Collection:oops:missing-"+fact.typeAttribute;
+                    }
 
-                options = fact.mutate(options);
+                    // lookup by 'type' [ Local / Remote / etc ]
+                    var Finder = fact.factory[type];
+                    if (!Finder) throw "meta4:fact:Collection:oops:missing-finder#"+type;
 
-                // instantiate typed-finder
-				collection = new Finder(options);
-				collection[fact.idAttribute] = id;
+                    options = fact.mutate(options);
+
+                    // instantiate typed-finder
+                    collection = new Finder(options);
+                    collection[fact.idAttribute] = id;
+                }
 
 				if (options.data && _.isArray(options.data)) {
 					collection.add(options.data)

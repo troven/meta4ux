@@ -13,7 +13,6 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			tagName: "li", template: "<a href='#{{id}}' title='{{label}}'>{{label}}</a>",
             initialize: function(_options) {
                 ux.initialize(this, _options);
-                console.log("MenuItem: %o --> %o", this, _options);
             },
             doSelect: function() {
 			    this.trigger("select", this.model);

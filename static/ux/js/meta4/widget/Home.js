@@ -5,20 +5,23 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var DEBUG = options.debug || ux.DEBUG;
 
-		options.template =  options.template || ux.compileTemplate("<div class='home-regions'><div class='home-header'></div><div class='wrapper '><div class='main'><div class='col-sm-12 home-body'>loading home ...</div></div></div><div class='home-footer'></div></div>");
+		options.template =  options.template || ux.compileTemplate("<div class='home-regions container'><div class='home-header'></div><div class='wrapper main'><div class='col-sm-12 home-body'>loading home ...</div></div><div class='home-footer'></div></div>");
 
 		var config = {
 			isNested: true, isNavigator: true, isTemplating: true,
 	 		template: options.template,
-		 	regions: { header: ".home-regions>.home-header" , body: ".home-regions>.wrapper>.main>.home-body", footer: ".home-regions>.home-footer" },
+		 	regions: { header: ".home-regions>.home-header" , body: ".home-regions>.main>.home-body", footer: ".home-regions>.home-footer" },
 		 	events: {
 		 		"click [data-navigate]": "doNavigate"
 		 	},
 
 			initialize: function(_options) {
                 var self = this;
-				_options.el = _options.el || "body";
+                self.$root= $( _options.el || "body");
+                self.$root.empty();
 				_options.views.body = _options.views.body || _options.views.home;
+
+                ux.initialize(this, _options);
 
                 // TODO: this needs to refactored - so it capture events from nested menus
 //                 var appRoutes = _.map(_options.views, function(v,k) {
@@ -43,16 +46,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                     alert("Error:" +evt);
                 });
 
-                if (_options.ok) throw "re-enter"
-                _options.ok=true
-                console.log("HOME: init");
-
 				return this;
 			},
 
 			onShow: function() {
 				var self = this
 DEBUG && console.log("onShow: %o %o", this, this.body);
+                self.$root.append(self.$el);
+
 //				this.on("navigate", self.onNavigate);
 //				if (!this.body.currentView) {
 //					this.showAllNested()
@@ -79,7 +80,7 @@ DEBUG && console.log("onShow: %o %o", this, this.body);
 //				view && this.attachNavigateListeners(view)
 //				if (this.footer && this.footer.currentView) this.footer.currentView.triggerMethod("navigate", go_to)
 				if (this.header && this.header.currentView) {
-					var _view = this._views[go_to]
+					var _view = this._views[go_to];
 					if (_view) {
 						this.header.currentView.triggerMethod("breadcrumb:home", go_to, view)
 					}

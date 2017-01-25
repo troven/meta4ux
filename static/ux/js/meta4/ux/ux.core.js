@@ -97,14 +97,15 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             // apply mixins
             core.ux.mixer.call(view, options);
 
-            // bind "when:" events
-            core.iq.aware(view, options.when);
-
             // apply css - incl className hueristics
             core.ux.stylize(view, options);
 
             // nested views
             if (options._views) this._views = options._views;
+
+            // bind "when:" events
+            core.iq.aware(view, options.when);
+            console.log("VIEW WHEN: %o %o -> %o", options.id, options, options.when);
 
             // announce
             view.trigger("initialized");
@@ -138,19 +139,17 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
         },
 
         // augment view with absolute 'className' or cumulative 'css' styles
-        stylize: function() {
+        stylize: function(view, options) {
             var css = "";
             var className = "";
             _.each(arguments, function(v) {
                 css = css + (v.css?" "+v.css:""); // concat all CSS modification
                 className = v.className?v.className:className; // last matching takes precedence
             })
-            var self = arguments[0];
-            className = className + css;
-            if (self.$el && className) {
-                self.$el.addClass(className);
+            className = className + " "+css;
+            if (view.$el && className) {
+                view.$el.addClass(className);
             }
-//		    self.className = className + css
             return css;
         },
 

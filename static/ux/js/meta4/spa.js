@@ -19,6 +19,7 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             // define the user principal
             var ProfileModel = Backbone.Model.extend({url: "/models/me"});
             navigator.user = new ProfileModel(options.principal || {label: "Anonymous"});
+            navigator.state = new Backbone.Model();
 
             // handle events
             // navigator.on("all", function(event, scope) {
@@ -44,6 +45,10 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
 
             // set-up routing
             Backbone.history.start();
+            Backbone.history.on("all", function (route, router) {
+                console.log("HISTORY: %s -> %o -> %s", route, router, window.location.hash);
+            });
+
         });
 
         return SPA;

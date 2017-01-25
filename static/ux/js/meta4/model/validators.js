@@ -1,7 +1,5 @@
 define(["underscore", "core"], function (_, core) {
 
-    var fact = core.fact;
-
     return {
         "required": {
             message: "required",

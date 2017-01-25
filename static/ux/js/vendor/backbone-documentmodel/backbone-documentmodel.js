@@ -291,6 +291,9 @@
     }
 
     function documentTrigger(name) {
+        return;
+console.log("FIX: documentTrigger: %o %s", this, name);
+
         Backbone.Events.trigger.apply(this, arguments);
 
         if (this._events) {

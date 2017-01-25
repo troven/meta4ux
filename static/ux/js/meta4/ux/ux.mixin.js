@@ -476,11 +476,12 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
             var self = this;
             var $actions = $("[data-action]", this.$el);
             console.log("attachExplicitActions(%s) %o -> %o", this.id, this, $actions);
+            $actions.unbind("click");
 
             $actions.click(function() {
                 var $this = $(this);
                 var event = $this.data();
-                console.log("click action: %o %o", event, this);
+                console.log("click action: %o %o", event, self);
                 self.trigger(event.action);
             });
         },
@@ -555,7 +556,8 @@ console.log("navigateTo (%s): %o", go_to, this);
                     },1);
                 }
                 return _view;
-			}
+			} else {
+            }
 			console.error("Missing View: %o %o %s", this, ux.views, viewId)
 			return false;
 		}
@@ -699,8 +701,8 @@ console.log("resolve view: %s -> %o --> %o", key, view, _view);
             } else if (_.isString(conf)) {
                 // try to resolve locally then globally
                 var view_id = conf;
-                console.log("view: %s", view_id);
                 conf = this._views[view_id] || navigator.views.get(view_id);
+                console.log("view: %s -> %o ->%o", view_id, conf, navigator.views);
                 if (!conf) {
                     console.warn("Missing nested view: %s", view_id);
                     return false;

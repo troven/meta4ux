@@ -18,6 +18,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		 	},
 			initialize: function(options) {
 DEBUG && console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);
+                ux.initialize(this, options);
 				return this;
 			}
 		}

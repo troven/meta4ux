@@ -46,7 +46,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         var view = new ViewClass(options, navigator);
 
         // decorate view (with mixins, styles, models, etc);
-        core.ux.initialize(view, options, navigator);
+//        core.ux.initialize(view, options, navigator);
 
         _DEBUG && console.warn("Widget View: %s: %o ", id, view);
 

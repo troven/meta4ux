@@ -5,31 +5,40 @@ define(["underscore", "backbone", "core",
 
     var fact = core.fact;
 
-    return function(options) {
+    var Models = function(options) {
 
         // internal constants
         var _DEBUG = options.debug || fact.DEBUG;
         var storeType = options.store || "file"
-        var storeURL = options.url || "models/"+storeType
+        var storeURL = options.url || "models/" + storeType
 
-        _DEBUG && console.log("Default Factory: (%s) => %o -> %o", options.id, fact, validates);
+        _DEBUG && console.log("Model: DocumentModel: (%s) => %o -> %o", options.id, fact, validates);
 
         if (!validates.model) throw new Error("meta4:fact:register:oops:missing-model-validate");
 
         // define our collection's Model
 
         var Model = Backbone.DocumentModel.extend({
-            url: function() {
-                return core.url(this.collection?this.collection.url:storeURL);
-            } ,
+            url: function () {
+                return core.url(this.collection ? this.collection.url : storeURL);
+            },
             sync: fact.sync.Default,
             mutators: options.mutators,
             defaults: options.defaults,
             validate: validates.model,
-            idAttribute: options.idAttribute||fact.idAttribute
-        })
+            idAttribute: options.idAttribute || fact.idAttribute
+        });
 
-        // define new Collection
+        return Model;
+    }
+
+    // define new Collection
+    var Collections = function(options) {
+
+        // internal constants
+        var _DEBUG = options.debug || fact.DEBUG;
+        var storeType = options.store || "file"
+        var storeURL = options.url || "models/" + storeType
 
         var Collection = Backbone.DocumentCollection.extend({
             url: core.url(storeURL),
@@ -42,8 +51,10 @@ define(["underscore", "backbone", "core",
         var collection = new Collection();
         collection.options = _.omit(options, ["data"]);
 
-        _DEBUG && console.log("DocumentModel: (%s): @ %s", options.id, storeURL);
+        _DEBUG && console.log("Collection: DocumentModel: (%s): @ %s", options.id, storeURL);
         return collection;
     }
+
+    return { Model: Models, Collection: Collections }
 
 })

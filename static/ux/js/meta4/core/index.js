@@ -123,6 +123,10 @@ _DEBUG && console.log("Existing Collection: %o %o", options, options.collection)
 //_DEBUG &&
 console.log("Register Collection: %s -> %o / %o", options.collection.id, options.collection, this.fact)
 				modelled.collection = this.fact.models.get(options.collection.id) || this.fact.register(options.collection)
+            } else if (_.isObject(options.collection) ) {
+                options.collection.id = options.id+"_collection";
+                console.log("Dynamic Collection: %s -> %o / %o", options.collection.id, options.collection);
+                modelled.collection = fact.Collection(options);
 			} else if (_.isFunction(options.collection)) {
 _DEBUG && console.log("Function Collection", options.collection, this.fact)
 				modelled.collection = options.collection(options);

@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 	var labelAttribute = ux.labelAttribute || "label";
 	var commentAttribute = ux.commentAttribute || "comment"
 
-	ux.view.Table = ux.view["meta4:ux:Table"] = function(options) {
+	ux.view.Collection = ux.view["meta4:ux:Collection"] = function(options) {
 		_.defaults(options, { child: {} })
 		var DEBUG = options.debug || ux.DEBUG;
 

@@ -8,9 +8,9 @@ define(["underscore", "core", "meta4/model/validators"], function ( _, core, val
             options = options || { debug: true };
 
             var schema = options.schema || (self.collection&&self.collection.options&&self.collection.options.schema?self.collection.options.schema:{});
-            var _DEBUG = options.debug;
+            var _DEBUG = options.debug?true:false;
 //_DEBUG&&
-            console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options)
+            console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options);
 
             attributes = attributes || this.attributes;
             options = options || this.options;
@@ -21,12 +21,12 @@ console.log("Validate Attr: %o %o", k, meta)
                 if (meta) {
                     // ubiquitous, so add some syntax sugar
                     if (meta.required) {
-                        var error = validate.attribute(k, v, attributes, validators.required );
+                        var error = self.attribute(k, v, attributes, validators.required );
                         error && errors.push(error);
                     }
 
                     // field-specific validation
-                    var error = validate.attribute(k, v, attributes, meta.validators);
+                    var error = self.attribute(k, v, attributes, meta.validators);
                     error && errors.push(error);
 
                     // generic field-type validation

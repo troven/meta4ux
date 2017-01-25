@@ -85,11 +85,15 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
             if (!vents) throw new Error("meta4:iq:oops:missing-event-source");
             if (!_.isObject(vents)) throw new Error("meta4:iq:oops:invalid-event-source");
             if (!vents.on) throw new Error("meta4:iq:oops:not-event-source");
-			if (!iqFn) return;
+			if (!iqFn) {
+                console.log("not IQ aware: %s -> %o", vents.id, vents);
+			    return;
+            }
 
 			// bind local 'iq' events events to fn()
             _.each(iqFn, function(fnId,key) {
                 if (_.isString(fnId)) {
+                    console.log("WHEN: %s -> %s", key, fnId)
                     var fn = core.iq.get(fnId);
                     if (fn) {
 //DEBUG && console.log("aware [%s] %o -> %s %o", key, vents, fnId, fn)
@@ -101,8 +105,9 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
                         throw new Error("meta4:iq:oops:missing-fn#"+fnId);
                     }
                 }
-            })
-			return vents
+            });
+console.log("IQ aware: %o %o", vents, iqFn);
+			return vents;
 		},
 
         bubble: function(event, when, then) {

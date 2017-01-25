@@ -16,7 +16,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         var TabSelector = Backbone.Marionette.CompositeView.extend({
             isSelectable: true,
-            template: "<ul class='nav nav-tabs'></ul>", childViewContainer: "ul", childView: TabItem,
+            template: "<ul class='nav nav-pills'></ul>", childViewContainer: "ul", childView: TabItem,
             initialize: function(_options) {
                 ux.initialize(this, _options)
                 this.trigger("select", this.model);
@@ -46,8 +46,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 	        	this._views = this._resolveNested(options.tabs || options.views)
 
-				this.currentTab = _options.firstTab || _options.currentTab || _options.currentView|| _options.view
-DEBUG && console.log("Init Tabs (%o) %o", this, _options)
+				this.currentTab = _options.firstTab || _options.currentTab || _options.currentView || _options.view || _options.tabs[0];
+DEBUG && console.log("Init Tabs (%o) %o", this, _options);
 
 			    this.collection = this.collection || new Backbone.Collection();
 			    _.each(this._views, function(tab, id) {
@@ -55,7 +55,7 @@ DEBUG && console.log("Init Tabs (%o) %o", this, _options)
                     var conf = { id: _options.id+"_"+id, label: tab.title || tab.label || id, comment: tab.comment || "", goto: id }
                     self.collection.add( conf );
 			    })
-DEBUG && console.log("Resolved Tabs: %o %o %o", this, this._views, this.collection)
+DEBUG && console.log("Initialzed Tabs (%s): %o", this.currentTab, this);
 
 				return this;
 			},
@@ -73,7 +73,9 @@ DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
                 })
 			    this.tabs.show(tabs);
 
-			    if (self.currentTab) this.selectTab(self.currentTab)
+			    if (self.currentTab) {
+			        this.selectTab(self.currentTab)
+                }
 
 			},
 
@@ -82,10 +84,10 @@ DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
 				var view = this.getNestedView(id, { model: this.model })
 DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
 				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id
-				this.$el.find("[data-toggle]").closest("li").removeClass("active")
-				this.$el.find("[href='#"+id+"']").closest("li").addClass("active")
-				this.body.show(view)
-				this.currentView = view
+				this.$el.find("[data-toggle]").closest("li").removeClass("active");
+				this.$el.find("[href='#"+id+"']").closest("li").addClass("active");
+				this.body.show(view);
+				this.currentView = view;
 			}
 		}
 

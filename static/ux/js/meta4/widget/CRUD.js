@@ -44,7 +44,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
                 this.can = _.extend({ create: true, read: true, update: true, delete: true }, _options.can);
 
 				// initialize
-//				ux.initialize(this, _options);
+				ux.initialize(this, _options);
 				this.initializeHeadersFooters(_options);
 
 DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can)
