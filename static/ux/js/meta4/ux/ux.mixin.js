@@ -482,7 +482,7 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
                 var $this = $(this);
                 var event = $this.data();
                 console.log("click action: %o %o", event, self);
-                self.trigger(event.action);
+                self.triggerMethod(event.action);
             });
         },
 
@@ -513,7 +513,12 @@ console.log("ACTION:%s -> %o %o", action, this, meta );
 		initializeNavigator: function(options) {
             var self = this;
             this.on("select", function(model) {
-                self.trigger("navigate", model.goto || model.id);
+                self.trigger("selected", model); // HACK because we can't seem to bind two events (e.g. this & IQ)
+
+                if (!model) throw "missing-selection-model";
+
+                var goto = model.get("goto") || model.get("id");
+                self.trigger("navigate", goto, model);
             });
 		},
 

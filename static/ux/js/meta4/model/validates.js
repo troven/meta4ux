@@ -1,40 +1,47 @@
 define(["underscore", "core", "meta4/model/validators"], function ( _, core, validators ) {
 
+
+    if (!validators) throw "meta4:oops:validators:missing";
+
     var self = {
 
         model: function(attributes, options) {
-            var self = this;
             var errors = [];
             options = options || { debug: true };
-
-            var schema = options.schema || (self.collection&&self.collection.options&&self.collection.options.schema?self.collection.options.schema:{});
+            var model = this;
+            var schema = options.schema || (this.collection&&this.collection.options&&this.collection.options.schema?this.collection.options.schema:{});
             var _DEBUG = options.debug?true:false;
+            if (!schema || _.isEmpty(schema)) {
+                console.log("No Validate Schema: %o ", this);
+                return false;
+            }
 //_DEBUG&&
-            console.log("Validate Model: %o %o / %o %o", this, schema, attributes, options);
+            console.log("Validate Model: %o %o\n%o using %o", this, schema, attributes, validators);
 
             attributes = attributes || this.attributes;
             options = options || this.options;
+            var _validators = validators;
 
             _.each(schema, function(meta,k) {
-console.log("Validate Attr: %o %o", k, meta)
                 var v = attributes[k];
+                console.log("Validate? %s == %s: %o -> %o", k, v, meta, _validators)
                 if (meta) {
                     // ubiquitous, so add some syntax sugar
                     if (meta.required) {
-                        var error = self.attribute(k, v, attributes, validators.required );
+                        var error = self.attribute(k, v, attributes, [_validators.required] );
                         error && errors.push(error);
                     }
 
                     // field-specific validation
-                    var error = self.attribute(k, v, attributes, meta.validators);
+                    var error = self.attribute(k, v, attributes, meta.validators );
                     error && errors.push(error);
 
                     // generic field-type validation
-                    var type = meta[fact.typeAttribute];
+                    var type = meta[core.fact.typeAttribute];
                     if (type) {
-                        var validators = validators[type.toLowerCase()];
+                        var validate = _validators[type.toLowerCase()];
 //console.log("Validate Type: %o %o %o / %o %o", k, v, type, validators, meta.validators)
-                        var error = validate.attribute(k, v, attributes, [ validators ] );
+                        var error = self.attribute(k, v, attributes, [ validate ] );
                         error && errors.push(error);
                     }
                 }
@@ -42,8 +49,8 @@ console.log("Validate Attr: %o %o", k, meta)
 
             var hasErrors = (errors && errors.length);
             if (hasErrors) {
-                console.warn("Model Invalid: %o %o", self, errors);
-                self.trigger && self.trigger("invalid", errors);
+                console.error("Invalid Model: %o %o", model, errors);
+                model.trigger && model.trigger("invalid", errors);
                 return errors;
             }
         },
@@ -51,9 +58,8 @@ console.log("Validate Attr: %o %o", k, meta)
         attribute: function(fieldId, value, attributes, validators) {
             if (!validators) return false;
             var error = false;
-// DEBUG && console.debug("validateField (%s:=%s) %o", fieldId, value, validators)
-            _.each(validators, function(validator) {
-                var validate = validators[validator];
+// DEBUG && console.debug("validateAttribute(%s:=%s) %o", fieldId, value, validators)
+            _.each(validators, function(validate) {
 
                 if (_.isObject(validate)) {
                     var valid = true;
@@ -63,11 +69,12 @@ console.log("Validate Attr: %o %o", k, meta)
                         valid = value.match(regex)?true:false;
                     }
                     if (valid && validate.fn && _.isFunction(validate.fn) ) {
+                        console.debug("validateFn (%s:=%s) %o", fieldId, value, validate.fn)
                         valid = validate.fn(value, attributes);
                     }
                     if (!valid) {
 //DEBUG &&
-                        console.warn("invalid (%s) ", fieldId, valid, validator, validate);
+                        console.warn("invalid (%s) -> %o %o", fieldId, valid, validate);
                         error = { id: fieldId, message: validate.message };
                     }
                 }

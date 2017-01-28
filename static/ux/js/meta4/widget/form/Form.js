@@ -3,7 +3,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 
 	ux.view.Form = ux.view["meta4:ux:Form"] = function(options) {
 
-    	var DEBUG = options.debug || ux.DEBUG
+    	var DEBUG = options.debug || ux.DEBUG;
 
 		var FieldSet = Backbone.Marionette.CompositeView.extend( _.extend({
 		    isActionable: true,
@@ -16,7 +16,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
                 "click [data-action]": "doAction"
             },
 			initialize: function(_options) {
-
+                var self = this;
 			    _.defaults(_options, { model: false, editable: true , autoCommit: true, autoValidate: true, field: { css: "row" }  } )
 				ux.initialize(this, _options)
 
@@ -31,6 +31,13 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 //DEBUG&&
 				this._buildSchemaCollection( schema, col_schema );
                 console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
+
+                this.model.on("invalid", function() {
+                    self.triggerMethod("invalid");
+                    alert("invalid");
+
+
+                })
 
 				return this;
 			},
@@ -120,7 +127,8 @@ if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
             },
 
             doBlurFieldEvent: function(e) {
-DEBUG && console.log("doBlurFieldEvent: %o %o", this, e);
+//DEBUG &&
+console.log("doBlurFieldEvent: %o %o", this, e);
                 this.triggerMethod("blur");
                 if (!this.options.autoCommit) return this;
                 this._commitField($(e.currentTarget));
@@ -151,11 +159,11 @@ DEBUG && console.log("Saved Form(%s): %o", this.model.id, this.model);
             _commitField: function($this) {
                 var self = this
                 var fieldId = $this.attr("data-id") || $this.attr("name")
-                if (!fieldId) return
+                if (!fieldId) return;
                 var _options = self.collection.get(fieldId)
                 if (_.isUndefined(_options)) return; // not our field
-                var fieldView = self.children.findByModel(_options)
-                if (fieldView && fieldView.commit) fieldView.commit()
+                var fieldView = self.children.findByModel(_options);
+                if (fieldView && fieldView.commit) fieldView.commit();
             }
 
 		}, ux.mixin.Common));

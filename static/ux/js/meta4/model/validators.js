@@ -1,4 +1,4 @@
-define(["underscore", "core"], function (_, core) {
+define(["underscore"], function (_) {
 
     return {
         "required": {

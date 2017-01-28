@@ -92,9 +92,9 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 		},
 
 		Collection: function(options) {
-			var _DEBUG = options.debug || fact.DEBUG
+			var _DEBUG = options.debug || fact.DEBUG;
 			if (!options) throw "meta4:fact:Collection:oops:missing-options";
-			options.type = options.type || "Local"
+			options.type = options.type || "Local";
 //_DEBUG && console.log("Fact Collection: %s %o ", options.id, options)
 
 			var collection = null
@@ -148,10 +148,9 @@ _DEBUG && console.log("Instance Data: %o %o", options.data, collection, options.
 				}
 			} else  throw new Error("meta4:fact:collection:oops:invalid-collection-reference");
 
-			var id = options[fact.idAttribute]
-			if (id) {
+			if (options.schema) {
 				collection.schema = new Backbone.Collection(collection.model.schema = this._buildSchema(options.schema))
-_DEBUG && console.log("Schema: %s %o %o ", id, collection, collection.schema)
+_DEBUG && console.log("Collection Schema: %s %o %o ", id, collection, collection.schema);
 			}
 
 			core.iq.aware(collection, options.iq || options.when);

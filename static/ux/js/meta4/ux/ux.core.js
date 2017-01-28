@@ -105,7 +105,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
             // bind "when:" events
             core.iq.aware(view, options.when);
-            console.log("VIEW WHEN: %o %o -> %o", options.id, options, options.when);
+//            console.log("VIEW WHEN: %o %o -> %o", options.id, options, options.when);
 
             // announce
             view.trigger("initialized");

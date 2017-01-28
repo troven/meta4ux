@@ -47,12 +47,13 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
             }, error: function(response) {
                 collection.busy = false;
 
-                console.error("sync failed: %s-> %o %o", url, response, arguments);
-                options.error && options.error(collection, response);
-
                 collection.trigger("error", response);
 
-                alert(url + "-> "+response.statusText);
+                console.error("sync failed: %s-> %o %o", url, response, arguments);
+                options.error && options.error(collection, response);
+                //
+                //
+                // alert(url + "-> "+response.statusText);
             }
         });
 

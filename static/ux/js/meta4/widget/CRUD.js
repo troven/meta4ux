@@ -51,11 +51,14 @@ DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can)
 
                 // bind CRUD events
                 this.on("nested:create", this.onCreate);
-				this.on("nested:childview:select", this.onSelect)
-                this.on("nested:delete", this.onDelete)
-				this.on("nested:finish", this.onSave)
-                this.on("nested:save", this.onSave)
-				this.on("nested:cancel", this.onCancel)
+				this.on("nested:childview:select", this.onSelect);
+                this.on("nested:delete", this.onDelete);
+				this.on("nested:finish", this.onSave);
+                this.on("nested:save", this.onSave);
+				this.on("nested:cancel", this.onCancel);
+                this.on("nested:invalid", function(){
+                    alert("nested:invalid");
+                });
 
 //                var body = this._views.body || this._views.read || this._views.update
 				return this;
@@ -81,26 +84,31 @@ DEBUG && console.log("initHeadersFooters: %o %o", this.headers, this.footers)
 
 			},
 
+            onInvalid: function() {
+                console.error("CRUD: invalid: %o -> %o", this, arguments);
+                this.$el.addClass("danger");
+            },
+
 			onRender: function() {
                 if (!this._views.body) {
                     if (this._views.read) this.triggerMethod("read");
                     else if (this._views.update) this.triggerMethod("update");
                 }
 			},
+
+            onAction: function(action, meta) {
+                throw "ACTION"
+                var can = this.options.can || {}
+                if (!can[action]===false) throw new Error("meta4:ux:crud:oops:cannot-"+action);
+
+DEBUG && console.log("CRUD onAction (%s): %o", action, meta)
+//                var _view = this.getNestedView(action, meta);
 //
-//             onAction: function(action, meta) {
-//                 var can = this.options.can || {}
-//
-//                 if (!can[action]===false) throw new Error("meta4:ux:crud:oops:cannot-"+action);
-//
-// DEBUG && console.log("CRUD onAction (%s): %o", action, meta)
-// //                var _view = this.getNestedView(action, meta);
-// //
-// //                 if (_view) {
-// //                    this.body.show(_view)
-// //                }
-//                 this.triggerMethod(action, meta.model)
-//             },
+//                 if (_view) {
+//                    this.body.show(_view)
+//                }
+                this.triggerMethod(action, meta.model)
+            },
 
             onSelect: function(view, selection) {
                 this.triggerMethod("update", selection);
@@ -122,12 +130,22 @@ console.log("CRUD onSaved: %o %o", this, arguments);
 
                 model.on("all", function() {
                     DEBUG && console.log("CRUD ALL: %o -> %o", this, arguments)
-                })
+                });
 
-//                model.validate && model.validate()
-DEBUG && console.log("CRUD onSave: %o %o valid: %s", this, model, model.isValid())
-                if (model.isValid())  model.save();
-                if (!this.modal) self.onRead();
+                model.validate && model.validate();
+                if (model.isValid())  {
+                    self.triggerMethod("valid");
+                    DEBUG && console.log("CRUD onSave: %o %o valid: %s", this, model, model.isValid())
+                    model.save();
+                    if (!this.modal) {
+                        self.onRead();
+                    }
+                } else {
+                    // DEBUG &&
+                    console.warn("Can't Save CRUD: %o %o ", this, model);
+                    self.triggerMethod("invalid");
+
+                }
             },
 
             showHeaderFooters: function(action, meta) {
@@ -176,11 +194,10 @@ DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
 //                _collection.trigger("create",_model)
 
                 // heuristically acquire an editable view
-                var view = this.getNestedView("create", meta) || this.getNestedView("edit", meta) || this.getNestedView("update", meta);
-
+                var view = this.getNestedView("create", meta) || this.getNestedView("edit", meta);
                 if (!view) throw "meta4:ux:crud:oops:missing:view:create";
 
-                this.once("cancel", function() { self.onRead() })
+                this.once("cancel", function() { self.onRead() });
 
                 this.once("save", function() {
                     console.log("CRUD onSave: %o %o %o", _collection, view, arguments);

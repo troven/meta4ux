@@ -15,10 +15,10 @@ define(["jquery", "underscore", "backbone", "marionette", "core"], function ($,_
         boot: function(navigator, options) {
             var self = this;
 
-            console.log("IQ BOOT: %o -> %o", navigator, options);
+            // console.log("IQ BOOT: %o -> %o", navigator, options);
 
             _.each(options.scripts, function(script,id) {
-                self.fn[id] = self.compileScript(script);
+                self.fn[id] = self.compileScript(script, navigator);
                 navigator.on(id, self.fn[id]);
 
             });
@@ -26,14 +26,14 @@ define(["jquery", "underscore", "backbone", "marionette", "core"], function ($,_
             _.each(options.controllers, function(then, when) {
                 if(!self.fn[then]) self.fn[then]=function(){console.warn('missing fn() '+then, this); this.triggerMethod(then, this, arguments) }
                 navigator.on(when, function() {
-DEBUG && console.log("IQ When: ", when, then, arguments);
+//DEBUG && console.log("IQ When: ", when, then, arguments);
                     self.fn[then].apply(arguments[0], [arguments[1]]);
                 })
             })
 
             options.timers && self.timers(navigator, options.timers);
 
-            DEBUG && console.log("Module IQ: %s -> %j", navigator.id, options);
+            // DEBUG && console.log("Module IQ: %s -> %j", navigator.id, options);
 
             return self;
         },
@@ -58,8 +58,8 @@ DEBUG && console.log("IQ When: ", when, then, arguments);
             return _fn;
         },
 
-        compileScript: function(script) {
-            return new Function("it", script);
+        compileScript: function(script, meta4) {
+            return new Function("meta4", script);
         },
 
 		compileScriptEmbed: function(script_src) {
@@ -86,19 +86,18 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
             if (!_.isObject(vents)) throw new Error("meta4:iq:oops:invalid-event-source");
             if (!vents.on) throw new Error("meta4:iq:oops:not-event-source");
 			if (!iqFn) {
-                console.log("not IQ aware: %s -> %o", vents.id, vents);
+//                console.log("not IQ aware: %s -> %o", vents.id, vents);
 			    return;
             }
 
 			// bind local 'iq' events events to fn()
             _.each(iqFn, function(fnId,key) {
                 if (_.isString(fnId)) {
-                    console.log("WHEN: %s -> %s", key, fnId)
                     var fn = core.iq.get(fnId);
                     if (fn) {
-//DEBUG && console.log("aware [%s] %o -> %s %o", key, vents, fnId, fn)
+//console.log("WHEN [%s] on %o THEN %s %o", key, vents, fnId, fn)
                         vents.on(key, function() {
-//                            DEBUG && console.log("WHEN %o WHEN: %s -=> %s -> %o", this, key, fnId, fn);
+//console.log("WHEN %s on %o\nDO: %s -=> %s -> %o", key, this, fnId, fn);
                             fn.apply(vents,arguments);
                         })
                     } else {

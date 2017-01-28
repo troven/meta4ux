@@ -13,7 +13,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
             events: { "click": "doSelect"},
-            tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{label}}'>{{label}}</a>",
+            tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{comment}}'>{{label}}</a>",
 
             initialize: function(_options) {
                 ux.initialize(this, _options);
@@ -26,17 +26,21 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         }, ux.mixin ) );
 
         var MenuList = Backbone.Marionette.CollectionView.extend({
-            isNavigator: true,
-            childView: MenuItem, tagName: "ul", className: "nav nav-pills "+(isVertical?"nav-stacked":""),
+            isNavigator: true, isSelectable: true,
+            childView: MenuItem, tagName: "ul", className: "nav",
             childEvents: {
                 "select": function(view, model, event) {
                     this.$el.find(".active").removeClass("active");
-                    this.selected = model;
-                    console.log("MenuList: selected: %o %o %o", this, view, model);
-                    // bubble navigate to ActionList parent
-                    this.triggerMethod("select", model);
+
+                    this.selected = this.select(model, event);
+                    console.log("MenuList: selected: %o -> %o   qa", view, this.selected);
+                    // bubble navigate to MenuList parent
+                    this.triggerMethod("select", this.selected);
                     view.$el.addClass("active");
                 }
+            },
+            initialize: function(_options) {
+                ux.initialize(this, _options);
             }
         });
 

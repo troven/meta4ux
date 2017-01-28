@@ -49,9 +49,10 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             // merge validation (schema/model, editor/widget)
             var validators = []
             validators = validators.concat( model_validators );
-            validators = validators.concat( this.validators )
+            validators = validators.concat( this.validators );
 
-            DEBUG && console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
+            //DEBUG &&
+            console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
 
             _.each(validators, function(validator) {
                 var validate = ux.view.validators[validator]
@@ -151,9 +152,9 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
                 ux.initialize(this, options);
             },
             onInvalid: function(invalid) {
-                this.model.set("message", invalid.message)
+                this.model.set("message", invalid.message);
 // console.log("onInvalid: %o %o", this, arguments);
-                this.render()
+                this.render();
                 $(".message", this.$el).show();
             },
             onValid: function() {
