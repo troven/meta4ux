@@ -176,34 +176,30 @@ require(['splash'], function(splash) {
         require(['meta4app'], function (SinglePageApp) {
 
             if (!options.boot.url) throw new oops.Error("meta4:app:oops:missing-boot-url");
-            console.log("booting %s @ %s", options.boot.id, options.boot.url);
+
+            var meta4 = new SinglePageApp();
 
             // load application payload
 
+            // console.log("booting %s from %s", options.boot.id, options.boot.url);
             $.ajax({url: options.boot.url, dataType: "json", type: "GET", contentType: "application/json; charset=utf-8",
                 success: function(resp) {
                     var result = options.parse(resp);
                     if (!result) {
+                        meta4.trigger("error", "application:missing");
                         throw oops.Error("meta4:app:oops:invalid-payload")
-                        newApp.trigger("boot:missing");
                         return;
                     }
+
                     try {
-
-                        var meta4 = new SinglePageApp();
-
-                        meta4.on("started", function() {
-                            // hide splash screen (if displayed)
-                            (!options.splash.disabled) && splash.close();
-                        });
-
+                        // hide splash screen (if displayed)
+                        if ( (!options.splash.disabled) ) {
+                            meta4.on("started", function() { splash.close(); });
+                        }
                         meta4.start(result);
-
                     } catch(e) {
                         console.log("BOOT ERROR: %o", e);
                         throw e;
-                        // var yorn = confirm(e+"\n\nApplication failed to boot. Try again?");
-                        // yorn && Reload();
                     }
                 }
             });

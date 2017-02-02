@@ -7,9 +7,10 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
 
         SPA.on("start", function (options) {
 
+            var _DEBUG = options.debug;
             var navigator = _.extend({}, Modals, BB.Events);
 
-            console.log("SPA: started: %o -> ", options, navigator);
+            _DEBUG && console.log("SPA: started: %o -> ", options, navigator);
 
             // Boot the Module's dynamic architecture
             iq.boot(navigator, options);
@@ -27,27 +28,26 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             // });
 
             navigator.on("navigate", function (go_to) {
-                console.log("**** NAVIGATE: %s ****", go_to);
+                if (!go_to || go_to == options.home || go_to == "home" )  navigator.trigger("home");
+                else navigator.trigger(go_to);
             });
 
             // home view
             navigator.on("home", function () {
-                var home = navigator.Home(options.home, navigator);
-                home.triggerMethod("show");
-                navigator.home = home;
-                SPA.trigger("navigator", navigator);
-                SPA.trigger("home", home);
+                if (navigator.home) {
+                    navigator.home.destroy();
+                }
+                navigator.home = navigator.Home(options.home, navigator);
+                navigator.home.triggerMethod("show");
+
+                console.log("HOME: %o -> %o", navigator.home, arguments);
+                Backbone.history.start();
             });
 
-            // existing fragment
-            var currentView = Backbone.history.fragment || false;
-            currentView && this.trigger("navigate", currentView);
-
-            // set-up routing
-            Backbone.history.start();
-            Backbone.history.on("all", function (route, router) {
-                console.log("HISTORY: %s -> %o -> %s", route, router, window.location.hash);
-            });
+            // logout view
+            navigator.on("logout", function () {
+                window.location.reload();
+            })
 
         });
 

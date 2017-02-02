@@ -59,7 +59,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         // handle data
 
         var collection_options = view.collection?view.collection.options:{};
-        console.log("new view %o %o collection: %o -> %o", view.id, view, view.collection||"No Data", collection_options);
+        _DEBUG && console.log("new view %o %o collection: %o -> %o", view.id, view, view.collection||"No Data", collection_options);
 
         // refresh remote collections
         var collections_id = view.collection?view.collection.id:false;

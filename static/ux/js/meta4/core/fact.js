@@ -109,7 +109,7 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 				options = { data: options }
 				collection = fact.factory.Local(options)
 //console.log("Local Array: %o %o", options, collection)
-				collection.add( options.data )
+				collection.add( options.data );
 			} else if (_.isObject(options)) {
 				var id = options[fact.idAttribute]
 				if (!id) throw "meta4:fact:Collection:oops:missing-"+fact.idAttribute;
@@ -205,7 +205,11 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
             filtered.original = collection;
 
 			var refresh = function() {
-				var results = collection.filter(function(a) { return fn(a.attributes) } );
+			    var self = this;
+				var results = collection.filter(function(a) {
+                    console.log("filter?: %o -> %o", self, a)
+				    return fn(a.attributes)
+				} );
                 console.log("RE-FILTER: %o -> %o", query, results)
 				filtered.reset(results);
 //				filtered.trigger("filter", query)
@@ -224,6 +228,7 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 //			collection.on("destroy", function() { filtered.destroy() })
 //			filtered.filters.on && filtered.filters.on("change", refresh);
 
+            collection.refresh();
 			return filtered;
 		}
 

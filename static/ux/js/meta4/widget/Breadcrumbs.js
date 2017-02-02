@@ -5,13 +5,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		var DEBUG = true;
 
 		options.template =  options.template || ux.compileTemplate("<ul class='breadcrumb'></ul>");
+
 		var config = {
-			isTemplating: true, isActionable: true, isNested: false,
+			isTemplating: true, isActionable: true, isNested: true,
 			isSelectable: true, isHoverPanel: false,
 			isPopOver: false, isActionMenu: false,
 	 		template: options.template,
 			childView: Marionette.ItemView,
-			childViewContainer: "ul",
+			childViewContainer: "ul.breadcrumb",
 			childViewOptions: {
 				tagName: "li",
 				template: "<a href='#' data-navigate='{{id}}' >{{label}}</a>"
@@ -37,7 +38,10 @@ DEBUG && console.log("Breadcrumb Home: %o", this)
 					attrs.label && this.collection.add(attrs)
 DEBUG && console.log("Breadcrumb: %o (%s) -> %o %o", this, view.id, view, attrs)
 				}
-			}
+			},
+            onRender: function() {
+
+            }
 		}
 
 		return Backbone.Marionette.CompositeView.extend(config);

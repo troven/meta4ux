@@ -103,12 +103,12 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
         var commitField = function() {
             var self = this
             var model = self.options.formModel;
-            var $field = this.$el
-            var $fields = $("[name]", $field)
+            var $field = this.$el;
+            var $fields = $("[name]", $field);
 
             if (!$fields || !$fields.length) {
-                setModelField.call(self, $field, model)
-                this.triggerMethod("commit", model, $field)
+                setModelField.call(self, $field, model);
+                this.triggerMethod("commit", model, $field);
             } else {
                 $fields.each(function() {
                     var $this = $(this)
@@ -207,11 +207,13 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             onBlur: function(e) {
                 var idAttribute = this.options.id || idAttribute;
                 var $field = $(e.currentTarget);
-                var slug  = this.model.get(idAttribute);
+                var model = this.options.formModel;
+                var slug  = model.get(idAttribute);
                 if ( this.options.required && !slug) slug = core.uuid();
+console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
                 if (slug) {
                     slug = core.ux.uid(slug);
-                    this.model.set(idAttribute, slug);
+                    model.set(idAttribute, slug);
                     $field.val(slug);
                 }
             }
@@ -254,13 +256,24 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
         fields.Date = FormField.extend({
             className: "form-group row form-date",
             validators: ["date"],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+            initialize: function(options) {
+console.log("Date Field: %o -> %o", this, options);
+                var fieldId = this.model.get("id");
+                var date = new Date();
+                var day = date.getDate();
+                var monthIndex = date.getMonth();
+                var year = date.getFullYear();
+
+                var today = day+"/"+(1+monthIndex)+"/"+year;
+                this.options.formModel.set(fieldId, today);
+            }
         })
 
         fields.Time = FormField.extend({
             className: "form-group row form-time",
-            validators: [],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control col-sm-2' placeholder='{{label}}' type='integer' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
+            validators: ["time"],
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control col-sm-1' placeholder='{{label}}' type='time' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>"
         })
 
         fields.Password = FormField.extend({

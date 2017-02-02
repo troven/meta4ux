@@ -12,8 +12,7 @@ define(["underscore", "backbone", "core",
         var storeType = options.store || "file"
         var storeURL = options.url || "models/"+storeType
 
-        //_DEBUG &&
-        console.log("Default Factory: (%s) => %o", options.id, options);
+        _DEBUG && console.log("Default Factory: (%s) => %o", options.id, options);
 
         if (!validates.model) throw new Error("meta4:fact:register:oops:missing-model-validate");
 

@@ -47,7 +47,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             isNavigator: true,
 			tagName: "nav",
 			className: "navbar navbar-default",
-			template: "<div class='container-fluid'></div><div class='navbar-header'><a href='#' class='navbar-brand'>{{label}}</a></div><div class='collapse navbar-collapse ux_navbar_menu'></div></div>",
+			template: "<div class='container-fluid'></div><div class='navbar-header'><span data-navigate='views:home' title='{{comment}}' class='clickable navbar-brand'>{{label}}</span></div><div class='collapse navbar-collapse ux_navbar_menu'></div></div>",
 			searchTemplate: "<div class='navbar-search pull-right'><input id='search-query' class='search-query' type='text' placeholder='search' size='8'/></div>",
             events: {
                 'click [data-navigate]': 'doNavigate'

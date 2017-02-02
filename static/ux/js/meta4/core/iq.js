@@ -105,7 +105,7 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
                     }
                 }
             });
-console.log("IQ aware: %o %o", vents, iqFn);
+//console.log("IQ aware: %o %o", vents, iqFn);
 			return vents;
 		},
 

@@ -2,7 +2,7 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
 
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
     core.ux.ViewRegistry = Backbone.Model.extend({
-        debug: true,
+        debug: false,
         navigator: false,
 
         /**
@@ -160,7 +160,8 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
      */
 
     core.ux.WidgetRegistry = Backbone.Collection.extend({
-        idAttribute: core.ux.idAttribute, debug: true,
+        idAttribute: core.ux.idAttribute,
+        debug: false,
 
         /**
          * Catch duplicates
@@ -181,11 +182,11 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
 
         requires: function(widgetTypes, cb) {
             var self = this;
-            console.log("Requires widgets: %o", widgetTypes);
+            self.debug && console.log("Requires widgets: %o", widgetTypes);
 
             // uses require.js to load Widgets and cache meta-data,
             require(widgetTypes, function() {
-                console.log("Loaded widgets: %o", arguments);
+               self.debug && console.log("Loaded widgets: %o", arguments);
 
                 _.each(arguments, function(widget, i) {
 

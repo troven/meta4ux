@@ -21,7 +21,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
 		var ListItem = Backbone.Marionette.ItemView.extend({
 			tagName: "li", className: "list-group-item clickable",
-			template: options.child.template || "<a href='' title='{{"+options.child[ux.commentAttribute]+"}}'>{{"+options.child[ux.labelAttribute]+"}}</a>",
+			template: options.child.template || "<a href='#{{id}}' title='{{comment}}'>{{label}}</a>",
 
 			isSelectable: true, isDroppable: false,
 			isHoverPanel: false, isTemplating: true, isPopOver: false,
@@ -60,7 +60,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
                 return _childViewOptions;
 			},
 			initialize: function(_options) {
-//				ux.initialize(this, _options);
+				ux.initialize(this, _options);
 				this.childView.template = _options.child && _options.child.template;
 				if (_options.empty) {
 					this.emptyView = EmptyView;

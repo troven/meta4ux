@@ -13,6 +13,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             if (!module) throw new Error("meta4:ux:boot:oops:missing-module");
 
             var self = this;
+            var _DEBUG = options.debug || false;
 
             core.oops = new Oops(options.errors);
 
@@ -30,7 +31,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
                 Handlebars.registerHelper(name,fn);
             });
 
-            console.log("UX: boot: %o", options.views);
+            _DEBUG && console.log("UX: boot: %o", options.views);
 
             // discover used widgets
             var widgetTypes = module.views.register(options.views);

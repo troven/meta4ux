@@ -9,7 +9,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var config = {
 			isNested: true, isNavigator: true, isTemplating: true,
-	 		template: options.template,
+	 		template: options.template, isHome: true,
 		 	regions: { header: ".home-regions>.home-header" , body: ".home-regions>.main>.home-body", footer: ".home-regions>.home-footer" },
 		 	events: {
 		 		"click [data-navigate]": "doNavigate"
@@ -17,29 +17,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 			initialize: function(_options) {
                 var self = this;
-                self.$root= $( _options.el || "body");
-                self.$root.empty();
+                _options.$el = $("body").empty();
+
 				_options.views.body = _options.views.body || _options.views.home;
 
                 ux.initialize(this, _options);
-
-                // TODO: this needs to refactored - so it capture events from nested menus
-//                 var appRoutes = _.map(_options.views, function(v,k) {
-// console.log("ROUTE: %o -> %o", v, k);
-//                     self.navigateTo(k, {}, module);
-//                 });
-//                 console.log("@home: %o %o", this, appRoutes);
-//
-//                 this.router = new M.AppRouter({  });
-//                 this.router.onRoute = function(name, path, args) {
-//                     console.log("On Route: %s %s -> %o", name, path, args);
-//                     throw "new-route";
-//                 };
-
-                module.on("navigate", function(go_to) {
-                    console.log("HOME navigate: %o -> %o", this, go_to);
-                    Backbone.history.navigate(go_to);
-                });
 
                 module.on("error", function(evt) {
                     console.log("HOME ERROR: %o -> %o", this, evt);
@@ -49,10 +31,13 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				return this;
 			},
 
+            onBeforeRender: function() {
+			    this.$el.empty();
+                console.log("Home Widget: %o @ %o", this, this.$el);
+            },
 			onShow: function() {
 				var self = this
 DEBUG && console.log("onShow: %o %o", this, this.body);
-                self.$root.append(self.$el);
 
 //				this.on("navigate", self.onNavigate);
 //				if (!this.body.currentView) {
@@ -71,7 +56,7 @@ DEBUG && console.log("onShow: %o %o", this, this.body);
 				this.header && this.header.currentView && this.header.currentView.triggerMethod("breadcrumb:home", go_to, view)
 			},
 
-			onNavigate: function(go_to) {
+			x_onNavigate: function(go_to) {
                 console.log("onNavigate: %o", this);
 				var view = this.navigateTo(go_to);
 //DEBUG &&

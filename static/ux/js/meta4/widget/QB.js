@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
 	var DEBUG = true
 
-	ux.view.QB = ux.view["meta4:ux:QB"] = function(options) {
+	ux.view.QB = ux.view["meta4:ux:QB"] = function(options, navigator) {
         return Backbone.Marionette.ItemView.extend({
             tagName: "li", template: false,
 			initialize: function(_options) {
@@ -25,7 +25,7 @@ DEBUG && console.log("Render QB Dash (%s): %o %o", config.id, this, config)
                 var lookUps = {}
                 _.each(config.lookups, function(v,k) {
                 	if (_.isString(v)) {
-                		var labels = ux.fact.models.get(v);
+                		var labels = navigator.models.get(v);
                 		var lookup = {}
                 		labels.each(function(label) {
                 			lookup[label.id] = label.get("label")
@@ -33,7 +33,7 @@ DEBUG && console.log("Render QB Dash (%s): %o %o", config.id, this, config)
                 		lookUps[k] = lookup
 DEBUG && console.log("QB Lookup (%s): %o %o", k, labels, lookup)
                 	} else if (_.isObject(v)) {
-                		var labels = ux.fact.models.get(v.collection);
+                		var labels = navigator.models.get(v.collection);
                 		var lookup = {}
 						var template = ux.compileTemplate(v.template)
                 		labels.each(function(label) {

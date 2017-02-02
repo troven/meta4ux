@@ -58,6 +58,7 @@ define(["underscore", "core", "meta4/model/validators"], function ( _, core, val
         attribute: function(fieldId, value, attributes, validators) {
             if (!validators) return false;
             var error = false;
+            value = value || "";
 // DEBUG && console.debug("validateAttribute(%s:=%s) %o", fieldId, value, validators)
             _.each(validators, function(validate) {
 

@@ -43,7 +43,7 @@ define(["underscore"], function (_) {
         },
         "date": {
             message: "Invalid date (dd/mm/yyyy)",
-            pattern: /^([0-1][0-9]|[2][0-3]):([0-5][0-9])$/
+            pattern: /^\d{1,2}\/\d{1,2}\/\d{4}$/
         },
         "time": {
             message: "Invalid time (hh:mm)",

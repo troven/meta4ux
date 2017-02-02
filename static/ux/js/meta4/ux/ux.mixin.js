@@ -475,14 +475,18 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
         attachExplicitActions: function() {
             var self = this;
             var $actions = $("[data-action]", this.$el);
-            console.log("attachExplicitActions(%s) %o -> %o", this.id, this, $actions);
             $actions.unbind("click");
 
             $actions.click(function() {
                 var $this = $(this);
                 var event = $this.data();
-                console.log("click action: %o %o", event, self);
-                self.triggerMethod(event.action);
+
+                var model = self.model;
+                var meta = { model: model , collection: self.collection };
+
+                console.log("click action: %o %o -> ", event, self, meta);
+                self.triggerMethod(event.action, meta);
+                self.triggerMethod( "action", event.action, meta );
             });
         },
 
@@ -492,11 +496,11 @@ DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
                 console.log("no-select-action: %o -> %o", this, model);
                 return;
             }
-            console.log("doSelectAction: %o -> %o", this, arguments);
+            console.log("doSelectAction: %s ->  %o -> %o", action, this, arguments);
 			var model = this.collection?this.collection.get(action): this.model;
 			var meta = { model: model , collection: this.collection };
 
-            this.triggerMethod( "action:"+action, meta );
+//            this.triggerMethod( action, meta );
 			this.triggerMethod( "action", action, meta );
 console.log("ACTION:%s -> %o %o", action, this, meta );
 
@@ -522,24 +526,27 @@ console.log("ACTION:%s -> %o %o", action, this, meta );
             });
 		},
 
-// 		doNavigate: function(e) {
-// 			var go_to = this.model.id;
-//             if (!go_to) {
-//                 var $this = $(e.currentTarget);
-//                 go_to = $this.attr("data-navigate") || $this.attr("data-trigger");
-//                 console.warn("doNavigate Event (%s): %o --> %o", go_to, this, arguments);
-//             }
-// 			if (!go_to) throw "meta4:ux:mixin:oops:missing-navigate";
-//
-// 			this.triggerMethod("navigate", go_to);
-// //			e.stopImmediatePropagation();
-// 		},
-		onNavigate: function(model) {
-			if (! model || !this.getNestedView) return;
+		doNavigate: function(e) {
+			var go_to = this.model.id;
+            if (!go_to) {
+                var $this = $(e.currentTarget);
+                go_to = $this.attr("data-navigate") || $this.attr("data-trigger");
+                console.warn("doNavigate Event (%s): %o --> %o", go_to, this, arguments);
+            }
+			if (!go_to) throw "meta4:ux:mixin:oops:missing-navigate";
 
-			var go_to = model.get("view") || model.id;
-			this.navigateTo(go_to);
+            this.navigator.trigger(go_to);
 		},
+
+		onNavigate: function(go_to, model) {
+            if (_.isString(go_to)) {
+                this.navigateTo(go_to);
+            } else {
+                go_to = model.get("view") || model.id;
+                this.navigateTo(go_to);
+            }
+		},
+
 		navigateTo: function(go_to, meta, navigator) {
 			var viewId = false, eventId = false;
 console.log("navigateTo (%s): %o", go_to, this);
@@ -578,7 +585,7 @@ console.log("navigateTo (%s): %o", go_to, this);
 				t = t || options.template || this.template || false;
 				if (!t || _.isFunction(t)) return t;
 //console.log("UX getTemplate() %o %o %o ", this, options, t);
-				var template = self.navigator.templates[t] || ux.compileTemplate(t)
+				var template = (self.navigator?self.navigator.templates[t]:false) || ux.compileTemplate(t)
 				return template;
 			}
 		}
@@ -606,36 +613,29 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             }
 
             if (self.regions) {
-                console.warn("nested-regions: %s -> %o", self.id, self);
                 _.each(self.regions, function(ignore, region) {
                     var view = self._views[region];
                     if (view) self.__showNested( self, view, region, meta );
-                    else console.warn("Missing %s for view %s", region, self.id);
+                    else console.warn("Missing %s for view %o", region, self);
                 })
             }
 		},
 
 		__showNested: function(self, v, k, meta) {
-//_DEBUG && console.log("__showNested (%s): %s", this.options.id, k)
 		    var _DEBUG = self.options.debug || DEBUG;
-			if (v.el) {
-//_DEBUG &&
-console.log("Nested DOM: (%s @ %s) %o %o %o", k, v.el, v, self, subview)
-                var subview = self.getNestedView(v, meta);
-                if (subview) {
-//                    self.listenTo(subview);
-                    subview.render();
-//                        .$el.appendTo( $(v.el) )
-                }
+            var subview = self.getNestedView(v, meta);
+            if(!subview) throw new Error("meta4:ux:mixin:oops:missing-view#"+view_id);
+
+            if (subview.isHome) {
+                console.warn("nested-home: %s -> %o", self.id, subview);
+                this.showNestedHome(subview);
+            } else if (v.el) {
+                console.warn("nested-dom: %s -> %o", self.id, subview);
+                subview.render();
 			} else if (self[k] && self[k].show && self.regions[k]) {
-				var subview = self.getNestedView(v, meta);
-				if (subview) {
-//_DEBUG &&
-console.log("Show Nested (%s): %o %o %o", k, v, self, subview)
-//					self.listenTo(subview);
-					self[k].show(subview);
-				}
-			}
+                console.warn("nested-view: %o -> %o @ %s", self, subview, k);
+                self[k].show(subview);
+			} else throw new Error("meta4:ux:mixin:oops:invalid-view#"+k);
 		},
 
 		// nested view[]{} hierarchy and return a k/v of widgets
@@ -663,16 +663,30 @@ console.log("resolve view: %s -> %o --> %o", key, view, _view);
             return _views;
         },
 
+        showNestedHome: function(view) {
+            if(!view) throw new Error("meta4:ux:mixin:oops:missing-view#"+view_id);
+
+            if (view.isHome) {
+                view.render();
+                this.$el.empty().append(view.$el);
+                console.log("nested home (%s): %o -> %o", this.id, this.$el, view);
+                view.trigger("show");
+            }
+        },
+
         showNested: function(view_id, meta, navigator) {
             var view = this.getNestedView(view_id, meta, navigator);
             if(!view) throw new Error("meta4:ux:mixin:oops:missing-view#"+view_id);
-            if (this.body) {
+            if (view.isHome) {
+                this.showNestedHome(view);
+            } else if (this.body) {
                 this.body.show(view);
-                console.log("show nested: %o -> %o", this, view);
+                console.log("show nested (%s): %o -> %o", this.id, this, view);
             } else {
                 var $el = view.render().$el;
                 this.$el.replaceWith($el);
-                console.log("show ne$ted: %o -> %o", this.$el, view);
+                console.log("render nested (%s): %o -> %o", this.id, this.$el, view);
+                view.trigger("show");
             }
             return view;
         },
@@ -682,6 +696,7 @@ console.log("resolve view: %s -> %o --> %o", key, view, _view);
             var self = this, widget = false;
             meta = meta || {};
             navigator = navigator || this.navigator;
+            var _DEBUG = conf.debug || false;
 
             // assume model is over-ridden unless explictly false
             if (meta.model===false) {
@@ -707,7 +722,7 @@ console.log("resolve view: %s -> %o --> %o", key, view, _view);
                 // try to resolve locally then globally
                 var view_id = conf;
                 conf = this._views[view_id] || navigator.views.get(view_id);
-                console.log("view: %s -> %o ->%o", view_id, conf, navigator.views);
+                _DEBUG && console.log("nested-view: %s -> %o ->%o", view_id, conf, navigator.views);
                 if (!conf) {
                     console.warn("Missing nested view: %s", view_id);
                     return false;
@@ -718,7 +733,7 @@ console.log("resolve view: %s -> %o --> %o", key, view, _view);
 
             if (_.isObject(conf)) {
                 meta = _.extend({}, conf, meta);
-                console.log("widget: %o -> %o", meta);
+                _DEBUG && console.log("widget: %o -> %o", meta);
                 if (!meta.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
                 widget = navigator.views.view(meta.id, meta, navigator);
 		    } else throw new core.oops.Error("meta4:ux:mixin:oops:invalid-view-def", conf);
