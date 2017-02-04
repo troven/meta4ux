@@ -51,8 +51,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             validators = validators.concat( model_validators );
             validators = validators.concat( this.validators );
 
-            //DEBUG &&
-            console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
+            DEBUG && console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
 
             _.each(validators, function(validator) {
                 var validate = ux.view.validators[validator]
@@ -83,19 +82,20 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
         }
 
         var setModelField = function($field, model) {
-            $field = $field || this.$el
-            model = model || this.model
-// console.warn("$field: %o", $field)
-            var fieldId = $field.attr("data-id") || $field.attr("name")
+            $field = $field || this.$el;
+            model = model || this.model;
+            var fieldId = $field.attr("data-id") || $field.attr("name");
             if (!fieldId) {
 // console.warn("anonModelField: %o", $field)
                 return
             }
 
-            var value = $field.val();
-            var invalid = this.validate?this.validate(value, model):{}
+            var value = this.getDefault( $field.val() );
+            var invalid = this.validate?this.validate(value, model):{};
+console.warn("$et %o field = %o ==> %o / %o", fieldId, value, this, invalid);
+
             if (!invalid || !invalid.message) {
-                model.set(fieldId, value )
+                model.set(fieldId, value );
                 DEBUG && console.log("updatedField(%s): %o %o", fieldId, value, model)
             }
         }
@@ -150,6 +150,11 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             commit: commitField,
             initialize: function(options) {
                 ux.initialize(this, options);
+            },
+            getDefault: function(value) {
+                if (!_.isUndefined(value)) return value;
+                console.log("getDefault: %o --> %o or %o", this, value, this.options.default);
+                return this.options.default || "";
             },
             onInvalid: function(invalid) {
                 this.model.set("message", invalid.message);
@@ -258,7 +263,6 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             validators: ["date"],
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             initialize: function(options) {
-console.log("Date Field: %o -> %o", this, options);
                 var fieldId = this.model.get("id");
                 var date = new Date();
                 var day = date.getDate();
@@ -267,6 +271,7 @@ console.log("Date Field: %o -> %o", this, options);
 
                 var today = day+"/"+(1+monthIndex)+"/"+year;
                 this.options.formModel.set(fieldId, today);
+                console.log("Date Field: %o -> %o == %o", this, fieldId, today);
             }
         })
 

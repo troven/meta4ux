@@ -3,7 +3,7 @@ define(["underscore"], function (_) {
     return {
         "required": {
             message: "required",
-            fn: function(v) { return v===false||v?true:false }
+            fn: function(v) { return v===false||v===0||v?true:false }
         },
         "email": {
             message: "invalid email address",

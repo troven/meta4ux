@@ -101,8 +101,11 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
 
             onAction: function(action, meta) {
                 DEBUG && console.log("CRUD onAction (%s): %o", action, meta)
-                var can = this.can || this.options.can || {}
-                if (!can[action]===false) throw new Error("meta4:ux:crud:oops:cannot-"+action);
+                var can = this.can || this.options.can || {};
+                if (can[action]===false) {
+                    console.log("CRUD %s denied: %o -> %o", action, this, meta);
+                    throw new Error("meta4:ux:crud:oops:cannot-"+action);
+                }
                 this.triggerMethod(action, meta);
             },
 
@@ -112,7 +115,14 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
 
             onSave: function(meta) {
                 var self = this;
-                model = meta.model || self.body.currentView.model;
+                var form = self.body.currentView;
+
+                if (form.validate) {
+                    var validated = form.validate();
+                    console.log("CRUD Form validated: %o %o", form, validated);
+                }
+
+                model = meta.model || form.model;
                 if (!model) throw "Missing model for view: "+self.id;
                 console.log("CRUD onSave: %o %o", this, model);
 

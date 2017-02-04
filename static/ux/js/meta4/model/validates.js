@@ -24,26 +24,29 @@ define(["underscore", "core", "meta4/model/validators"], function ( _, core, val
 
             _.each(schema, function(meta,k) {
                 var v = attributes[k];
-                console.log("Validate? %s == %s: %o -> %o", k, v, meta, _validators)
+                var error = false;
+
                 if (meta) {
                     // ubiquitous, so add some syntax sugar
                     if (meta.required) {
-                        var error = self.attribute(k, v, attributes, [_validators.required] );
-                        error && errors.push(error);
+                        error = self.attribute(k, v, attributes, [_validators.required] );
                     }
 
                     // field-specific validation
-                    var error = self.attribute(k, v, attributes, meta.validators );
-                    error && errors.push(error);
+                    if (!error) {
+                        error = self.attribute(k, v, attributes, meta.validators);
+                    }
 
                     // generic field-type validation
-                    var type = meta[core.fact.typeAttribute];
-                    if (type) {
-                        var validate = _validators[type.toLowerCase()];
-//console.log("Validate Type: %o %o %o / %o %o", k, v, type, validators, meta.validators)
-                        var error = self.attribute(k, v, attributes, [ validate ] );
-                        error && errors.push(error);
+                    if (!error) {
+                        var type = meta[core.fact.typeAttribute];
+                        if (type) {
+                            var validate = _validators[type.toLowerCase()];
+                            error = self.attribute(k, v, attributes, [ validate ] );
+                        }
                     }
+                    console.log("Validate? %s == %s: %o -> %o --->", k, v, meta, _validators, !error);
+                    error && errors.push(error);
                 }
             })
 
@@ -53,6 +56,7 @@ define(["underscore", "core", "meta4/model/validators"], function ( _, core, val
                 model.trigger && model.trigger("invalid", errors);
                 return errors;
             }
+            return false;
         },
 
         attribute: function(fieldId, value, attributes, validators) {

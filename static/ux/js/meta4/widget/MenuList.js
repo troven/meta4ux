@@ -39,6 +39,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                     view.$el.addClass("active");
                 }
             },
+            childViewOptions: function(model, index) {
+                return _.extend({ model: model }, this.options.child);
+            },
             initialize: function(_options) {
                 ux.initialize(this, _options);
             }

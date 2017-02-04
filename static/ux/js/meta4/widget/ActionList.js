@@ -9,7 +9,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	var DEBUG = true; // && ux.DEBUG;
 
 	ux.view.ActionList = ux.view["meta4:ux:ActionList"] = function(options, navigator) {
-		_.defaults(options, { child: {} })
+		_.defaults(options, { child: {}, views: {} })
 
 
         var EmptyView  = Backbone.Marionette.ItemView.extend({
@@ -55,9 +55,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
                 }
             },
 			childViewOptions: function(model, index) {
-				var _childViewOptions = _.extend({ model: model }, this.options.child);
-//console.log("_childViewOptions: %o", _childViewOptions);
-                return _childViewOptions;
+				return _.extend({ model: model }, this.options.child);
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options);

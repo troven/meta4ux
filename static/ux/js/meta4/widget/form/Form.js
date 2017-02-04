@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
-    function ($, _, Backbone, Marionette, core, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/model/validates" ],
+    function ($, _, Backbone, Marionette, core, ux, validate) {
 
 	ux.view.Form = ux.view["meta4:ux:Form"] = function(options) {
 
@@ -24,7 +24,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 
 				this.collection = new Backbone.Collection() // Collection of Fields
 
-                console.debug("Form Editors: %o", _.keys(ux.view.fields) );
+                console.debug("Form Editors: %o -> %o", this, _.keys(ux.view.fields) );
 
                 var schema =   _options.schema || _options.views || {}
                 var col_schema = this.model&&this.model.collection?this.model.collection.schema:false
@@ -32,21 +32,24 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux" ],
 				this._buildSchemaCollection( schema, col_schema );
                 console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
 
+                this.model.on("all", function() {
+                    alert("change");
+                });
                 this.model.on("invalid", function() {
-                    self.triggerMethod("invalid");
                     alert("invalid");
-
-
+                    self.triggerMethod("invalid");
                 })
 
 				return this;
 			},
 
-            validate: function(ctx) {
-                var schema = this.options.schema || this.model.schema;
-                var is_valid = core.fact.validate.model(this.model.toJSON(), { schema: schema });
-console.debug("Validate Form: %o %o -> %o == %s", this.model, ctx, schema, is_valid)
-                return is_valid;
+            validate: function() {
+                var errors = [];
+                _.each(this.children._views, function(field, fieldId) {
+                    var error = field.validate?field.validate():false;
+                    if (error) errors.push(error);
+                })
+                return errors;
             },
 
 			_buildSchemaCollection: function(schema, col_schema) {
@@ -54,8 +57,9 @@ console.debug("Validate Form: %o %o -> %o == %s", this.model, ctx, schema, is_va
 				col_schema = col_schema&&col_schema.toJSON()?col_schema.toJSON():[]
 
 				var isEditable = this.options.editable===false?false:true
-				var merged = {}
+				var merged = {};
 
+				// view schema
 				_.each(schema, function(field,id) {
 					if (_.isString(field)) field = { editor: field }
 					field.id = field.id || id
@@ -64,6 +68,7 @@ console.debug("Validate Form: %o %o -> %o == %s", this.model, ctx, schema, is_va
 DEBUG&&console.debug("View Schema: %s %o", id, field)
 				})
 
+                // model schema
 				_.each(col_schema, function(field,id) {
 					field.id = field.id || id
 					if (field.id && merged[field.id]) {
@@ -71,6 +76,8 @@ DEBUG&&console.debug("View Schema: %s %o", id, field)
 DEBUG && console.debug("Merge Schema: %s %o", field.id, field)
 					}
 				})
+
+                // set defaults for merged schema
 
 				_.each(merged, function(field, id) {
 //console.debug("Field Schema: %s %o", id, field, field.editable)
@@ -110,15 +117,16 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
 
             getChildView: function(field) {
                 var editorType = field.get(ux.editorAttribute) || field.get(ux.typeAttribute);
-                var Field = ux.view.fields[editorType]
+                var Field = ux.view.fields[editorType];
                 if (!Field) {
-	                Field = ux.view[editorType]
-	                Field = Field && ux.view.fields.ViewField( Field )
+                    Field = ux.view[editorType];
+                    Field = Field && ux.view.fields.ViewField( Field );
                 }
+                if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
+
 //DEBUG &&
-console.log("getChildView: %s %o -> %o @ %o", editorType, field, ux.view.fields, Field)
-if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
-                return Field
+                console.log("getChildView: %s %o -> %o", editorType, field, Field);
+                return Field;
             },
 
             onRender: function() {
@@ -127,11 +135,15 @@ if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
             },
 
             doBlurFieldEvent: function(e) {
-//DEBUG &&
-console.log("doBlurFieldEvent: %o %o", this, e);
+                var autoCommit = this.options.autoCommit?true:false;
                 this.triggerMethod("blur");
-                if (!this.options.autoCommit) return this;
-                this._commitField($(e.currentTarget));
+
+                if (autoCommit) {
+                    this._commitField($(e.currentTarget));
+                }
+
+                var errors = this.validate();
+                console.log("doBlurFieldEvent: %o -> %o", this, errors);
                 return this;
             },
 
