@@ -80,15 +80,22 @@ _DEBUG && console.debug("View Model (%s): %o %o", modelled.id, _options, modelle
 
 				// nested-collection
 				if (options.collection.indexOf(".")==0) {
-					var cid = options.collection.substring(1);
+                    _DEBUG = true;
+                    var cid = options.collection.substring(1);
 					_collection = modelled.model.get(cid);
 					if (!_collection) {
-						_collection = new Backbone.Collection()
+						_collection = new Backbone.Collection.extend( {
+                            url: function() {
+                                console.warn("Save Local Collection (%s): %o", options.collection, this);
+                                return true;
+                            }
+                        });
 _DEBUG && console.log("New Local Collection (%s): %o %o %o", cid, options, modelled, _collection);
 						modelled.model.set(cid, _collection);
 					} else {
 _DEBUG && console.log("Existing Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
 					}
+                    return { model: modelled.model };
 				} else if (options.collection.indexOf("!")==0) {
 				    // global-collection
 					var cid = options.collection.substring(1);
@@ -126,7 +133,7 @@ console.log("Register Collection: %s -> %o / %o", options.collection.id, options
             } else if (_.isObject(options.collection) ) {
                 options.collection.id = options.id+"_collection";
                 console.log("Dynamic Collection: %s -> %o / %o", options.collection.id, options.collection);
-                modelled.collection = fact.Collection(options);
+                modelled.collection = this.fact.Collection(options);
 			} else if (_.isFunction(options.collection)) {
 _DEBUG && console.log("Function Collection", options.collection, this.fact)
 				modelled.collection = options.collection(options);

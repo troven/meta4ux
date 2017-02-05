@@ -25,7 +25,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
 			isSelectable: true, isDroppable: false,
 			isHoverPanel: false, isTemplating: true, isPopOver: false,
-			isActionable: true, isActionMenu: true, isNavigator: false,
+			isActionable: false, isActionMenu: false, isNavigator: false,
 			events: {
 				"click": "doEventSelect",
 				"dblClick": "doEventSelect",
@@ -37,7 +37,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
 		var definition = {
 			isSortable: false, isCommon: true, isActionable: true, isNested: true,
-            isPopOver: false, isSelectable: true, isHoverPanel: false,
+            isPopOver: false, isSelectable: false, isHoverPanel: false,
 			childView: ListItem, tagName: "ul",
 			className: "list-group",
 			sortable: {

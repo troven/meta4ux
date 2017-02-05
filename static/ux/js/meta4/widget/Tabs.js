@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-    ux.view.Tabs = ux.view["meta4:ux:Tabs"] = function(options) {
+    ux.view.Tabs = ux.view["meta4:ux:Tabs"] = function(options, navigator) {
 
 		var DEBUG = options.debug || ux.DEBUG;
 
@@ -39,26 +39,31 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	 		template: options.template,
 		 	regions: { tabs: ".tabs-header" , body: ".tab-content" },
 			initialize: function(_options) {
-			    var self = this
 
-				ux.initialize(this, _options)
+                _options = _.extend({ views: {}, tabs: {} }, _options)
+
+				ux.initialize(this, _options, navigator);
 				this._collection = this.collection;
-
-	        	this._views = this._resolveNested(options.tabs || options.views)
-
-				this.currentTab = _options.firstTab || _options.currentTab || _options.currentView || _options.view || _options.tabs[0];
-DEBUG && console.log("Init Tabs (%o) %o", this, _options);
-
-			    this.collection = this.collection || new Backbone.Collection();
-			    _.each(this._views, function(tab, id) {
-			        self.currentTab = self.currentTab || id;
-                    var conf = { id: _options.id+"_"+id, label: tab.title || tab.label || id, comment: tab.comment || "", goto: id }
-                    self.collection.add( conf );
-			    })
-DEBUG && console.log("Initialzed Tabs (%s): %o", this.currentTab, this);
 
 				return this;
 			},
+            onBeforeRender: function() {
+                var self = this;
+                var _options = this.options;
+
+                this._views = this._resolveNested(_options.tabs || _options.views);
+                this.currentTab = _options.firstTab || _options.currentTab || _options.currentView || _options.view || _options.tabs[0];
+                DEBUG && console.log("Init Tabs (%o) %o", this, _options);
+
+                this.collection = this.collection || new Backbone.Collection();
+                _.each(this._views, function(tab, id) {
+                    self.currentTab = self.currentTab || id;
+                    var conf = { id: _options.id+"_"+id, label: tab.title || tab.label || id, comment: tab.comment || "", goto: id }
+                    self.collection.add( conf );
+                })
+                DEBUG && console.log("Initialzed Tabs (%s): %o", this.currentTab, this);
+
+            },
 			onShow: function() {
 			    var self = this
 DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)

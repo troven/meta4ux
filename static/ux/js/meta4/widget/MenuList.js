@@ -33,7 +33,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                     this.$el.find(".active").removeClass("active");
 
                     this.selected = this.select(model, event);
-                    console.log("MenuList: selected: %o -> %o   qa", view, this.selected);
+//                    console.log("MenuList: selected: %o -> %o   qa", view, this.selected);
                     // bubble navigate to MenuList parent
                     this.triggerMethod("select", this.selected);
                     view.$el.addClass("active");

@@ -1,6 +1,4 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux",
-    "backgrid"
-], function ($,_, Backbone, Marionette, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "ux", "backgrid"], function ($,_, Backbone, Marionette, ux) {
 
     var idAttribute = ux.idAttribute || "id";
     var typeAttribute = ux.typeAttribute || "widget";
@@ -8,12 +6,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 
     var Grid = function(options) {
         options = ux.checkOptions(options, ["id", "label", "collection"]);
-        options = _.extend({DEBUG: true, paging: false, selectable: false}, options);
+        options = _.extend({debug: true, paging: false, selectable: false}, options);
 
 //		if (options.columns instanceof Array) options.columns = new Backbone.Collection(options.columns);
 //		if (!(options.columns instanceof Backbone.Collection)) throw "meta4:ux:oops:invalid-column-collection";
 
-        var DEBUG = true // options.DEBUG && ux.DEBUG;
+        var DEBUG = true;//options.debug?true:false;
 
         var map2cell = {
             "boolean":	"boolean",
@@ -24,19 +22,28 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
             "datetime":	Backgrid.DatetimeCell,
             "date":		Backgrid.DateCell,
             "time":		Backgrid.TimeCell,
+            "select":	Backgrid.SelectCell,
+            "lookup":	Backgrid.SelectCell,
             "anyURI":	Backgrid.UriCell,
         }
-
+        // Backgrid.SelectCell.extend({
+        //     // It's possible to render an option group or use a
+        //     // function to provide option values too.
+        //     optionValues: [["Male", "m"], ["Female", "f"]]
+        // })
         // handle columns
         var Schema2Column = function(c,k) {
             var widget = (c.type ||  "string").toLowerCase();
-            var editor = c.editor || c.widget
+            var editor = c.editor || c.widget;
+
+            // _.isUndefined(c.sortable)?true:c.sortable?true:false
+
             var col = {
                 name:       c.id || c.name || k,
                 label:      c.label || c.id,
                 editable:   _.isUndefined(c.editable)?true:c.editable?true:false,
                 renderable: _.isUndefined(c.visible)?true:c.visible?true:false,
-                sortable:   _.isUndefined(c.sortable)?true:c.sortable?true:false,
+                sortable:   false,
                 editor: 	c.editor || editor,
                 cell:       c.cell || widget
             };
@@ -68,18 +75,18 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
         var Grid = Backgrid.Grid.extend( _.extend({
             className: "backgrid",
             footer: GridFooter,
-//			events: { "click": "doEventSelectRow" },
+			// events: { "click": "doEventSelectRow" },
             emptyText: "No "+options.label,
             initialize: function (options) {
                 var self = this;
 
                 ux.initialize(this, options);
 
-                DEBUG && console.debug("Init Grid: %o %o css: %o", this, options, this.className);
+                DEBUG && console.debug("[Grid] init: %o %o css: %o", this, options, this.className);
 
                 this.columns = _.map(options.columns || options.schema, Schema2Column);
                 // this.columns = new Backbone.Collection(_columns;
-                DEBUG && console.debug("Init Grid Columns: %o", this.columns );
+                DEBUG && console.debug("[Grid] columns: %o", this.columns );
 
                 if (options.selectable) {
                     this.columns.add({ name: "_selected_", cell: "select-row", headerCell: Backgrid.Extension.SelectAllHeaderCell });
@@ -89,17 +96,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
                 meta.columns = this.columns;
                 meta.collection = this.collection;
 
-//                this.row = Backgrid.Row.extend({
-//                    columns: this.columns,
-//                    events: { "click": "doEventSelectRow" },
-//                    initialize: function() {
-//DEBUG && console.log("Row Initialize: %o", this);
-//                    },
-//                    doEventSelectRow: function (that,x) {
-//DEBUG && console.log("Row Selected: %o %o %o", this, that, x);
-//                        ux.mixin.Common.doSelect.call(this, this.model);
-//                    }
-//                } );
+               this.row = Backgrid.Row.extend({
+                   columns: this.columns,
+                   events: { "click": "doEventSelectRow" },
+                   initialize: function() {
+DEBUG && console.log("[Grid] Row Initialize: %o", this);
+                   },
+                   doEventSelectRow: function (that,x) {
+DEBUG && console.log("[Grid] Row Selected: %o %o %o", this, that, x);
+//                       ux.mixin.Common.doSelect.call(this, this.model);
+                   }
+               } );
 
                 var Header = options.header || Backgrid.Header;
                 this.header = new Header(meta);
@@ -140,11 +147,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
             onRendered: function() {
                 this.$el.parent().addClass("backgrid-container");
                 this.$el.addClass("backgrid");
-                console.log("onRender: %o", this.$el);
+                console.log("[Grid] onRender: %o", this.$el);
             },
 
             doEventSelectRow: function (ui, event) {
-                //DEBUG &&
                 console.log("[Grid] Row Selected: %o %o", this, event );
             }
 

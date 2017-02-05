@@ -48,6 +48,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 			attachNavigateListeners: function(view) {
 				var self = this
+console.log("nested:navigate: %o", view);
 				view.on("nested:navigate", self.onNavigate);
 				return view;
 			},
@@ -56,7 +57,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				this.header && this.header.currentView && this.header.currentView.triggerMethod("breadcrumb:home", go_to, view)
 			},
 
-			x_onNavigate: function(go_to) {
+			onNavigate: function(go_to) {
                 console.log("onNavigate: %o", this);
 				var view = this.navigateTo(go_to);
 //DEBUG &&

@@ -32,9 +32,8 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 				this._buildSchemaCollection( schema, col_schema );
                 console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
 
-                this.model.on("all", function() {
-                    alert("change");
-                });
+                // this.model.on("all", function() {
+                // });
                 this.model.on("invalid", function() {
                     alert("invalid");
                     self.triggerMethod("invalid");

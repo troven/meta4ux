@@ -6,11 +6,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		var config = {
 			isTemplating: true, isActionable: true, isSelectable: true,
 			isNavigator: true, isHoverPanel: false, isNested: true,
-			isPopOver: false, isActionMenu: true,
+			isPopOver: false, isActionMenu: false,
 			template: options.template || "<div class='panel-title' data-action='{{id}}'>{{label}}</div>",
 			events: {
                 "click [data-navigate]": "doEventNavigate",
-				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doEventAction"
 			},
 			initialize: function(options) {
@@ -18,6 +17,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				ux.initialize(this, options)
 				this.template = (this.model&&this.model.get("template")) || options.template || this.template;
 			},
+            onRender: function() {
+			    this.attachedNestedViews();
+            },
             _renderTemplate: function() {
                 var template = this.getTemplate();
 

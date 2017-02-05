@@ -93,7 +93,7 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
             },
 
 			onRender: function() {
-                if (!this._views.body) {
+                if (this._views && !this._views.body) {
                     if (this._views.read) this.triggerMethod("read");
                     else if (this._views.update) this.triggerMethod("update");
                 }
@@ -143,8 +143,12 @@ console.log("CRUD onSaved: %o %o", this, arguments);
                 model.validate && model.validate();
                 if (model.isValid())  {
                     self.triggerMethod("valid");
-                    DEBUG && console.log("CRUD onSave: %o %o valid: %s", this, model, model.isValid())
-                    model.save();
+                    if (model.url) {
+                        DEBUG && console.log("CRUD onSave: %o %o valid: %s", this, model, model.isValid());
+                        model.save();
+                    } else {
+                        DEBUG && console.log("CRUD noSave: %o %o valid: %s", this, model, model.isValid());
+                    }
                     if (!this.modal) {
                         self.onRead();
                     }

@@ -44,9 +44,12 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             // });
 
             navigator.on("navigate", function (go_to) {
+console.log("navigator goto: %s", go_to);
                 if (!go_to || go_to == options.home || go_to == "home")  navigator.trigger("home");
+                // navigator.home.trigger("navigate", go_to);
                 else navigator.trigger(go_to);
             });
+
             // home view
             navigator.on("home", ShowHome(options, navigator));
             navigator.on("views:home", ShowHome(options, navigator));
