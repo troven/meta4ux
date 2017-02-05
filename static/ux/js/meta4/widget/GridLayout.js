@@ -12,7 +12,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	 		template: options.template,
             regions: { header: ".regions> .region-header" , body: ".regions> .region-body", footer: ".regions> .region-footer" },
 		 	events: {
-		 		"click [data-navigate]": "doNavigate"
+		 		"click [data-navigate]": ""
 		 	},
 			initialize: function(options) {
 				ux.initialize(this, options)

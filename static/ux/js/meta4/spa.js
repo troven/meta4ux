@@ -1,5 +1,21 @@
 define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oops", "meta4/ux/modals"], function (_, BB, M, meta4, ux, fact, iq, oops, Modals) {
 
+    var ShowHome = function (options, navigator) {
+        return function() {
+            if (navigator.home) {
+                console.log("RE-HOME: %o -> %o", navigator.home, arguments);
+                navigator.home.show();
+                return;
+            }
+            console.log("NEW-HOME: %o -> %o", (navigator.home?navigator.home:"1st home"), navigator);
+
+            navigator.home = navigator.Home(options.home, navigator);
+            navigator.home.triggerMethod("show");
+
+            Backbone.history.start();
+        }
+    }
+
     // lazy boot loader
     return function() {
 
@@ -28,30 +44,19 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             // });
 
             navigator.on("navigate", function (go_to) {
-                if (!go_to || go_to == options.home || go_to == "home" )  navigator.trigger("home");
+                if (!go_to || go_to == options.home || go_to == "home")  navigator.trigger("home");
                 else navigator.trigger(go_to);
             });
-
             // home view
-            navigator.on("home", function () {
-                if (navigator.home) {
-                    navigator.home.destroy();
-                }
-                navigator.home = navigator.Home(options.home, navigator);
-                navigator.home.triggerMethod("show");
-
-                console.log("HOME: %o -> %o", navigator.home, arguments);
-                Backbone.history.start();
-            });
+            navigator.on("home", ShowHome(options, navigator));
+            navigator.on("views:home", ShowHome(options, navigator));
 
             // logout view
             navigator.on("logout", function () {
                 window.location.reload();
             })
-
         });
 
         return SPA;
     }
-
 });

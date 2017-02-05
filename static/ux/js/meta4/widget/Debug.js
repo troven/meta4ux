@@ -15,7 +15,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			events: {
 			    "click [data-action]": "doAction",
                 "click [data-trigger]": "doAction",
-			    "click [data-navigate]": "doNavigate"
+			    "click [data-navigate]": ""
 			},
 			className: "ux_debug",
 			initialize: function(options) {

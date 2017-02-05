@@ -13,7 +13,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	 		className: "ux-Columns",
             Columns: { header: ".Columns>.region-header" , body: ".Columns>.region-body", footer: ".Columns>.region-footer" },
 		 	events: {
-		 		"click [data-navigate]": "doNavigate"
+		 		"click [data-navigate]": ""
 		 	},
 			initialize: function(options) {
 				ux.initialize(this, options)

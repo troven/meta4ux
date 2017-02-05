@@ -5,10 +5,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var config = {
 			isTemplating: true, isActionable: true, isSelectable: true,
-			isNavigator: false, isHoverPanel: false, isNested: true,
+			isNavigator: true, isHoverPanel: false, isNested: true,
 			isPopOver: false, isActionMenu: true,
 			template: options.template || "<div class='panel-title' data-action='{{id}}'>{{label}}</div>",
 			events: {
+                "click [data-navigate]": "doEventNavigate",
 				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doEventAction"
 			},

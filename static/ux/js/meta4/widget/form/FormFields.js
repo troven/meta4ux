@@ -47,22 +47,23 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
             var model_validators = this.model.get("validators")
 
             // merge validation (schema/model, editor/widget)
-            var validators = []
+            var validators = [];
             validators = validators.concat( model_validators );
             validators = validators.concat( this.validators );
 
             DEBUG && console.log("validateField (%s) %o %o %o", fieldId, this.validators, model_validators, validators);
 
             _.each(validators, function(validator) {
-                var validate = ux.view.validators[validator]
+                var validate = ux.view.validators[validator];
 
-                if (_.isObject(validate)) {
+                if (value && _.isObject(validate)) {
                     var valid = true
                     var pattern = validate.pattern || validate.regexp
                     if (pattern) {
-                        var regexp = new RegExp(pattern)
+                        var regexp = new RegExp(pattern);
+//DEBUG &&
+console.log("is %o valid?: %s --> %s %s -> %o", fieldId, value, validator, pattern, valid)
                         valid = value.match(regexp)?true:false
-//DEBUG && console.log("valid rx: %s %s -> %o", validator, pattern, valid)
                     }
                     if (validate.fn && _.isFunction(validate.fn) ) {
                         valid = validate.fn(value, model.attributes, self.model.attributes)
@@ -90,9 +91,10 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2
                 return
             }
 
-            var value = this.getDefault( $field.val() );
+            var value = $field.val();
+            value = this.getDefault && this.getDefault( value );
             var invalid = this.validate?this.validate(value, model):{};
-console.warn("$et %o field = %o ==> %o / %o", fieldId, value, this, invalid);
+console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid, this.getDefault?"getDefault":"noDefault");
 
             if (!invalid || !invalid.message) {
                 model.set(fieldId, value );
@@ -325,13 +327,18 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
                 }
                 ux.initialize(this,options)
             },
+            getDefault: function(value) {
+                if (!_.isUndefined(value)) return value;
+                console.log("getDefaultSelect: %o --> %o or %o", this, value, this.options.default);
+                return this.options.default || "";
+            },
             commit: commitField,
             onRender: renderField,
             onShow: function() {
                 var $select = $("select",this.$el);
                 var self = this
 //DEBUG && console.log("onShow Select: %o %o", this, $select)
-                $select.select2(_.extend({ width: "element", minimumResultsForSearch: 6 }, this.options.select2))
+//                $select.select2(_.extend({ width: "element", minimumResultsForSearch: 6 }, this.options.select2))
                 $select.on("change", function() {
                     self.commit($select);
                 })

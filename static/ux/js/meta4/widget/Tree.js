@@ -1,5 +1,4 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux"
-], function ($, _, Backbone, Marionette, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _, Backbone, Marionette, ux) {
 
 // require("jquery-bridget/jquery.bridget")
 //    $.bridget( 'masonry', masonry );
@@ -14,12 +13,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"
 	ux.view.Tree = ux.view["meta4:ux:Tree"] = function(options) {
 console.log("Tree: %o", options)
 
-		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: true, isTemplating: true, isSortable: true,
+		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: false, isTemplating: true, isSortable: true,
 			events: {
 			  'click [data-id]': 'doEventSelect'
 			},
 			initialize: function(_options) {
-				_.extend(_options, { child: {} } )
+				_.extend(_options, { child: {} } );
 				ux.checkOptions(_options, [ "child"] );
 				ux.initialize(this, _options);
 			},
@@ -64,7 +63,7 @@ DEBUG && console.debug("getBranch options: %o %o", this, childOptions)
         "label": "Tree",
         "comment": "A hierarchical widget",
         "emits": ["action"],
-        "mixins": [ "isTemplating", "isSortable", "isHoverPanel" ],
+        "mixins": [ "isTemplating", "isSortable", "isHoverPanel", "isPopOver" ],
         "views": false,
         "collection": true,
         "options": true,
@@ -72,5 +71,4 @@ DEBUG && console.debug("getBranch options: %o %o", this, childOptions)
 
         "fn": ux.view.Tree
     }
-
- })
+});

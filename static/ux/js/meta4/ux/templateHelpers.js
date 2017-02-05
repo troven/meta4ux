@@ -5,18 +5,15 @@ define(["underscore", "Handlebars", "core", "md5"
 
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
     /*
-     Moustache template helper.
+     Handlebars template helper.
      */
 
     return {
-        now: function () {
-            return new Date();
-        },
         _: function (that) {
 //console.error("_: %o %o %o", this, that, this[that])
             return that ? core.ux.uid(that) : core.uuid();
         },
-        "raw": function (field) {
+        raw: function (field) {
             console.log("RAW: %o %o %o", this, field, this[field])
             return _.isUndefined(this[field]) ? field : this[field]
         },
@@ -34,6 +31,12 @@ define(["underscore", "Handlebars", "core", "md5"
         },
         i18n: function (that) {
             throw "i18n not implemented: " + that
+        },
+        today: function () {
+            return new Date();
+        },
+        now: function () {
+            return new Date().getTime();
         },
         gravatar: function (that) {
             return "http://www.gravatar.com/avatar/" + md5(that.trim().toLowerCase())

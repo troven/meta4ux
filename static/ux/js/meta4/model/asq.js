@@ -13,6 +13,8 @@ define(["underscore"], function (_) {
 	return {
 
 		compile: function(query) {
+            if (_.isFunction(query)) return;
+
 			var self = this
 			return function(data) {
 				return self.match(data, query)

@@ -8,9 +8,10 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "oops", "ux"
     return {
 
         Home: function(options, navigator) {
-            if (!options) throw new ux.oops.Arguments("meta4:ux:oops:missing-options");
-            if (!navigator) throw new ux.oops.Arguments("meta4:ux:oops:missing-navigator");
-            if (!navigator.views) throw new core.oops.Arguments("meta4:ux:oops:invalid-navigator");
+            if (!options) throw new ux.oops.Arguments("meta4:ux:home:oops:missing-options");
+            if (!navigator) throw new ux.oops.Arguments("meta4:ux:home:oops:missing-navigator");
+            if (!navigator.views) throw new core.oops.Arguments("meta4:ux:home:oops:invalid-navigator");
+//            if (!options.el) throw new core.oops.Arguments("meta4:ux:home:oops:missing-el");
 
             // Render an initial "Home" View
             if (_.isString(options)) options = navigator.views.get(options);
@@ -20,30 +21,21 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "oops", "ux"
             var id = options[ux.idAttribute];
             if (!id) {
                 _DEBUG && console.log("UX Widget (%s): %o", [ux.typeAttribute], options)
-                throw new Error("meta4:ux:oops:missing-home-id:"+ux.idAttribute);
+                throw new Error("meta4:ux:home:oops:missing-home-id:"+ux.idAttribute);
             }
 
             // make sure we have an el && a Widget
-            options = _.extend({ el: options.el || "body" }, options);
             options[ux.typeAttribute] = options[ux.typeAttribute] || "Home";
 
             // Render Home View - over-ride using 'home.type'
 
-            console.log("Home (%s): %o", id, navigator)
+            console.log("Home (%s): %o -> %o", id, options, navigator)
             var home = navigator.views.view(id, options, navigator);
-            if (!home) throw new Error("meta4:ux:oops:missing-home");
-
-            home.on("action", function(action) {
-                alert("action:"+action)
-            });
-
-            home.on("navigate", function(go_to) {
-                alert("navigate:"+go_to)
-            });
+            if (!home) throw new Error("meta4:ux:home:oops:missing-home");
 
             // render & show
             home.render();
-//        home.triggerMethod("show");
+            $("body").empty().append(home.$el);
 
             _DEBUG && console.log("UX Home (%s): %o", id, options);
             return home;

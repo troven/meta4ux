@@ -14,7 +14,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	 		className: "ux-regions",
             regions: { header: ".regions>.region-header" , body: ".regions>.region-body", footer: ".regions>.region-footer" },
 		 	events: {
-		 		"click [data-navigate]": "doNavigate"
+		 		"click [data-navigate]": ""
 		 	},
 			initialize: function(options) {
 DEBUG && console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);

@@ -198,6 +198,8 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 
  console.log("FILTER: %o -> %o", collection, query);
 			var fn = asq.compile(query);
+            if (!fn) throw "meta4:oops:fact:missing-filter-fn#"+query;
+
 			var filtered = fact.Collection([]);
 			filtered.filters = query;
 			filtered.options = collection.options;
@@ -206,9 +208,8 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 
 			var refresh = function() {
 			    var self = this;
-				var results = collection.filter(function(a) {
-                    console.log("filter?: %o -> %o", self, a)
-				    return fn(a.attributes)
+				var results = collection.filter(function(m) {
+				    return fn(m.attributes);
 				} );
                 console.log("RE-FILTER: %o -> %o", query, results)
 				filtered.reset(results);

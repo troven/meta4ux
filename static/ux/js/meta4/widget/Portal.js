@@ -20,7 +20,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doAction",
                 "click [data-trigger]": "doAction",
-				"click [data-navigate]": "doNavigate"
+				"click [data-navigate]": ""
 			},
 			initialize: function(options) {
 				_.defaults(options, { model: false, portletAttribute: widgetAttribute })

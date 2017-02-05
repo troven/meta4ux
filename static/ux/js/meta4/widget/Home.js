@@ -12,12 +12,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	 		template: options.template, isHome: true,
 		 	regions: { header: ".home-regions>.home-header" , body: ".home-regions>.main>.home-body", footer: ".home-regions>.home-footer" },
 		 	events: {
-		 		"click [data-navigate]": "doNavigate"
+		 		"click [data-navigate]": ""
 		 	},
 
 			initialize: function(_options) {
                 var self = this;
-                _options.$el = $("body").empty();
 
 				_options.views.body = _options.views.body || _options.views.home;
 
@@ -28,20 +27,21 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                     alert("Error:" +evt);
                 });
 
+                console.log("Home: init: %o --> %o", this, _options);
 				return this;
 			},
 
-            onBeforeRender: function() {
-			    this.$el.empty();
-                console.log("Home Widget: %o @ %o", this, this.$el);
+            show: function() {
+			    this.render();
+                this.showNestedRegions();
+                this.trigger("show");
             },
+
 			onShow: function() {
 				var self = this
-DEBUG && console.log("onShow: %o %o", this, this.body);
 
 //				this.on("navigate", self.onNavigate);
 //				if (!this.body.currentView) {
-//					this.showAllNested()
 //				}
 				this.attachNavigateListeners(this);
 			},

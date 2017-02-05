@@ -62,7 +62,7 @@ DEBUG && console.log("QB Template Lookup (%s): %o %o", k, labels, lookup)
 			events: {
 				"click [data-id]": "doEventSelect",
 				"click [data-action]": "doAction",
-				"click [data-navigate]": "doNavigate"
+				"click [data-navigate]": ""
 			},
 			className: "qb",
 			initialize: function(options) {
