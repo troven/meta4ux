@@ -98,7 +98,11 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
 //console.log("WHEN [%s] on %o THEN %s %o", key, vents, fnId, fn)
                         vents.on(key, function() {
 //console.log("WHEN %s on %o\nDO: %s -=> %s -> %o", key, this, fnId, fn);
-                            fn.apply(vents,arguments);
+                            try {
+                                fn.apply(vents,arguments);
+                            } catch(e) {
+                                console.error("IQ Error: on %s -> %o", fnId, e);
+                            }
                         })
                     } else {
                         throw new Error("meta4:iq:oops:missing-fn#"+fnId);

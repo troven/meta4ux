@@ -123,8 +123,7 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
                 }
                 if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
 
-//DEBUG &&
-                console.log("getChildView: %s %o -> %o", editorType, field, Field);
+DEBUG && console.log("getChildView: %s %o -> %o", editorType, field, Field);
                 return Field;
             },
 

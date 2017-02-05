@@ -34,7 +34,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 		var CRUDView = Backbone.Marionette.LayoutView.extend( _.extend({
 			isNested: true, isActionable: true, isHoverPanel: false,
             template: options.template,
-            className: "panel panel-default",
+            className: "meta4_crud",
             regions: { header: ".regions>.region_header" , body: ".regions>.region_body", footer: ".regions>.region_footer" },
             model: new Backbone.Model(options),
 

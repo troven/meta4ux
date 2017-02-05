@@ -13,12 +13,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 	ux.view.Tree = ux.view["meta4:ux:Tree"] = function(options) {
 console.log("Tree: %o", options)
 
-		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: false, isTemplating: true, isSortable: true,
+		var treeCommon = { isCommon: true, isHoverPanel: true, isPopOver: false, isTemplating: true, isSortable: true, isSelectable: true,
 			events: {
 			  'click [data-id]': 'doEventSelect'
 			},
+            childEvents: {
+                "select": function(x,y) {
+console.log("TreeChild: select: %o %o", this, arguments);
+                }
+            },
 			initialize: function(_options) {
-				_.extend(_options, { child: {} } );
+				_.extend(_options, { child: { branch: "children" } } );
 				ux.checkOptions(_options, [ "child"] );
 				ux.initialize(this, _options);
 			},
@@ -33,23 +38,24 @@ DEBUG && console.debug("getBranch (%s): %o %o %o %o",  _model.id, _model, this.o
 				return View
 			},
 			childViewOptions: function(_model) {
-				var options = this.options.child || {}
-				var branch = _model.get(options.branch)
+				var options = this.options.child || {};
+				var branch = _model.get(options.branch);
 			    var childOptions = _.extend({ model: _model, collection: branch, child: options }, options );
-DEBUG && console.debug("getBranch options: %o %o", this, childOptions)
-			    return childOptions
+DEBUG && console.debug("getBranch %s options: %o %o", options.branch, this, childOptions);
+			    return childOptions;
 			}
 		}
 
 		var TreeBranch = false
 		var treeBranch = _.extend({}, treeCommon, {
 			childViewContainer: "ul",
-			tagName: "li", className: "tree-branch", childView: TreeBranch,
+            template: "<div data-id='{{id}}'>{{label}}</div><ul/>",
+			tagName: "li", className: "tree-branch list-group-item", childView: TreeBranch,
 		})
 		TreeBranch = Backbone.Marionette.CompositeView.extend( treeBranch )
 
 		var treeRoot = _.extend({}, treeCommon, {
-			tagName: "ul", className: "tree-root", childView: TreeBranch,
+			tagName: "ul", className: "tree-root list-group", childView: TreeBranch,
 		})
 
 

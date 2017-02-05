@@ -248,11 +248,11 @@ console.debug("onDropped: %o %o %o %o %o", view, newIndex, view.model);
 
 	ux.mixin.Sortable = {
 		initializeSortable: function(options) {
-			var self = this
+			var self = this;
 //DEBUG && console.log("Init Sortable: %o %o", this, options)
-			this.collection && ux.mixin.attach("Sortable", ["sync"], this.collection, this, options)
-			ux.mixin.attach("Sortable", ["show"], this, this, options)
-			return this
+			this.collection && ux.mixin.attach("Sortable", ["sync"], this.collection, this, options);
+			ux.mixin.attach("Sortable", ["show"], this, this, options);
+			return this;
 		},
 		attachSortable: function(_options) {
 			if (!this.$el) return this;
@@ -270,23 +270,23 @@ console.debug("onDropped: %o %o %o %o %o", view, newIndex, view.model);
 				cursor: "auto"
 			}, _options)
 
-			if (!options.connectWith && !options.containment) options.containment = "parent"
+			if (!options.connectWith && !options.containment) options.containment = "parent";
 
-			var _DEBUG = DEBUG || options.debug
+			var _DEBUG = DEBUG || options.debug;
 
 			var $el = this.$el;
 _DEBUG && console.debug("Attach Sortable: %o %o %o", _options, options, $el)
 
 			var getItemModel = function(ui, collection) {
-				var id = ux.identity(ui.item)
+				var id = ux.identity(ui.item);
 				if (!id) throw "meta4:ux:sortable:oops:missing-drop-id";
-				return collection?collection.get(id):null
+				return collection?collection.get(id):null;
 			}
 
 			options.start = function(e,ui) {
-				ui.item.data("ux_collection", self.collection)
+				ui.item.data("ux_collection", self.collection);
 				var id = ux.identity(ui.item)
-console.log("start drag (%s): %o %o - %o %o %o", id, e, ui, this, self, ui.item.data())
+console.log("start drag (%s): %o %o - %o %o %o -> %o", id, e, ui, this, self, ui.item.data(), core);
 				if (!id) return;
 //				if (!id) throw "meta4:ux:sortable:oops:missing-drag-id";
 				var model = self.collection.get(id);
@@ -649,7 +649,8 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
                 DEBUG && console.warn("nested-dom: %s -> %o", self.id, subview);
                 subview.render();
 			} else if (self[k] && self[k].show && self.regions[k]) {
-                DEBUG && console.warn("nested-view: %s --> %o -> %o", k, self, subview);
+                //DEBUG &&
+                console.warn("nested-view: %s --> %o -> %o", k, self, subview);
                 self[k].show(subview);
 			} else throw new Error("meta4:ux:mixin:oops:invalid-view#"+k);
 		},

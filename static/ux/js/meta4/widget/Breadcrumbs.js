@@ -34,19 +34,25 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var defn = this.trail[step];
                 var meta = { model: this.navigator.state };
                 var view = this.getNestedView( defn, meta, this.navigator );
-                DEBUG && console.log("Breadcrumb %s Show: %o -> %o", step, this, view)
+                DEBUG && console.log("Breadcrumb %s show: %o -> %o", step, this, view)
                 this.body.show(view);
+
                 view.on("select", function() {
                     console.error("Breadcrumb: select: %o -> %o", this, arguments);
-                })
+                });
                 view.on("action", function(action, meta) {
-                    console.error("Breadcrumb: action: %o -> %o", self, meta);
+                    console.warn("Breadcrumb: %s action: %o -> %o", action, self, meta);
                     meta && self.collection.add(meta.model);
                     self.showCurrent();
-                })
-                view.on("navigate", function() {
-                    console.error("Breadcrumb: navigate: %o -> %o", this, arguments);
-                })
+                });
+                view.on("navigate", function(go_to, model) {
+                    console.error("Breadcrumb: %s navigate: %o -> %o", go_to, this, arguments);
+                    meta && self.collection.add(model);
+                    self.showCurrent();
+                });
+                view.on("nested:navigate", function() {
+                    console.error("Breadcrumb: nested:navigate: %o -> %o", this, arguments);
+                });
 
             },
             onShow: function() {

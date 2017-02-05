@@ -71,8 +71,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             $id = $el.find("[id]")
             id = $id.attr("id")
             if (id) return id;
-
-            throw new Error("meta4:ux:oops:missing-dom-id");
+            console.error("missing-drag-dom: %o -> %o", this, $el);
         },
 
         // can be called by a Widget to intialize itself
