@@ -17,7 +17,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			isCommon:true, isActionable: true,
 			model: true,
 
-			template: "<span class='btn-group'><button class='btn dropdown-toggle' data-toggle='dropdown'>{{label}}</button><ul class='dropdown-menu'></ul></span>",
+			template: "<span class='btn-group'><button class='btn dropdown-toggle' data-toggle='dropdown'><i class='pull-right mdi mdi-menu'></i>{{label}}</button><ul class='dropdown-menu'></ul></span>",
 			className: "btn-toolbar", tagName: "div",
 			childView: ButtonItem, childViewContainer: "ul",
 

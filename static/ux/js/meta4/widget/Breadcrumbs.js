@@ -1,10 +1,13 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, M, ux) {
 
 	ux.view.Breadcrumbs = ux.view["meta4:ux:Breadcrumbs"] = function(options) {
 //		options = ux.checkOptions(options, ["id"]);
 		var DEBUG = true;
 
-        options.template =  options.template || ux.compileTemplate("<div class='breadcrumb-regions container'><div class='breadcrumb-header'></div><div class='wrapper main'><div class='breadcrumb-body'>loading breadcrumb ...</div></div><div class='breadcrumb-footer'></div></div>");
+        options.template =  options.template || ux.compileTemplate("<div class='breadcrumb-regions'><div class='breadcrumb-header'></div><div class='wrapper main'><div class='breadcrumb-body'>loading breadcrumb ...</div></div><div class='breadcrumb-footer'></div></div>");
+
+        var CrumbItem = M.ItemView.extend( { tagName: "li", template: "<a href='#{{id}}'>{{label}}</a>" });
+        var Crumbs = M.CollectionView.extend( { tagName: "ol", childView: CrumbItem } );
 
 		var config = {
 			isTemplating: true, isActionable: true, isNested: true,
@@ -33,17 +36,19 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
                 var defn = this.trail[step];
                 var meta = { model: this.navigator.state };
-                var view = this.getNestedView( defn, meta, this.navigator );
+                var view = this.navigator.views.view( defn, meta, this.navigator );
                 DEBUG && console.log("Breadcrumb %s show: %o -> %o", step, this, view)
                 this.body.show(view);
 
-                view.on("select", function() {
+                view.on("select", function(model) {
                     console.error("Breadcrumb: select: %o -> %o", this, arguments);
+                    meta && self.collection.add(meta.model);
+                    self.showCurrent();
                 });
                 view.on("action", function(action, meta) {
                     console.warn("Breadcrumb: %s action: %o -> %o", action, self, meta);
-                    meta && self.collection.add(meta.model);
-                    self.showCurrent();
+                    // meta && self.collection.add(meta.model);
+                    // self.showCurrent();
                 });
                 view.on("navigate", function(go_to, model) {
                     console.error("Breadcrumb: %s navigate: %o -> %o", go_to, this, arguments);
@@ -59,11 +64,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 DEBUG && console.log("Breadcrumb onShow: %o", this)
                 this.showNestedRegions();
                 this.showCurrent();
+                var crumbs = new Crumbs({ collection: this.collection });
+                this.header.show(crumbs);
             },
             resetTrail: function() {
 DEBUG && console.log("Breadcrumb Home: %o", this)
 				this.collection.reset();
 				this.collection.add( { id: 'home', label: options.label || "Home" } );
+
                 return 0;
 			},
 			onBreadcrumb: function(go_to, view) {
@@ -79,7 +87,7 @@ DEBUG && console.log("Breadcrumb: %o (%s) -> %o %o", this, view.id, view, attrs)
             }
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config);
+		return M.LayoutView.extend(config);
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

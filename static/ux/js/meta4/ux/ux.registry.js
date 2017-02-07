@@ -60,7 +60,7 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
             if (widget.navigator) {
                 // navigator listens to all events
                 self.debug && console.log("Module View: %s -> %o", id, widget.navigator);
-                widget.on("all", function() {
+                    widget.on("all", function() {
 //                    console.log("Widget All: %s -> %o", id, arguments);
 
                     // route widget events to navigator/controller

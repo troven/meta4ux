@@ -50,12 +50,6 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
 
         _DEBUG && console.warn("Widget View: %s: %o ", id, view);
 
-        // TODO: deprecate? - should it be isModal mix-in?
-        if (options.modal || options.isModal)  {
-            navigator.trigger("modal", view);
-            navigator.Modal(view);
-        }
-
         // handle data
 
         var collection_options = view.collection?view.collection.options:{};
@@ -102,6 +96,8 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
 
         // inject a 'guided tour' feature ... TODO: fix it
         if (options.tour) core.ux.tour(options)
+
+        view._isModal = options.modal?true:false;
 
         return view;
     }

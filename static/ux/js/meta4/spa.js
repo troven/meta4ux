@@ -16,6 +16,33 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
         }
     }
 
+
+    var Routing = function(navigator, options) {
+
+        var routing = Backbone.Router.extend({
+
+            routes: {
+                "views:view":           "view",
+                // "auth/:code":           "auth",
+                // "search/:query":        "search",
+                "logout":               "logout"
+            },
+
+            view: function(view) {
+                console.log("VIEW: views%s", view);
+                navigator.trigger("navigate", "views"+view);
+            },
+
+            logout: function() {
+                console.log("LOGOUT: %o", arguments);
+                navigator.trigger("logout");
+            }
+
+        });
+
+        return new routing();
+    };
+
     // lazy boot loader
     return function() {
 
@@ -45,19 +72,26 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
 
             navigator.on("navigate", function (go_to) {
 console.log("navigator goto: %s", go_to);
-                if (!go_to || go_to == options.home || go_to == "home")  navigator.trigger("home");
-                // navigator.home.trigger("navigate", go_to);
-                else navigator.trigger(go_to);
+                if (!navigator.home || !go_to || go_to === options.home || go_to === "home")  navigator.trigger("home");
+                else navigator.home.onNavigate(go_to);
             });
 
             // home view
             navigator.on("home", ShowHome(options, navigator));
             navigator.on("views:home", ShowHome(options, navigator));
 
+            navigator.on("modal", function(view) {
+                navigator.Modal(view);
+            });
+
             // logout view
             navigator.on("logout", function () {
                 window.location.reload();
-            })
+            });
+
+            var routing = new Routing(navigator);
+            console.log("Routing: %o", routing);
+
         });
 
         return SPA;

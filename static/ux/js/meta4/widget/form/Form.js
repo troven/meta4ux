@@ -6,7 +6,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
     	var DEBUG = options.debug || ux.DEBUG;
 
 		var FieldSet = Backbone.Marionette.CompositeView.extend( _.extend({
-		    isActionable: true,
+		    isActionable: true, isNested: true,
             template: options.template || "<fieldset/>",
             childViewContainer: "fieldset",
 			className: "form-fields",
@@ -118,12 +118,14 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
                 var editorType = field.get(ux.editorAttribute) || field.get(ux.typeAttribute);
                 var Field = ux.view.fields[editorType];
                 if (!Field) {
-                    Field = ux.view[editorType];
-                    Field = Field && ux.view.fields.ViewField( Field );
+                    Field = this.navigator.widgets.get(editorType);
+                    console.log("globalChildWidget: %s %o -> %o", editorType, field, Field);
+                    Field = Field && ux.view.fields.ViewField( Field.get("fn"), this.navigator );
                 }
                 if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
 
-DEBUG && console.log("getChildView: %s %o -> %o", editorType, field, Field);
+//DEBUG &&
+console.log("getChildView: %s %o -> %o", editorType, field, Field);
                 return Field;
             },
 

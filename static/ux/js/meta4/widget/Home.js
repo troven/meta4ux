@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, M, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], function ($,_, Backbone, M, core, ux) {
 
 	var Home = function(options, module) {
 		options = ux.checkOptions(options);
@@ -53,25 +53,26 @@ console.log("nested:navigate: %o", view);
 				return view;
 			},
 
-			onNavigateHome: function(go_to, view) {
-				this.header && this.header.currentView && this.header.currentView.triggerMethod("breadcrumb:home", go_to, view)
-			},
+            onBreadcrumb: function(view) {
+                console.log("onBreadcrumb: %o %o", this, view);
+                this.header && this.header.currentView.trigger("breadcrumb", view);
+                this.footer && this.footer.currentView.trigger("breadcrumb", view);
+            },
 
 			onNavigate: function(go_to) {
-                console.log("onNavigate: %o", this);
-				var view = this.navigateTo(go_to);
+			    var meta = { model: this.model, collection: this.collection};
+                var view = this.navigator.views.view(go_to, meta, this.navigator );
+                if (!view) throw new core.oops.Error("meta4:ux:mixin:oops:missing-view#"+go_to);
 //DEBUG &&
-                console.log("onNavigate: %o %o %o", this, go_to, view)
-// throw "go_to: "+go_to;
-//				view && this.attachNavigateListeners(view)
-//				if (this.footer && this.footer.currentView) this.footer.currentView.triggerMethod("navigate", go_to)
-				if (this.header && this.header.currentView) {
-					var _view = this._views[go_to];
-					if (_view) {
-						this.header.currentView.triggerMethod("breadcrumb:home", go_to, view)
-					}
-					this.header.currentView.triggerMethod("breadcrumb", go_to, view)
-				}
+                console.log("onNavigate: %o %o %o", this, go_to, view);
+
+                if (view._isModal)  {
+                    this.navigator.Modal(view);
+                } else {
+                    this.body.show(view);
+                    this.trigger("breadcrumb", view);
+                }
+
 			}
 		}
 

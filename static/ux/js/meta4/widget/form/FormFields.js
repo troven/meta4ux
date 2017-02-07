@@ -181,21 +181,25 @@ console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid
             return t
         }
 
-        fields.ViewField = function(Field) {
-
-            if (!Field) throw new Error("ViewField missing")
+        fields.ViewField = function(Field, navigator) {
+            if (!Field) throw new Error("ViewField missing");
+console.log("ViewField: %o -> %o", this, navigator);
             var View = Backbone.Marionette.ItemView.extend({
-                className: "form-group row form-text",
-                template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='field-view col-sm-9'></div><div class='message text-danger'>{{message}}</div>",
+                className: "form-group form-text",
+                template: "<div></div>",
                 initialize: function(options) {
-                    var View = new Field(options)
-                    this.view = new View(options)
+                    var Widget = Field(options, navigator)
+                    this.view = new Widget(options);
+                    this.view.navigator = navigator;
                 },
                 onRender: function() {
-                    var $el = $(".field-view", this.$el)
-                    console.log("FieldView: %o %o", this, $el)
-                    $el.append( this.view.render().$el )
-                    this.view.triggerMethod("show")
+                    this.view.render();
+                    var $view = this.view.$el;
+                    console.log("FieldView: %o %o", this, $view)
+                    this.$el.empty().append( $view );
+                    this.view.onRead();
+                    // this.view.showNestedRegions();
+                    // this.view.triggerMethod("show");
                 }
             })
             return View

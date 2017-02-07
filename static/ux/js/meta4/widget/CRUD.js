@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 
-	var CRUD = function(options) {
+	var CRUD = function(options, navigator) {
 		options = ux.checkOptions(options, ["id", "views"]);
 
 		var DEBUG = options.debug?true:ux.DEBUG?true:false;
