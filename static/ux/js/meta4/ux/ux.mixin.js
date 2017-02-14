@@ -35,7 +35,10 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "ux", "oops"
 
 					var initializer = self["initialize"+method];
 					initializer && initializer.call(self, defaults);
-				}
+                    self[k] = true;
+				} else {
+                    self[k] = false;
+                }
 			}
 		}
 	}
@@ -427,8 +430,9 @@ _DEBUG && console.log("** Unknown model for selection: ", selected, event);
 
 		// default event-handler for model selections
 		doEventSelect: function(event) {
+            var _DEBUG = true; // this.options?this.options.debug:DEBUG;
+
 			if (!event) throw "meta4:ux:mixin:oops:select:event-missing";
-			var _DEBUG = true; // this.options?this.options.debug:DEBUG;
 			event.stopImmediatePropagation();
             if (this.model) {
                 _DEBUG && console.debug("doEventSelect: %o %o %o", this, event, this.model );
@@ -453,8 +457,13 @@ _DEBUG && console.debug("doEventSelect ID: %o %o -> %o %o %o ", this, event, thi
 
 		// Fire select/deselect events on source model and create/update a Selection model
 		doSelect: function(event, model) {
+            var _DEBUG = this.options?this.options.debug:DEBUG;
 			if (!model) throw "meta4:ux:mixin:oops:select:model-missing";
-			this.triggerMethod("select", model, event );
+                var isSelectable = (this.isSelectable && !(this.options.isSelectable===false) );
+                _DEBUG && console.debug("doSelect : %o %o -> %s", this, event, isSelectable);
+                if (isSelectable) {
+                    this.triggerMethod("select", model, event );
+                }
 			return this;
 		}
 	}
@@ -468,41 +477,58 @@ _DEBUG && console.debug("doEventSelect ID: %o %o -> %o %o %o ", this, event, thi
 		    // if (this._isActionable) throw "isActionable: "+options.id;
 		    // this._isActionable = true;
 DEBUG && console.log("Mixin Actionable(%s) %o %o", this.id, this, options );
-            this.on("select", this.doSelectActionEvent);
-            this.once("render", this.attachExplicitActions);
+            if (!options.isSelectable===false) {
+                this.on("select", this.doSelectActionEvent);
+            }
 		},
 
         attachExplicitActions: function() {
+            var _DEBUG = this.options.debug?true:false;
             var self = this;
             var $actions = $("[data-action]", this.$el);
             $actions.unbind("click");
-
-            $actions.click(function() {
-                var $this = $(this);
+            var meta = { model: this.model , collection: this.collection };
+            // console.log("attachExplicitActions: %o -> %o", this, $actions);
+            $actions.click(function(e) {
+                var $this = (e?$(e.currentTarget):$(this)).closest("[data-action]");
                 var event = $this.data();
-
-                var model = self.model;
-                var meta = { model: model , collection: self.collection };
-
-                console.log("click action: %o %o -> ", event, self, meta);
-                self.triggerMethod(event.action, meta);
-                self.triggerMethod( "action", event.action, meta );
+                _DEBUG && console.log("onExplicitEventAction: %o -> %o ->%o", self, $this, event);
+                self.trigger( event.action, meta);
+                self.trigger( "action", event.action, meta );
             });
         },
 
-        doSelectActionEvent: function(model) {
-            var action = model.id;
+        doEventAction: function(e, meta) {
+            var _DEBUG = this.options.debug?true:false;
+            var $this = (e?$(e.currentTarget):$(this)).closest("[data-action]");
+            var event = $this.data();
+            _DEBUG && console.log("doEventAction: %o -> %o ->o", this, $this, e);
+
+            var model = this.model;
+            var meta = _.extend({ model: model , collection: this.collection },meta);
+
+            _DEBUG && console.log("triggerEventAction: %s -> %o %o -> %o", event.action, event, this, meta);
+            this.trigger( event.action, meta);
+            this.trigger( "action", event.action, meta );
+        },
+
+        doSelectActionEvent: function(model, event) {
+            var _DEBUG = this.options.debug?true:false;
+            var $action = $("[data-action]", $(event.currentTarget));
+            _DEBUG && console.log("doSelectAction: %s ->  %o -> %o -> %o -> %o", action, this, model, event, $action);
+            var action_data = $action.data();
+            var action = action_data.action || model.get("action") || model.id;
+
             if (!action) {
                 console.log("no-select-action: %o -> %o", this, model);
                 return;
             }
-            console.log("doSelectAction: %s ->  %o -> %o", action, this, arguments);
 			var model = this.collection?this.collection.get(action): this.model;
 			var meta = { model: model , collection: this.collection };
 
-//            this.triggerMethod( action, meta );
 			this.triggerMethod( "action", action, meta );
-console.log("ACTION:%s -> %o %o", action, this, meta );
+            this.triggerMethod( ""+action, meta );
+            _DEBUG && console.log("ACTION:%s -> %o %o", action, this, meta );
 
             // is nested
             // this.showNested && this._views["action"] && this.showNested( "action", meta, this.navigator );
@@ -517,6 +543,7 @@ console.log("ACTION:%s -> %o %o", action, this, meta );
 		initializeNavigator: function(options) {
             this.on("select", this.doSelectNavigate);
 		},
+
         doSelectNavigate: function(model) {
             var self = this;
             if (!model) throw "meta4:ux:mixin:oops:missing-select-navigate";
@@ -538,6 +565,7 @@ console.log("ACTION:%s -> %o %o", action, this, meta );
             this.navigator.trigger("navigate", go_to);
 		},
 		onNavigate: function(go_to, model) {
+            console.log("navigateTo (%s): %o -> %o", go_to, this, model);
             if (_.isString(go_to)) {
                 this.navigateTo(go_to);
             } else {
@@ -632,6 +660,8 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             }
 
             if (self.regions) {
+                //DEBUG &&
+                console.warn("nested-regions: %s -> %o -> %o", self.id, self, meta);
                 _.each(self.regions, function(ignore, region) {
                     var view = self._views[region];
                     if (view) self.__showNested( self, view, region, meta );
@@ -756,29 +786,49 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
             // instantiate view (conf) as a Widget
 
             if (_.isObject(conf)) {
-                meta = _.extend({}, conf, meta);
-                _DEBUG && console.log("widget: %o -> %o", meta);
-                if (!meta.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
-                widget = navigator.views.view(meta.id, meta, navigator);
+                if (!meta.collection) delete meta.collection;
+                if (!meta.model) delete meta.model;
+                var _options= _.extend({}, conf, meta);
+//console.log("getNestedView:models: %s -> %o %o", _options.id, conf, meta);
+                if (!_options.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
+                widget = navigator.views.view(_options.id, _options, navigator);
+                _DEBUG && console.log("widget: %s -> %o -> %o", _options.id, _options, widget);
 		    } else throw new core.oops.Error("meta4:ux:mixin:oops:invalid-view-def", conf);
-
-            if (widget && !widget._isNested && !conf.isDetached) {
-				var self = this;
-				var trigger = this.triggerMethod?this.triggerMethod:this.trigger; // Prefer marionette
-				widget._isNested = true;
-                // bubble nested:events to parent
-				widget.on("all", function() {
-					if (arguments[0].indexOf("nested:")<0) {
-						arguments[0] = "nested:"+arguments[0];
-					}
-					trigger.apply(self, arguments);
-				})
-            };
 
             // bind our parent's navigator
             widget.navigator = navigator;
+
+            if (widget) this.listenToNestedEvents(widget, conf);
+				// widget.on("all", function() {
+				// 	if (arguments[0].indexOf("nested:")<0) {
+				// 		arguments[0] = "nested:"+arguments[0];
+				// 	}
+				// 	console.log("trigger: %s %o <- %o", arguments[0], self, widget);
+				// 	trigger.apply(self, arguments);
+				// })
+
             return widget;
 		},
+
+        listenToNestedEvents: function(widget, when) {
+            var self = this;
+            var trigger = this.triggerMethod?this.triggerMethod:this.trigger; // Prefer marionette
+            when = _.extend({}, widget.options.when, when);
+
+            // bubble nested:events to parent
+            _.each(when, function(then, when) {
+                if (when.indexOf("nested:")==0) {
+//                    console.log("WHEN: %s -> %o <-- %o", when, self, widget);
+                    widget.on(when.substring(7), function() {
+                        if (arguments[0].indexOf("nested:")<0) {
+                            arguments[0] = "nested:"+arguments[0];
+                        }
+//                        console.log("trigger: %s %o <- %o", arguments[0], self, widget);
+                        trigger.apply(self, arguments);
+                    });
+                }
+            });
+        }
 
 //		attachNestedListeners: function(widget) {
 //			var self = this

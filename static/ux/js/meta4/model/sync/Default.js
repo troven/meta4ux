@@ -35,6 +35,7 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
             contentType: "application/json; charset=utf-8",
             success: function(response) {
                 collection.busy = false;
+                collection.synced = new Date().getTime();
                 collection.trigger("done");
                 if (response && response.status == "success" ) {
                     _DEBUG && console.log("CRUD Success: %s %s -> %o", url, response.status, response.data);

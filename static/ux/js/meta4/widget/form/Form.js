@@ -122,10 +122,9 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
                     console.log("globalChildWidget: %s %o -> %o", editorType, field, Field);
                     Field = Field && ux.view.fields.ViewField( Field.get("fn"), this.navigator );
                 }
-                if (!Field) throw "meta4:ux:form:oops:missing-editor#"+editorType
+                if (!Field) throw "meta4:ux:form:oops:missing-editor#"+field.get(ux.idAttribute)
 
-//DEBUG &&
-console.log("getChildView: %s %o -> %o", editorType, field, Field);
+//DEBUG && console.log("getChildView: %s %o -> %o", editorType, field, Field);
                 return Field;
             },
 

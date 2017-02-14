@@ -47,8 +47,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
 			},
 
 			attachNavigateListeners: function(view) {
-				var self = this
-console.log("nested:navigate: %o", view);
+				var self = this;
 				view.on("nested:navigate", self.onNavigate);
 				return view;
 			},
@@ -61,12 +60,13 @@ console.log("nested:navigate: %o", view);
 
 			onNavigate: function(go_to) {
 			    var meta = { model: this.model, collection: this.collection};
+                console.log("onNavigate: %o %o", this, go_to);
                 var view = this.navigator.views.view(go_to, meta, this.navigator );
                 if (!view) throw new core.oops.Error("meta4:ux:mixin:oops:missing-view#"+go_to);
 //DEBUG &&
-                console.log("onNavigate: %o %o %o", this, go_to, view);
+//                console.log("onNavigate: %o %o %o", this, go_to, view);
 
-                if (view._isModal)  {
+                if (view.isModal)  {
                     this.navigator.Modal(view);
                 } else {
                     this.body.show(view);

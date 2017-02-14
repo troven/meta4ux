@@ -23,6 +23,7 @@ require.config({
         backbone_documentmodel: "vendor/backbone-documentmodel/backbone-documentmodel",
         backbone_statemachine: "vendor/backbone-statemachine/backbone.statemachine",
         backbone_filtered: "vendor/backbone-filtered/backbone-filtered-collection",
+        bootstrap_datepicker: "vendor/bootstrap-datepicker/js/bootstrap-datepicker",
         visualsearch: "vendor/visualsearch/visualsearch",
 
         localStorage: "vendor/backbone.localStorage",
@@ -116,6 +117,9 @@ require.config({
         },
         bootstrap_tour: {
             deps : ['jquery', 'bootstrap'], exports : 'bootstrap_tour'
+        },
+        bootstrap_datepicker: {
+            deps : ['jquery', 'bootstrap'], exports : 'bootstrap_datepicker'
         },
         full_calendar: {
             deps : ['jquery'], exports : 'full_calendar'

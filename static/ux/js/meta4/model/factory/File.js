@@ -17,7 +17,7 @@ define(["underscore", "backbone", "core", "meta4/model/factory/Default"], functi
             url: function() { return this.collection?this.collection.url:storeURL } ,
             sync: fact.sync.remote,
             mutators: options.mutators,
-            defaults: options.defaults,
+            defaults: _.isObject(options.defaults)?options.defaults:{},
             validate: fact.validate.model,
             idAttribute: options.idAttribute||idAttribute
         })

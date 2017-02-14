@@ -196,8 +196,8 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 				query = collection.filters || new Backbone.Model();
 			}
 
- console.log("FILTER: %o -> %o", collection, query);
 			var fn = asq.compile(query);
+            console.log("FILTER: %o -> %o -> %s", collection, query, fn);
             if (!fn) throw "meta4:oops:fact:missing-filter-fn#"+query;
 
 			var filtered = fact.Collection([]);
@@ -225,6 +225,7 @@ fact.DEBUG && console.log("Fact Schema() ", field.id, field, field.validators);
 			filtered.fetch = function(options) {
 				return collection.fetch(options);
 			}
+			filtered.synced = collection.synced;
             collection.refresh = refresh;
 //			collection.on("destroy", function() { filtered.destroy() })
 //			filtered.filters.on && filtered.filters.on("change", refresh);

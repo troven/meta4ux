@@ -101,7 +101,7 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
                             try {
                                 fn.apply(vents,arguments);
                             } catch(e) {
-                                console.error("IQ Error: on %s -> %o", fnId, e);
+                                console.error("Script Error: on %s -> %o", fnId, e);
                             }
                         })
                     } else {

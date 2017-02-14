@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2"],
-    function ($, _, Backbone, Marionette, core, ux, select2) {
+define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2", "bootstrap_datepicker"],
+    function ($, _, Backbone, Marionette, core, ux, select2, bootstrap_datepicker) {
 
         var idAttribute = ux.idAttribute || "id";
         var typeAttribute = ux.typeAttribute || "widget";
@@ -130,6 +130,7 @@ console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid
             console.log("CommitGroupFields: %o %o %o", this, event, $fields);
             $("[name]", $fields).each(function() {
                 var submodel = self.options.formModel.get(self.options.id);
+                console.log("CommitGroupField: %o %o %o", self, submodel, this);
                 if (!submodel) {
                     submodel = new Backbone.Model();
                     self.options.formModel.set(self.options.id, submodel);
@@ -195,8 +196,8 @@ console.log("ViewField: %o -> %o", this, navigator);
                 onRender: function() {
                     this.view.render();
                     var $view = this.view.$el;
-                    console.log("FieldView: %o %o", this, $view)
                     this.$el.empty().append( $view );
+                    console.log("FieldView: %o %o", this, $view)
                     this.view.onRead();
                     // this.view.showNestedRegions();
                     // this.view.triggerMethod("show");
@@ -267,7 +268,7 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
         fields.Date = FormField.extend({
             className: "form-group row form-date",
             validators: ["date"],
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' type='date' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             initialize: function(options) {
                 var fieldId = this.model.get("id");
                 var date = new Date();
@@ -278,6 +279,9 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
                 var today = day+"/"+(1+monthIndex)+"/"+year;
                 this.options.formModel.set(fieldId, today);
                 console.log("Date Field: %o -> %o == %o", this, fieldId, today);
+            },
+            onRender: function() {
+                $("input", this.$el).datepicker({ format: 'mm/dd/yyyy', todayBtn: "linked", todayHighlight: true, autoclose: true });
             }
         })
 
@@ -370,13 +374,13 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             }
         })
 
-        fields.Checkbox = Backbone.Marionette.CompositeView.extend({
+        fields.Checkboxes = Backbone.Marionette.CompositeView.extend({
             className: "form-group row form-checkbox",
-            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><ul class='col-sm-4 form-group-container'></ul><div class='message text-danger'>{{message}}</div>",
-            events: { blur: "doCommit", "change": "doCommit" },
+            template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><ul class='col-sm-4 list-item-group form-group-container'></ul><div class='message text-danger'>{{message}}</div>",
+            events: { click: "doCommit" },
             childView: Backbone.Marionette.ItemView.extend({
-                tagName: "span",
-                template: "<li><input type='checkbox' name='{{id}}' value='true'/>&nbsp;<label for='{{name}}'>{{label}}</label></li>",
+                tagName: "li",
+                template: "<input type='checkbox' name='{{id}}' value='true'/>&nbsp;<label for='{{id}}'>{{label}}</label>",
                 onRender: renderField
             }),
             childViewContainer: ".form-group-container",
@@ -385,8 +389,8 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             },
             initialize: function(options) {
 //                options.childView = ux.view.fields.SelectOption
-                var values = options.options
-                this.collection = ux.lookup(values)
+                var values = options.options || options.collection;
+                this.collection = ux.lookup(values);
                 if (!this.collection) throw "meta4:form:oops:missing-lookup#"+values
 //                options.values = values
                 DEBUG && console.log("Checkbox: %o %o %o", this, options, this.collection?this.collection.toJSON():"Missing Lookup")

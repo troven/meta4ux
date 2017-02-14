@@ -32,7 +32,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
         });
 
 		var CRUDView = Backbone.Marionette.LayoutView.extend( _.extend({
-			isNested: true, isActionable: true, isHoverPanel: false,
+			isNested: true, isActionable: false, isHoverPanel: false,
             template: options.template,
             className: "meta4_crud",
             regions: { header: ".regions>.region_header" , body: ".regions>.region_body", footer: ".regions>.region_footer" },
@@ -51,7 +51,8 @@ DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can);
 
                 // bind CRUD events
                 this.on("nested:create", this.onCreate);
-				this.on("nested:childview:select", this.onSelect);
+                this.on("nested:action", this.onNestedAction);
+				this.on("nested:select", this.onSelect);
                 this.on("nested:delete", this.onDelete);
 				this.on("nested:finish", this.onSave);
                 this.on("nested:save", this.onSave);
@@ -96,11 +97,22 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
                 if (this._views && !this._views.body) {
                     if (this._views.read) this.triggerMethod("read");
                     else if (this._views.update) this.triggerMethod("update");
+                    else if (this._views.edit) this.triggerMethod("update");
                 }
 			},
 
+            onNestedAction: function(action, meta) {
+                console.log("CRUD onNestedAction (%s): %o", action, meta)
+                // if (can[action]===false) {
+                //     console.log("CRUD %s denied: %o -> %o", action, this, meta);
+                //     throw new Error("meta4:ux:crud:oops:cannot-"+action);
+                // }
+                // this.triggerMethod("action", action, meta);
+                // this.triggerMethod(""+action, meta);
+            },
+
             onAction: function(action, meta) {
-                DEBUG && console.log("CRUD onAction (%s): %o", action, meta)
+                console.log("CRUD onAction (%s): %o", action, meta)
                 var can = this.can || this.options.can || {};
                 if (can[action]===false) {
                     console.log("CRUD %s denied: %o -> %o", action, this, meta);
@@ -109,7 +121,19 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
                 this.triggerMethod(action, meta);
             },
 
+            onHeaderFooterAction: function(action, meta) {
+                console.log("CRUD onHeaderFooterAction (%s): %o", action, meta)
+                var can = this.can || this.options.can || {};
+                if (can[action]===false) {
+                    console.log("CRUD %s denied: %o -> %o", action, this, meta);
+                    throw new Error("meta4:ux:crud:oops:cannot-"+action);
+                }
+//                this.triggerMethod(action, meta);
+            },
+
+
             onSelect: function(view, selection) {
+throw "deprecated";
                 this.triggerMethod("update", selection);
             },
 
@@ -136,10 +160,6 @@ console.log("CRUD onSaved: %o %o", this, arguments);
                     console.log("CRUD onError: %o %o", this, arguments);
                 })
 
-                model.on("all", function() {
-                    DEBUG && console.log("CRUD ALL: %o -> %o", this, arguments)
-                });
-
                 model.validate && model.validate();
                 if (model.isValid())  {
                     self.triggerMethod("valid");
@@ -161,9 +181,9 @@ console.log("CRUD onSaved: %o %o", this, arguments);
             },
 
             showHeaderFooters: function(action, meta) {
-                meta = meta || { model: this.body.currentView?this.body.currentView.model:this.model, collection: this.collection }
+                meta = _.extend({ model: this.body.currentView?this.body.currentView.model:this.model, collection: this.collection },meta);
 
-                if (this.options.modal) {
+                if (this.isModal) {
                     this.header.show(new ActionView(meta));
                     this.footer.show(new ActionView(meta));
 DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, options)
@@ -175,17 +195,19 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 header = _.extend({}, meta, header);
                 header.id = header.id || this.id+"#header";
                 var headerView = ( header && this.getNestedView(header, meta) ) || new ActionView(header);
-                DEBUG && console.debug("showHeader: (%s) %o %o", action, header, headerView);
-                this.listenTo(headerView, "action", this.onAction );
+                // DEBUG && console.debug("showHeader: (%s) %o %o", action, header, headerView);
+                this.listenToNestedEvents(headerView, { "nested:action": true });
 
                 // Footers
                 var footer = this.options.footers!==false && this.footers[action] || this.options.footers;
                 footer = _.extend({}, meta, footer);
                 footer.id = footer.id || this.id+"#footer";
                 var footerView = ( footer && this.getNestedView(footer, meta) ) || new ActionView(footer);
-                DEBUG && console.debug("showFooter: (%s) %o %o", action, footer, footerView);
+                // DEBUG && console.debug("showFooter: (%s) %o %o", action, footer, footerView);
                 this.footer.show(footerView);
-                this.listenTo(footerView, "action", this.onAction );
+                this.listenToNestedEvents(footerView, { "nested:action": true });
+
+                //console.log("showHeaderFooters: %o -> %o %o", this, header, footer);
 
             },
 
@@ -209,7 +231,7 @@ DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
                 var view = this.getNestedView("create", meta) || this.getNestedView("edit", meta);
                 if (!view) throw "meta4:ux:crud:oops:missing:view:create";
 
-                this.once("cancel", function() { self.onRead() });
+                view.once("cancel", function() { self.onRead() });
 
                 this.once("save", function() {
                     console.log("CRUD onSave: %o %o %o", _collection, view, arguments);
@@ -222,19 +244,26 @@ DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
                     self.onRead();
                 });
 
-                this.body.show(view);
+                if (view.isModal)  {
+                    this.navigator.Modal(view);
+                } else {
+                    this.body.show(view);
+                }
+
                 this.showHeaderFooters("create", { model: _model, collection: _collection} )
             },
 
-            onRead: function() {
-                var can = this.options.can
+            onRead: function(view_id) {
+                view_id = view_id || "read";
+                var can = this.options.can;
                 var self = this
                 var meta = { model: this.model, collection: this.collection };
-                var view = this.getNestedView("read", meta );
+                var view = this.getNestedView(view_id, meta );
+                DEBUG && console.log("CRUD onRead: (%s) %o -> %o", view_id, this, view);
 
-DEBUG && console.log("CRUD onRead: %s -> %o", this, view);
                 if (view) {
-                    this.showHeaderFooters("read", meta )
+                    this.listenToNestedEvents(view, { "nested:action": true, "nested:select": true });
+                    this.showHeaderFooters(view_id, meta )
                     this.body.show(view);
                 } else {
                     this.destroy();
@@ -256,15 +285,19 @@ DEBUG && console.log("CRUD onUpdate: %o %o", this, selected)
                 if (!this.can.delete) return;
                 var _model = this.body.currentView.model;
 DEBUG && console.log("CRUD onDelete: %o %o", this, _model);
-                var y_or_n = confirm("Delete?");
+                var y_or_n = confirm("Delete ?");
                 if (y_or_n) {
                     _model.destroy();
                     this.onRead();
                 }
                 return y_or_n;
+            },
+
+            onCancel: function() {
+                this.onRead();
             }
 
-		}  ) )
+		} ) )
 
 		return CRUDView;
 	}

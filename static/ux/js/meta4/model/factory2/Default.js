@@ -24,7 +24,7 @@ define(["underscore", "backbone", "core",
             },
             sync: fact.sync.Default,
             mutators: options.mutators,
-            defaults: options.defaults,
+            defaults: _.isObject(options.defaults)?options.defaults:{},
             validate: validates.model,
             idAttribute: options.idAttribute || fact.idAttribute
         });

@@ -13,12 +13,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				"click [data-action]": "doEventAction"
 			},
 			initialize: function(options) {
-				_.defaults(options, { model: false })
+				_.defaults(options, { model: true });
 				ux.initialize(this, options)
 				this.template = (this.model&&this.model.get("template")) || options.template || this.template;
 			},
             onRender: function() {
+//			    console.log("onRenderTemplate: %o", this);
 			    this.attachedNestedViews();
+            },
+            onShow: function() {
+//               console.log("onShowTemplate: %o", this);
+                this.attachExplicitActions();
             },
             _renderTemplate: function() {
                 var template = this.getTemplate();

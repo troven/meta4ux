@@ -16,14 +16,21 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         var widgetType = options.widget || options.type;
         var widgetClass = navigator.widgets.widget(widgetType);
 
-        // sanitize the 'ID' to keep the DOM happy
-        var id = options[core.ux.idAttribute] = core.ux.uid(options[core.ux.idAttribute]);
+        var id = options[core.ux.idAttribute];
+//        _DEBUG && console.log("Widget: %s -> %s -> %o", id, widgetType, options);
 
+        if (!id) {
+            console.log("Anonymous Widget: %o", options);
+            throw new Error("meta4:ux:oops:widget:missing-id#"+widgetType, options);
+        }
+
+        // sanitize the 'ID' to keep the DOM happy
+        id = core.ux.uid(options[core.ux.idAttribute]);
         if (!widgetClass) throw new Error("meta4:ux:oops:unknown-widget#"+widgetType);
 
         // get Widget instance
         var ViewClass = widgetClass(options, navigator);
-        _DEBUG && console.log("ux.Widget: %s (%s) %o %o", options.id, widgetType, options, ViewClass)
+        _DEBUG && console.log("new view: %s (%s) %o", id, widgetType, options);
 
         if (!ViewClass || !_.isFunction(ViewClass)) {
             throw new Error("meta4:ux:oops:invalid-widget#"+widgetType);
@@ -39,8 +46,8 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
             console.log("EXTEND: %s %o", options.extends, _extend);
         }
 
-        // resolve Model/Collections
-        options = core.ux.model(options);
+        // resolve Model/Collections - dupe: handled by ux.initialize
+//        options = core.ux.model(options);
 
         // instantiate View
         var view = new ViewClass(options, navigator);
@@ -48,29 +55,29 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         // decorate view (with mixins, styles, models, etc);
 //        core.ux.initialize(view, options, navigator);
 
-        _DEBUG && console.warn("Widget View: %s: %o ", id, view);
+//        _DEBUG && console.warn("Widget View: %s: %o ", id, view);
 
         // handle data
 
         var collection_options = view.collection?view.collection.options:{};
-        _DEBUG && console.log("new view %o %o collection: %o -> %o", view.id, view, view.collection||"No Data", collection_options);
+        _DEBUG && console.log("New View %o %o\ncollection: %o -> %o", id, view, view.collection||"No Data", collection_options);
 
         // refresh remote collections
         var collections_id = view.collection?view.collection.id:false;
-        var fetch = (options.fetch==false?false:true) || (collections_id && view.collection.options.fetch==false?false:true);
-        var prefetch = (options.prefetch?true:false)  || (collections_id && view.collection.options.prefetch?true:false);
+        var fetch = (options.fetch===false?false:true) || (collections_id && collection_options.fetch===false?false:true);
+        var prefetch = (options.prefetch?true:false)  || (collections_id && collection_options.prefetch?true:false);
 
         if (collections_id && fetch) {
             _DEBUG && console.log("fetch? %s -> %s / v: (%s) %s -> %s / m: (%s) %s -> %s",
                 fetch, prefetch,
-                id, options.fetch==false?false:true, options.prefetch?true:false,
-                collections_id, view.collection.options.fetch==false?false:true, view.collection.options.prefetch?true:false );
+                id, options.fetch===false?false:true, options.prefetch?true:false,
+                collections_id, collection_options.fetch===false?false:true, collection_options.prefetch?true:false );
 
             view.on("before:render", function() {
-                if (view._isFetched) return;
-                var fields = _.pick(view.model.attributes, view.collection.options.parameters || ["id"] );
-                console.debug("fetching (%s @ %s): %o", id, widgetType, fields);
-                view._isFetched = true;
+                if (view.collection.synced) return;
+                var idAttribute = collection_options.idAttribute;
+                var fields = _.pick(view.model.attributes, collection_options.parameters || [idAttribute] );
+                console.debug("fetching (%s @ %o): %o", id, fields, view.collection);
                 view.collection.fetch( { debug: options.debug?true:false, filter: fields } );
             })
 
@@ -81,15 +88,21 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
 
         // show inline help ... TODO: reconsider this strategy
         if (options.help) {
+            var help_id = _.isString(options.help)?options.help:id;
 
-            view.on("show", function() {
+            view.on("render", function() {
                 var self = this
-                var helpOptions = _.extend({ id: id, type: "Help", template: options[core.ux.idAttribute]+".html" }, options.help)
+
+                var helpOptions = _.extend(
+                    { id: help_id+"#help", type: "Help", template: "template:"+help_id+".html" },
+                    _.isObject(options.help)?options.help:{} );
+
                 var HelpView = core.ux.view[helpOptions.type](helpOptions);
                 var helpView = new HelpView(helpOptions);
                 helpView.render();
-                view.$el.prepend(helpView.$el)
-                _DEBUG && console.debug("Help View: (%s) %o %o", id, helpOptions, helpView);
+                view.$el.prepend(helpView.$el);
+                // _DEBUG &&
+                console.debug("Help View: (%s @ %s) %o %o", help_id, id, helpOptions, helpView);
             })
 
         }
@@ -97,7 +110,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         // inject a 'guided tour' feature ... TODO: fix it
         if (options.tour) core.ux.tour(options)
 
-        view._isModal = options.modal?true:false;
+        view.isModal = options.modal?true:false;
 
         return view;
     }

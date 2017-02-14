@@ -51,6 +51,7 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
             } else if (_.isString(id)) {
                 _options = _.extend({}, this.get(id), _options);
                 widget = new Widget(_options, navigator);
+//                console.log("view reference: %s %o ->%o", id, _options, widget);
             }
             if (!widget) throw new Error("meta4:ux:oops:invalid-view#"+id);
 

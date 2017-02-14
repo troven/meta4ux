@@ -29,7 +29,7 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             },
 
             view: function(view) {
-                console.log("VIEW: views%s", view);
+                console.log("direct view: views%s", view);
                 navigator.trigger("navigate", "views"+view);
             },
 

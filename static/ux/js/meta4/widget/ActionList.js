@@ -6,14 +6,13 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	var typeAttribute = ux.typeAttribute || "widget";
 	var labelAttribute = ux.labelAttribute || "label";
 	var commentAttribute = ux.commentAttribute || "comment"
-	var DEBUG = true; // && ux.DEBUG;
 
 	ux.view.ActionList = ux.view["meta4:ux:ActionList"] = function(options, navigator) {
 		_.defaults(options, { child: {}, views: {} })
-
+        var DEBUG = options.debug?true:false;
 
         var EmptyView  = Backbone.Marionette.ItemView.extend({
-            isTemplating: true, isActionable: true,
+            isTemplating: true, isActionable: false, isSelectable: true,
             initialize: function(_options) {
                 ux.initialize(this, _options, navigator);
             }
@@ -23,21 +22,33 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 			tagName: "li", className: "list-group-item clickable",
 			template: options.child.template || "<a href='#{{id}}' title='{{comment}}'>{{label}}</a>",
 
-			isSelectable: true, isDroppable: false,
+			isSelectable: false, isDroppable: false,
 			isHoverPanel: false, isTemplating: true, isPopOver: false,
-			isActionable: false, isActionMenu: false, isNavigator: false,
+			isActionable: true, isActionMenu: false, isNavigator: false,
 			events: {
-				"click": "doEventSelect",
+                "click": "doActionEvent",
 				"dblClick": "doEventSelect",
 			},
 			initialize: function(_options) {
 				ux.initialize(this, _options, navigator);
-			}
+			},
+            doActionEvent: function(event, model) {
+//			    this.doEventSelect(event);
+                var $about = $(event.currentTarget).closest("[data-action]");
+                var data = $about.data() || this.model.attributes;
+                var meta = { model: this.model, collection: this.collection };
+                var action = data.action || false;
+                DEBUG && console.log("doActionEvent (%s) %o %o %o ", action, event, $about, data);
+                this.trigger("action", action , meta);
+            },
+            onRender: function() {
+                this.attachExplicitActions();
+            }
 		});
 
 		var definition = {
 			isSortable: false, isCommon: true, isActionable: true, isNested: true,
-            isPopOver: false, isSelectable: false, isHoverPanel: false,
+            isPopOver: false, isSelectable: true, isHoverPanel: false,
 			childView: ListItem, tagName: "ul",
 			className: "list-group",
 			sortable: {
@@ -47,11 +58,32 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 				"sortstart": "doEventDrag",
 			},
             childEvents: {
+			    "click [data-action]": function() {
+                    console.log("[ActionList] click: %o %o", this, arguments);
+                },
+                "action": function(view, action, meta) {
+
+                    if (action) {
+                        DEBUG && console.log("[ActionList] action: %s: %o -> %o", action, this, arguments);
+                        this.triggerMethod("action", action, meta);
+                        this.triggerMethod(""+action, meta);
+                    } else if (this.isSelectable===true) {
+                        DEBUG && console.log("[ActionList] select: %o: %o -> %o", this, view, meta);
+                        this.triggerMethod("select", meta.model);
+                    // } else {
+                    //     DEBUG && console.log("[ActionList] no select: %o: %o -> %o", this, view, meta);
+                    }
+                },
                 "select": function(view, model, event) {
-                    console.log("ActionList: select: %o %o %o", this, view, model?model:"Skip: no model");
                     if (!model) return;
-                    // bubble navigate to ActionList parent
-                   this.triggerMethod("select", model);
+                    var isSelectable = (this.isSelectable && !(this.options.isSelectable===false));
+                    console.log("ActionList: %s: %o %o %o", (isSelectable?"select":"action"), this, view, model?model:"Skip: no model");
+                    if ( isSelectable )  {
+                        // bubble navigate to ActionList parent
+                        this.triggerMethod("select", model);
+                    } else {
+//                        this.doEventAction( { currentTarget: $("[data-action]", view.$el) }, {model: model } );
+                    }
                 }
             },
 			childViewOptions: function(model, index) {
@@ -67,7 +99,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 					    return _.extend({ "template": ""}, _options.empty);
 					}
 				}
-				console.log("ACTION LIST: init: %o", this);
+				console.log("ACTION LIST: init: %s -> %o", this.id, this);
 				return this;
 			}
 		}

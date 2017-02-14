@@ -11,7 +11,7 @@ define(["underscore", "backbone", "core", "meta4/model/factory/Default"], functi
         var Model = Backbone.DocumentModel.extend({
             sync: fact.sync.local,
             mutators: options.mutators,
-            defaults: options.defaults,
+            defaults: _.isObject(options.defaults)?options.defaults:{},
             validate: fact.validate.model,
             idAttribute: options.idAttribute||fact.idAttribute
         })

@@ -55,6 +55,8 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "oops", "ux"
 
                 view.on("action:close", function() { view.destroy(); })
                 view.on("close", function() { view.destroy(); })
+
+                console.warn("Modal: %o %o", view, $view);
                 return $view;
             },
 

@@ -37,17 +37,23 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var defn = this.trail[step];
                 var meta = { model: this.navigator.state };
                 var view = this.navigator.views.view( defn, meta, this.navigator );
-                DEBUG && console.log("Breadcrumb %s show: %o -> %o", step, this, view)
-                this.body.show(view);
+                //DEBUG &&
+                console.log("%s Breadcrumb %s show: %o -> %o", (view.isModal?"Modal":"Region"), step, this, view)
+
+                if (view.isModal)  {
+                    this.navigator.Modal(view);
+                } else {
+                    this.body.show(view);
+                }
 
                 view.on("select", function(model) {
-                    console.error("Breadcrumb: select: %o -> %o", this, arguments);
+                    console.error("Breadcrumb: select: %o -> %o", self, arguments);
                     meta && self.collection.add(meta.model);
                     self.showCurrent();
                 });
-                view.on("action", function(action, meta) {
-                    console.warn("Breadcrumb: %s action: %o -> %o", action, self, meta);
-                    // meta && self.collection.add(meta.model);
+                view.on("action", function(action, action_meta) {
+                    console.warn("Breadcrumb: %s action: %o -> %o", action, view, action_meta);
+                    // meta && self.collection.add(action_meta.model);
                     // self.showCurrent();
                 });
                 view.on("navigate", function(go_to, model) {
@@ -56,6 +62,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                     self.showCurrent();
                 });
                 view.on("nested:navigate", function() {
+throw "x"
                     console.error("Breadcrumb: nested:navigate: %o -> %o", this, arguments);
                 });
 

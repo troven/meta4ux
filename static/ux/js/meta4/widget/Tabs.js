@@ -8,7 +8,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         var TabItem = Backbone.Marionette.ItemView.extend({
             tagName: "li", events: { "click": "doSelect" },
-            template: "<a href='#{{_ id}}' title='{{comment}}' data-toggle='tab'>{{label}}</a>",
+            template: "<a data-toggle='tab'>{{label}}</a>",
             doSelect: function() {
                 this.trigger("select", this.model);
             }
@@ -52,8 +52,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var _options = this.options;
 
                 this._views = this._resolveNested(_options.tabs || _options.views);
-                this.currentTab = _options.firstTab || _options.currentTab || _options.currentView || _options.view || _options.tabs[0];
-                DEBUG && console.log("Init Tabs (%o) %o", this, _options);
+                this.currentTab = _options.firstTab || _options.currentTab || _.keys(_options.tabs)[0];
+                DEBUG && console.log("Init Tabs (%o) %o", this, _options, this.currentTab);
 
                 this.collection = this.collection || new Backbone.Collection();
                 _.each(this._views, function(tab, id) {
@@ -86,11 +86,9 @@ DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
 
 			selectTab: function(id) {
 				id = ux.uid(id)
-				var view = this.getNestedView(id, { model: this.model })
+				var view = this.getNestedView(id, { model: this.model });
 DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
-				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id
-				this.$el.find("[data-toggle]").closest("li").removeClass("active");
-				this.$el.find("[href='#"+id+"']").closest("li").addClass("active");
+				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id;
 				this.body.show(view);
 				this.currentView = view;
 			}

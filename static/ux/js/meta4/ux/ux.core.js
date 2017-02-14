@@ -27,7 +27,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             });
 
             // register Template helpers
-            _.each(core.ux.templateHelpers, function(fn,name) {
+            _.each(core.ux.templateHelpers(module,options), function(fn,name) {
                 Handlebars.registerHelper(name,fn);
             });
 
@@ -101,7 +101,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             core.ux.stylize(view, options);
 
             // nested views
-            if (options._views) this._views = options._views;
+            this._views = options._views || {};
 
             // bind "when:" events
             core.iq.aware(view, options.when);
@@ -121,20 +121,20 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
         // resolve look-up values using a variety of strategies - returns Collection of { id, label }
         lookup: function(values) {
+            var _DEBUG = true; //ux.DEBUG
             if (_.isArray(values)) {
                 values = _.map(values, function(v) { return _.isObject(v)?v:{ id: v, label: v} });
-                ux.DEBUG && console.log("Array Lookup: %o", values)
+                _DEBUG && console.log("Array Lookup: %o", values)
                 return new Backbone.Collection(values);
             } else if (_.isObject(values)){
-                values = _.map(values, function(v,k) { return _.isString(v)?{ id: k, label: v}:v });
-                ux.DEBUG && console.log("Object Lookup: %o", values)
+                values = _.map(values, function(v,k) { return _.isObject(v)?v:{ id: k, label: v} });
+                _DEBUG && console.log("Object Lookup: %o", values)
                 return new Backbone.Collection(values);
             } else if (_.isString(values)) {
-//DEBUG &&
-                console.log("Named Lookup: %o -> %o", values, core.fact);
+                _DEBUG && console.log("Named Lookup: %o -> %o", values, core.fact);
                 return core.fact.models.get(values);
             } else  {
-                return new Backbone.Collection(values);
+                throw new Error("meta4:ux:oops:invalid-values");
             }
         },
 

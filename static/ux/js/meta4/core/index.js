@@ -63,7 +63,9 @@ console.warn("Model$ (%s) %o %o -> %o", options.model, this.fact.models, options
 				modelled.model = new this.fact.Model( options.model );
 			} else if ( options.model === false ) {
 //				modelled.model = new Backbone.Model()
-_DEBUG && console.debug("No Model: %o %o", options, modelled)
+// _DEBUG &&
+console.debug("No Model: %s -> %o %o", options.id, options, modelled)
+throw "x"
 			} else if ( options.model === true || options.model == undefined) {
 				var _options = { label: options.label, comment: (options.comment || ""), icon: (options.icon || "") };
 				_options.idAttribute = options[this.ux.idAttribute]
@@ -83,19 +85,15 @@ _DEBUG && console.debug("View Model (%s): %o %o", modelled.id, _options, modelle
                     _DEBUG = true;
                     var cid = options.collection.substring(1);
 					_collection = modelled.model.get(cid);
-					if (!_collection) {
-						_collection = new Backbone.Collection.extend( {
-                            url: function() {
-                                console.warn("Save Local Collection (%s): %o", options.collection, this);
-                                return true;
-                            }
-                        });
-_DEBUG && console.log("New Local Collection (%s): %o %o %o", cid, options, modelled, _collection);
-						modelled.model.set(cid, _collection);
-					} else {
-_DEBUG && console.log("Existing Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
-					}
-                    return { model: modelled.model };
+                    if (!_collection) {
+                        modelled.model.set(cid, []);
+                        _collection = modelled.model.get(cid);
+                        _DEBUG && console.log("New Local Collection (%s): %o %o -> %o", cid, options, modelled, _collection);
+                    } else {
+                        _DEBUG && console.log("Existing Local Collection (%s): %o %o %o", cid, options, modelled, _collection)
+                    }
+                    modelled.collection = _collection;
+                    return modelled;
 				} else if (options.collection.indexOf("!")==0) {
 				    // global-collection
 					var cid = options.collection.substring(1);
@@ -118,13 +116,13 @@ _DEBUG && console.log("Local Collection: %o %o %o %o", options.collection, optio
 				}
 
 				// resolve any string models
-				this.ux.model( { model: modelled.model, collection: _collection }, modelled);
+                modelled = this.ux.model( { model: modelled.model, collection: _collection }, modelled);
 _DEBUG && console.log("String Modelled: %o", modelled)
 			} else if (_.isArray(options.collection)) {
-_DEBUG && console.log("Array Collection", options.collection, this.fact)
+_DEBUG && console.log("Array %s Collection", options.id, options.collection, this.fact)
 				modelled.collection = this.fact.Collection(options.collection);
 			} else if (_.isObject(options.collection) && options.collection instanceof Backbone.Collection ) {
-_DEBUG && console.log("Existing Collection: %o %o", options, options.collection)
+_DEBUG && console.log("Existing %s Collection: %o %o", options.id, options, options.collection)
 				modelled.collection = options.collection;
 			} else if (_.isObject(options.collection) && _.isString(options.collection.id) ) {
 //_DEBUG &&
