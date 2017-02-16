@@ -13,10 +13,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         // UX Definition
 		var definition = _.extend({
-
 			isCommon:true, isActionable: true,
-			model: true,
-
 			template: "<span class='btn-group'><button class='btn dropdown-toggle' data-toggle='dropdown'><i class='pull-right mdi mdi-menu'></i>{{label}}</button><ul class='dropdown-menu'></ul></span>",
 			className: "btn-toolbar", tagName: "div",
 			childView: ButtonItem, childViewContainer: "ul",
@@ -26,6 +23,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			}, options.events ),
 
 			initialize: function(options) {
+                options = _.extend({ model: true }, options);
 				ux.checkOptions(options, ["collection"]);
 				ux.initialize(this, options);
 			},

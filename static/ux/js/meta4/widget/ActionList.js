@@ -33,11 +33,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 				ux.initialize(this, _options, navigator);
 			},
             doActionEvent: function(event, model) {
-//			    this.doEventSelect(event);
                 var $about = $(event.currentTarget).closest("[data-action]");
                 var data = $about.data() || this.model.attributes;
+                var action = data.action || "select";
                 var meta = { model: this.model, collection: this.collection };
-                var action = data.action || false;
+
                 DEBUG && console.log("doActionEvent (%s) %o %o %o ", action, event, $about, data);
                 this.trigger("action", action , meta);
             },
@@ -68,7 +68,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
                         this.triggerMethod("action", action, meta);
                         this.triggerMethod(""+action, meta);
                     } else if (this.isSelectable===true) {
-                        DEBUG && console.log("[ActionList] select: %o: %o -> %o", this, view, meta);
+                        //DEBUG &&
+                        console.log("[ActionList] select: %o: %o -> %o", this, view, meta);
                         this.triggerMethod("select", meta.model);
                     // } else {
                     //     DEBUG && console.log("[ActionList] no select: %o: %o -> %o", this, view, meta);

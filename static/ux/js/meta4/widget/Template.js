@@ -1,20 +1,20 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	var Template = function(options) {
-		var DEBUG = options.debug || ux.DEBUG;
+	var Template = function(_options,navigator) {
+		var DEBUG = _options.debug || ux.DEBUG;
 
 		var config = {
 			isTemplating: true, isActionable: true, isSelectable: true,
 			isNavigator: true, isHoverPanel: false, isNested: true,
 			isPopOver: false, isActionMenu: false,
-			template: options.template || "<div class='panel-title' data-action='{{id}}'>{{label}}</div>",
+			template: _options.template || "<div><h6>{{label}}</h6><div>{{comment}}</div></div>",
 			events: {
                 "click [data-navigate]": "doEventNavigate",
 				"click [data-action]": "doEventAction"
 			},
 			initialize: function(options) {
-				_.defaults(options, { model: true });
-				ux.initialize(this, options)
+				options = _.extend({ model: true }, options);
+				ux.initialize(this, options);
 				this.template = (this.model&&this.model.get("template")) || options.template || this.template;
 			},
             onRender: function() {

@@ -1,5 +1,7 @@
 define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"], function (_, Marionette, Handlebars, core, Widget) {
 
+    var DEFAULT_WIDGET_TYPES = [ "meta4/widget/Home", "meta4/widget/Buttons", "meta4/widget/CRUD" ];
+
     // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
     core.ux.ViewRegistry = Backbone.Model.extend({
         debug: false,
@@ -120,13 +122,12 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
 
         _registerViewsAndWidgets: function(views, widgetTypes, parent) {
             var self = this;
-            widgetTypes = widgetTypes || [];
+            widgetTypes = widgetTypes || DEFAULT_WIDGET_TYPES;
 
             _.each(views, function(view, key) {
                 if (_.isObject(view)) {
 
                     var id = view.id || parent.id+"#"+key;
-
                     if (id) {
                         // register global views
                         self.register( view.id, view );
@@ -187,8 +188,6 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
 
             // uses require.js to load Widgets and cache meta-data,
             require(widgetTypes, function() {
-               self.debug && console.log("Loaded widgets: %o", arguments);
-
                 _.each(arguments, function(widget, i) {
 
                     if (!widget.id)
@@ -199,6 +198,8 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
 
                     self.add(widget);
                 })
+
+               console.log("Loaded widgets: %o ->> %o", widgetTypes, arguments);
                 self.debug && console.log("Loaded %s x widgets (total: %s)", widgetTypes.length, self.size());
                 cb && cb();
             })
@@ -215,8 +216,10 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
                 throw new Error("meta4:ux:widget:oops:invalid-id");
 
             var _widget = this.get(id);
-            if (!_widget)
+            if (!_widget) {
+                console.log("Missing Widget: %o", this, core.ux.view);
                 throw new Error("meta4:ux:widget:oops:missing#"+id);
+            }
 
             var fn = _widget.get("fn")
 

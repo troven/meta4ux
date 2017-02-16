@@ -43,6 +43,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 return _.extend({ model: model }, this.options.child);
             },
             initialize: function(_options) {
+                options = _.extend({ model: true }, options);
                 ux.initialize(this, _options);
             }
         });

@@ -35,9 +35,11 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
             // discover used widgets
             var widgetTypes = module.views.register(options.views);
+            console.log("widgetTypes: %o", widgetTypes);
 
             // lazy-load the widgets
             module.widgets.requires(widgetTypes, function() {
+
                 module.trigger("home", options);
             });
 
@@ -91,8 +93,9 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             view.navigator = navigator?navigator:false;
             core.ux.model(options, view);
 
-            this.events = _.extend({}, this.events, this.options?this.options.events:{}, options.events);
-            this.ui = _.extend( {}, this.ui, options.ui );
+            view.events = _.extend({}, view.events, view.options?view.options.events:{}, options.events);
+            view.ui = _.extend({}, view.ui, options.ui );
+            view.can = _.extend({}, view.can, options.can);
 
             // apply mixins
             core.ux.mixer.call(view, options);
@@ -101,7 +104,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
             core.ux.stylize(view, options);
 
             // nested views
-            this._views = options._views || {};
+            view._views = _.extend({}, options._views);
 
             // bind "when:" events
             core.iq.aware(view, options.when);

@@ -5,12 +5,14 @@ define(["underscore", "backbone", "core",
 
     var fact = core.fact;
 
+    if (!DefaultSync) throw "Missing DefaultSync";
+
     return function(options) {
 
         // internal constants
         var _DEBUG = options.debug || fact.DEBUG;
-        var storeType = options.store || "file"
-        var storeURL = options.url || "models/"+storeType
+        var storeType = options.store = options.store || options.id;
+        var storeURL = options.url = options.url || "models/"+storeType;
 
         _DEBUG && console.log("Default Factory: (%s) => %o", options.id, options);
 
@@ -21,8 +23,9 @@ define(["underscore", "backbone", "core",
         var Model = Backbone.DocumentModel.extend({
             url: function() {
                 return core.url(this.collection?this.collection.url:storeURL);
-            } ,
-            sync: fact.sync.Default,
+            },
+            type: storeType,
+            sync: DefaultSync,
             mutators: options.mutators,
             defaults: _.isObject(options.defaults)?options.defaults:{},
             schema: options.schema,
@@ -34,8 +37,9 @@ define(["underscore", "backbone", "core",
 
         var Collection = Backbone.DocumentCollection.extend({
             url: core.url(storeURL),
+            type: storeType,
             schema: options.schema,
-            sync: fact.sync.Default,
+            sync: DefaultSync,
             model: Model
         });
 
@@ -44,7 +48,7 @@ define(["underscore", "backbone", "core",
         var collection = new Collection();
         collection.options = _.omit(options, ["data"]);
 
-        _DEBUG && console.log("DocumentModel: (%s): @ %s", options.id, storeURL);
+        // _DEBUG && console.log("Default Collection: (%s): @ %s --> %o", options.id, storeURL, collection);
         return collection;
     }
 

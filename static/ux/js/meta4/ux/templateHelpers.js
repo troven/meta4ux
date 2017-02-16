@@ -64,8 +64,8 @@ if (!navigator) throw "meta4:oops:ux:templates:missing-navigator";
                 if (!lookup) return "no models @ " + hash.collection;
                 var value = this[hash.field];
                 var model = lookup.get(value);
-                console.log("lookup: %s = %s -> %o", hash.field, value, lookup);
-                if (!model) return "no " +hash.field+" = "+ value + " in " + hash.collection;
+//                console.log("lookup: %s = %s -> %o", hash.field, value, lookup);
+                if (!model) return value;
                 return model.get(hash.label||"label");
             },
             default: function (field, _default) {

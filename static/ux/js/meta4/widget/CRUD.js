@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _, Backbone, Marionette, ux) {
+define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Buttons"], function ($, _, Backbone, Marionette, ux, ButtonsWidget) {
 
 	var idAttribute = ux.idAttribute || "id";
 	var typeAttribute = ux.typeAttribute || "widget";
@@ -12,10 +12,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
         var TEMPLATE_TITLES = options.comment?"<h3>{{label}}</h3><p>{{comment}}</p>":"";
         var TEMPLATE_HEADER = ux.compileTemplate("<div class='panel-heading'><img class='pull-right' height='64' src='{{icon}}'/>"+TEMPLATE_TITLES+"</div>");
 
-        var TEMPLATE_FOOTER_CREATE = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
-        var TEMPLATE_FOOTER_READ = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-primary pull-right' data-action='create'>Create</button><div/>");
-        var TEMPLATE_FOOTER_UPDATE = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-danger pull-left' data-action='delete'>Delete</button><button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
-        var TEMPLATE_FOOTER_EDIT = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'>button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
+        // var TEMPLATE_FOOTER_CREATE = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
+        // var TEMPLATE_FOOTER_READ = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-primary pull-right' data-action='create'>Create</button><div/>");
+        // var TEMPLATE_FOOTER_UPDATE = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-danger pull-left' data-action='delete'>Delete</button><button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
+        // var TEMPLATE_FOOTER_EDIT = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'>button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
 
         var TEMPLATE_FORM = ux.compileTemplate("<div class='regions'><div class='region_header'></div><div class='panel-body region_body'></div><div class='region_footer'></div></div>");
 
@@ -40,14 +40,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($, _,
 
 			initialize: function(_options) {
 				// sanitize options
-			    _.defaults(_options, { model: true, views: {} } );
+			    _.defaults(_options, { model: false, views: {} } );
                 this.can = _.extend({ create: true, read: true, update: true, delete: true }, _options.can);
+                options.buttons = options.buttons || "buttons";
 
-				// initialize
 				ux.initialize(this, _options);
 				this.initializeHeadersFooters(_options);
 
-DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can);
+DEBUG && console.log("init %s CRUD: %o %o %o", this.id, this, _options, this.can);
 
                 // bind CRUD events
                 this.on("nested:create", this.onCreate);
@@ -65,6 +65,17 @@ DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can);
 				return this;
 			},
 
+            getButtons: function(buttons_id) {
+                if (!buttons_id) throw "meta4:ux:crud:oops:missing-buttons-id";
+                var modelButtons = this.navigator.models.get(this.options.buttons);
+                if (!modelButtons) throw "meta4:ux:crud:oops:missing-buttons-model";
+                var viewButtons = modelButtons.get(buttons_id);
+                if (!viewButtons) return false;
+                var buttons = viewButtons.get("buttons");
+                if (!buttons) throw "meta4:ux:crud:oops:missing-button-set#"+buttons_id;
+                return buttons;
+            },
+
 			initializeHeadersFooters: function(_options) {
 
                var headers = this.headers = _options.headers || {};
@@ -74,14 +85,14 @@ DEBUG && console.log("init CRUD: %o %o %o", this, _options, this.can);
                headers.update =  headers.update || { "template": TEMPLATE_HEADER };
 
                if (this.can.create) {
-                   footers.create =  footers.create || { "template": TEMPLATE_FOOTER_CREATE };
-                   footers.read   =  footers.read   || { "template": TEMPLATE_FOOTER_READ };
+//                   footers.create =  footers.create || { "template": TEMPLATE_FOOTER_CREATE };
+//                   footers.read   =  footers.read   || { "template": TEMPLATE_FOOTER_READ };
                }
-               footers.update =  footers.update || { "template": TEMPLATE_FOOTER_UPDATE };
-               footers.edit   =  footers.edit   || { "template": TEMPLATE_FOOTER_EDIT};
+               // footers.update =  footers.update || { "template": TEMPLATE_FOOTER_UPDATE };
+               // footers.edit   =  footers.edit   || { "template": TEMPLATE_FOOTER_EDIT};
 
 //DEBUG &&
-console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers);
+console.log("init %s HeadersFooters: %o -> %o %o", this.id, this, this.headers, this.footers);
 
 //				ux.initialize(this, { isNested: true, views: _options.headers })
 //				ux.initialize(this, { isNested: true, views: _options.footers })
@@ -102,17 +113,17 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
 			},
 
             onNestedAction: function(action, meta) {
-                console.log("CRUD onNestedAction (%s): %o", action, meta)
-                // if (can[action]===false) {
-                //     console.log("CRUD %s denied: %o -> %o", action, this, meta);
-                //     throw new Error("meta4:ux:crud:oops:cannot-"+action);
-                // }
-                // this.triggerMethod("action", action, meta);
-                // this.triggerMethod(""+action, meta);
+                console.log("CRUD %s onNestedAction (%s): %o", this.id, action, meta)
+                if (this.can[action]===false) {
+                    console.log("CRUD %s @ %s denied: %o -> %o", action, this.id, this, meta);
+                    throw new Error("meta4:ux:crud:oops:cannot-"+action);
+                }
+                this.triggerMethod("action", action, meta);
+                this.triggerMethod("nested:"+action, meta);
             },
 
             onAction: function(action, meta) {
-                console.log("CRUD onAction (%s): %o", action, meta)
+                console.log("CRUD onAction (%s): %o -> %o", action, this, meta)
                 var can = this.can || this.options.can || {};
                 if (can[action]===false) {
                     console.log("CRUD %s denied: %o -> %o", action, this, meta);
@@ -131,45 +142,49 @@ console.log("initHeadersFooters: %o -> %o %o", this, this.headers, this.footers)
 //                this.triggerMethod(action, meta);
             },
 
-
-            onSelect: function(view, selection) {
-throw "deprecated";
-                this.triggerMethod("update", selection);
+            onSelect: function(meta) {
+                if (this.isSelectable===false) return;
+                this.selected = meta;
+                this.triggerMethod("update", meta);
             },
 
-            onSave: function(meta) {
+            onSave: function() {
                 var self = this;
                 var form = self.body.currentView;
-
-                if (form.validate) {
-                    var validated = form.validate();
-                    console.log("CRUD Form validated: %o %o", form, validated);
+                model = this.selected || this.model; // form.model;
+                if (!model) {
+                    console.log("CRUD %s not-selected: %o", this.id, this);
+                    throw "Missing model for view: "+self.id;
                 }
-
-                model = meta.model || form.model;
-                if (!model) throw "Missing model for view: "+self.id;
-                console.log("CRUD onSave: %o %o", this, model);
 
                 model.once("sync", function() {
 //DEBUG &&
-console.log("CRUD onSaved: %o %o", this, arguments);
+console.log("CRUD %s onSaved: %o %o", this.id, this, arguments);
                     self.onRead();
                 });
 
                 model.once("error", function() {
-                    console.log("CRUD onError: %o %o", this, arguments);
+                    console.log("CRUD %s onError: %o %o", this.id, this, arguments);
                 })
 
-                model.validate && model.validate();
+                if (form.validate) {
+                    var validated = form.validate();
+                    console.log("CRUD %s Form validated: %o -> %o", this.id, form, validated);
+                } else if (model.validate) {
+                    var validated = model.validate();
+                    console.log("CRUD %s Model validated: %o -> %o", this.id, form, validated);
+                }
+
                 if (model.isValid())  {
                     self.triggerMethod("valid");
                     if (model.url) {
-                        DEBUG && console.log("CRUD onSave: %o %o valid: %s", this, model, model.isValid());
-                        model.save();
+                        // DEBUG &&
+                        console.log("CRUD %s saving: %o -> %o", this.id, model, _.keys(model));
+                        model.save && model.save();
                     } else {
-                        DEBUG && console.log("CRUD noSave: %o %o valid: %s", this, model, model.isValid());
+                        DEBUG && console.log("CRUD %s not saving: %o", this.id, model);
                     }
-                    if (!this.modal) {
+                    if (!this.isModal) {
                         self.onRead();
                     }
                 } else {
@@ -181,7 +196,8 @@ console.log("CRUD onSaved: %o %o", this, arguments);
             },
 
             showHeaderFooters: function(action, meta) {
-                meta = _.extend({ model: this.body.currentView?this.body.currentView.model:this.model, collection: this.collection },meta);
+                meta = _.extend({ model: this.selected || (this.body.currentView?this.body.currentView.model:this.model),
+                    collection: this.collection, can: this.can }, meta);
 
                 if (this.isModal) {
                     this.header.show(new ActionView(meta));
@@ -198,44 +214,84 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 // DEBUG && console.debug("showHeader: (%s) %o %o", action, header, headerView);
                 this.listenToNestedEvents(headerView, { "nested:action": true });
 
-                // Footers
-                var footer = this.options.footers!==false && this.footers[action] || this.options.footers;
-                footer = _.extend({}, meta, footer);
-                footer.id = footer.id || this.id+"#footer";
-                var footerView = ( footer && this.getNestedView(footer, meta) ) || new ActionView(footer);
-                // DEBUG && console.debug("showFooter: (%s) %o %o", action, footer, footerView);
-                this.footer.show(footerView);
-                this.listenToNestedEvents(footerView, { "nested:action": true });
+                var footerButtons = this.getButtons("crud:"+action);
+                if (footerButtons) {
+                    // Footers
+                    var footer = this.options.footers!==false && this.footers[action] || this.options.footers;
+                    footer = _.extend({ id: this.id+"#footer", widget: "Buttons"}, meta, { collection: footerButtons}, footer);
+
+                    var footerView = ( footer && this.getNestedView(footer) ) || new EmptyView();
+                    //DEBUG &&
+                    console.debug("show %s footer: (%s) %o %o", this.id, action, footer, footerView);
+                    this.footer.show(footerView);
+                    this.listenToNestedEvents(footerView, { "nested:action": true });
+
+                } else {
+                    //DEBUG &&
+                    console.debug("noFooter: %s (%s) %o", this.id, action, this);
+//                    this.footer.show( new EmptyView() );
+                }
 
                 //console.log("showHeaderFooters: %o -> %o %o", this, header, footer);
 
             },
 
-            onCreate: function() {
-                var self = this;
-
+            newModel: function() {
                 var _collection = this.collection;
-
                 // create new model - attach schema
                 var _model = new _collection.model();
                 _model.schema = _collection.schema;
-	            _model.collection = _collection;
+                _model.collection = _collection;
+                return _model;
+            },
 
-	            var meta = { model: _model };
+            showBody: function(view_id, meta) {
+                if (!view_id) throw "meta4:ux:crud:oops:missing:view-id";
+                if (this.can[view_id] === false) {
+                    console.error("Can't show %s view: %o", view_id, this);
+                    return false;
+                }
+                var self = this;
+                meta = meta || { model: this.selected?this.selected:this.model, collection: this.collection };
+                var view = this.getNestedView(view_id, meta );
+                if (!view) {
+                    return false;
+                }
+                this.listenToNestedEvents(view, { "nested:action": true, "nested:footer": true });
 
-DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
+                view.on("show", function() {
+                    console.log("NESTED:FOOTER: %s -> %o -> %o", view.footer?true:false, this, view);
+                    if (view.footer) {
+                        self.showHeaderFooters("nested", meta);
+                    }
+                })
 
-//                _collection.trigger("create",_model)
+                if (view.isModal)  {
+                    console.log("CRUD: modal: %s -> %o", view_id, view);
+                    this.navigator.Modal(view);
+                } else {
+                    console.log("CRUD: body: %s -> %o", view_id, view);
+                    this.body.show(view);
+                    this.showHeaderFooters(view_id, meta);
+                }
+                return view;
+            },
 
-                // heuristically acquire an editable view
-                var view = this.getNestedView("create", meta) || this.getNestedView("edit", meta);
+            onCreate: function() {
+                var self = this;
+                var _model = this.selected = this.newModel();
+                var meta = { model: _model };
+
+                var view = this.showBody("create", meta) || this.showBody("edit", meta);
                 if (!view) throw "meta4:ux:crud:oops:missing:view:create";
+
+DEBUG && console.error("CRUD %s onCreate: %o %o %o", this.id, this, self.collection, meta)
 
                 view.once("cancel", function() { self.onRead() });
 
                 this.once("save", function() {
-                    console.log("CRUD onSave: %o %o %o", _collection, view, arguments);
-                    _collection.add(_model);
+                    console.log("CRUD onSave: %o %o %o", self.collection, view, arguments);
+                    self.collection.add(_model);
                 })
 
                 view.collection.once("error", function(response) {
@@ -243,14 +299,6 @@ DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
                     ux.Alert({ message: "Error: "+response.message});
                     self.onRead();
                 });
-
-                if (view.isModal)  {
-                    this.navigator.Modal(view);
-                } else {
-                    this.body.show(view);
-                }
-
-                this.showHeaderFooters("create", { model: _model, collection: _collection} )
             },
 
             onRead: function(view_id) {
@@ -258,27 +306,23 @@ DEBUG && console.log("CRUD onCreate: %o %o %o", this, _collection, meta)
                 var can = this.options.can;
                 var self = this
                 var meta = { model: this.model, collection: this.collection };
-                var view = this.getNestedView(view_id, meta );
+                var view = this.showBody(view_id, meta );
                 DEBUG && console.log("CRUD onRead: (%s) %o -> %o", view_id, this, view);
+                if (!view) throw "meta4:ux:crud:oops:missing:view:read";
 
-                if (view) {
-                    this.listenToNestedEvents(view, { "nested:action": true, "nested:select": true });
-                    this.showHeaderFooters(view_id, meta )
-                    this.body.show(view);
-                } else {
+                view.on("cancel", function() {
                     this.destroy();
-                }
+                })
             },
 
             onUpdate: function(selected) {
                 var self = this;
-                var meta = { model: selected || this.model };
-                var view = this.getNestedView("update", meta) || this.getNestedView("edit", meta) || this.getNestedView("view", meta);
-DEBUG && console.log("CRUD onUpdate: %o %o", this, selected)
+                var meta = { model: selected || this.selected };
+                var view = this.showBody("update", meta) || this.showBody("edit", meta);
+                if (!view) throw "meta4:ux:crud:oops:missing:view:update-or-edit";
+                DEBUG && console.log("CRUD onUpdate: %o %o", this, selected)
 
                 this.once("cancel", function() { self.onRead() });
-                this.body.show(view);
-                this.showHeaderFooters("update", meta );
             },
 
             onDelete: function() {

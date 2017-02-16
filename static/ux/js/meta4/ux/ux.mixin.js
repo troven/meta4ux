@@ -641,7 +641,7 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             $views.each(function() {
                 var $view = $(this);
                 var view_id = $view.attr("data-view");
-                var view = self.getNestedView(view_id);
+                var view = self.getNestedView(view_id, { model: self.model });
                 view.on("navigate", function(g, m) {
                     console.log("navigate-parent: %o -> %s -> %o", this, g, m);
                     self.trigger("navigate", g, m);
@@ -658,6 +658,7 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
 			    return;
 //			    throw new Error("meta4:ux:mixin:oops:view-not-nested");
             }
+            meta = meta || { model: this.model, collection: this.collection };
 
             if (self.regions) {
                 //DEBUG &&
@@ -787,9 +788,9 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
 
             if (_.isObject(conf)) {
                 if (!meta.collection) delete meta.collection;
-                if (!meta.model) delete meta.model;
+                if (!meta.model || conf.model===true) delete meta.model;
                 var _options= _.extend({}, conf, meta);
-//console.log("getNestedView:models: %s -> %o %o", _options.id, conf, meta);
+console.log("getNestedView:models: %s -> %o %o", _options.id, conf, meta);
                 if (!_options.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
                 widget = navigator.views.view(_options.id, _options, navigator);
                 _DEBUG && console.log("widget: %s -> %o -> %o", _options.id, _options, widget);
@@ -813,18 +814,17 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
         listenToNestedEvents: function(widget, when) {
             var self = this;
             var trigger = this.triggerMethod?this.triggerMethod:this.trigger; // Prefer marionette
-            when = _.extend({}, widget.options.when, when);
+            when = _.extend({}, widget.options?widget.options.when:{}, when);
 
             // bubble nested:events to parent
-            _.each(when, function(then, when) {
+            _.each(when, function captureNestedEvent(then, when) {
                 if (when.indexOf("nested:")==0) {
 //                    console.log("WHEN: %s -> %o <-- %o", when, self, widget);
-                    widget.on(when.substring(7), function() {
-                        if (arguments[0].indexOf("nested:")<0) {
-                            arguments[0] = "nested:"+arguments[0];
-                        }
-//                        console.log("trigger: %s %o <- %o", arguments[0], self, widget);
-                        trigger.apply(self, arguments);
+                    widget.on(when.substring(7), function triggerNestedEvent() {
+                        var args = Array.prototype.slice.call(arguments);
+                        args = [when].concat(args);
+                        console.log("nested:trigger: %s %o <- %o", when, this, args);
+                        trigger.apply(self, args);
                     });
                 }
             });

@@ -48,7 +48,7 @@ define(["jquery", "underscore", "backbone", "meta4/util/strings"], function ($,_
 		resolve: function(options, modelled) {
 			if (!options) throw "meta4:ux:oops:missing-options"
 			var _DEBUG = options.debug || this.ux.DEBUG
-			modelled = modelled || _.extend({},options);
+			modelled = modelled || {};
 
 			// Resolve Backbone Model - last resort, use 'options'
 			if (_.isString(options.model)) {
@@ -57,22 +57,23 @@ define(["jquery", "underscore", "backbone", "meta4/util/strings"], function ($,_
 console.warn("Model$ (%s) %o %o -> %o", options.model, this.fact.models, options, modelled);
 			} else if ( options.model instanceof Backbone.Model ) {
 				modelled.model = options.model;
+//console.warn("BB Model$ (%s) %o %o -> %o", options.id, options.model, options, modelled);
 			} else if (_.isFunction(options.model)) {
 				modelled.model = options.model(options);
 			} else if (_.isObject(options.model)) {
+console.warn("Explicit Model$ (%s) %o %o -> %o", options.model, this.fact.models, options, modelled);
 				modelled.model = new this.fact.Model( options.model );
-			} else if ( options.model === false ) {
-//				modelled.model = new Backbone.Model()
-// _DEBUG &&
-console.debug("No Model: %s -> %o %o", options.id, options, modelled)
-throw "x"
-			} else if ( options.model === true || options.model == undefined) {
-				var _options = { label: options.label, comment: (options.comment || ""), icon: (options.icon || "") };
-				_options.idAttribute = options[this.ux.idAttribute]
-				modelled.model = new this.fact.Model({})
-				modelled.model.set(_options)
-_DEBUG && console.debug("View Model (%s): %o %o", modelled.id, _options, modelled.model)
-			} else throw "meta4:ux:oops:invalid-model#"+options.model
+			}
+
+			if ( !modelled.model || options.model===true ) {
+				var _options = { id: options.id, label: options.label, comment: (options.comment || options.label), icon: (options.icon || "") };
+				modelled.model = new this.fact.Model({});
+				modelled.model.set(_options);
+//_DEBUG &&
+console.debug("View Model (%s): %o %o", modelled.id, _options, modelled);
+			} else {
+                // _DEBUG && console.debug("NestedModel (%s): %o %o", modelled.id, _options, modelled);
+            }
 
 			// Resolve Backbone Collection
 			if (_.isString(options.collection)) {
