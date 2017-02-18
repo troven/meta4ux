@@ -69,8 +69,7 @@ console.warn("Explicit Model$ (%s) %o %o -> %o", options.model, this.fact.models
 				var _options = { id: options.id, label: options.label, comment: (options.comment || options.label), icon: (options.icon || "") };
 				modelled.model = new this.fact.Model({});
 				modelled.model.set(_options);
-//_DEBUG &&
-console.debug("View Model (%s): %o %o", modelled.id, _options, modelled);
+_DEBUG &&console.debug("View Model (%s): %o %o", modelled.id, _options, modelled);
 			} else {
                 // _DEBUG && console.debug("NestedModel (%s): %o %o", modelled.id, _options, modelled);
             }

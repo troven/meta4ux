@@ -29,7 +29,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "oops", "ux"
 
                 // Render Home View - over-ride using 'home.type'
 
-                console.log("Home (%s): %o -> %o", id, options, navigator)
+                _DEBUG && console.log("Home (%s): %o -> %o", id, options, navigator)
                 var home = navigator.views.view(id, options, navigator);
                 if (!home) throw new Error("meta4:ux:home:oops:missing-home");
 

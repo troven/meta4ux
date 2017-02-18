@@ -6,8 +6,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         options.template =  options.template || ux.compileTemplate("<div class='breadcrumb-regions'><div class='breadcrumb-header'></div><div class='wrapper main'><div class='breadcrumb-body'>loading breadcrumb ...</div></div><div class='breadcrumb-footer'></div></div>");
 
-        var CrumbItem = M.ItemView.extend( { tagName: "li", template: "<a href='#{{id}}'>{{label}}</a>" });
-        var Crumbs = M.CollectionView.extend( { tagName: "ol", childView: CrumbItem } );
+        var CrumbItem = M.View.extend( { tagName: "li", className: "breadcrumb-item", template: "<a href='#{{id}}'>{{label}}</a>" });
+        var Crumbs = M.CollectionView.extend( { tagName: "ul", className: "breadcrumb", childView: CrumbItem } );
 
 		var config = {
 			isTemplating: true, isActionable: true, isNested: true,
@@ -43,7 +43,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 if (view.isModal)  {
                     this.navigator.Modal(view);
                 } else {
-                    this.body.show(view);
+                    this.showChildView("body",view);
                 }
 
                 view.on("select", function(model) {
@@ -67,17 +67,19 @@ throw "x"
                 });
 
             },
-            onShow: function() {
-DEBUG && console.log("Breadcrumb onShow: %o", this)
+            onAttach: function() {
+DEBUG && console.log("Breadcrumb onAttach: %o", this)
                 this.showNestedRegions();
                 this.showCurrent();
                 var crumbs = new Crumbs({ collection: this.collection });
-                this.header.show(crumbs);
+                this.showChildView("header", crumbs);
             },
             resetTrail: function() {
 DEBUG && console.log("Breadcrumb Home: %o", this)
 				this.collection.reset();
-				this.collection.add( { id: 'home', label: options.label || "Home" } );
+
+                var homeHash = window.location.hash?window.location.hash.substring(1):"views:home";
+				this.collection.add( { id: homeHash, label: "Home" } );
 
                 return 0;
 			},
@@ -94,7 +96,7 @@ DEBUG && console.log("Breadcrumb: %o (%s) -> %o %o", this, view.id, view, attrs)
             }
 		}
 
-		return M.LayoutView.extend(config);
+		return M.View.extend(config);
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

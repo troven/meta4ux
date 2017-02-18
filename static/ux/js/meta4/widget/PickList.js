@@ -10,7 +10,7 @@ function ($, _, Backbone, Marionette, ux, Form) {
 	ux.view.PickList = ux.view["meta4:ux:PickList"] = function(options) {
 		options = _.defaults(options, { child: { "className": "list-group-item" } })
 
-		var ListItem = Backbone.Marionette.ItemView.extend( _.extend({
+		var ListItem = Backbone.Marionette.View.extend( _.extend({
 			tagName: "li", isHoverPanel: true, isActionable: true, isTemplating: true,
 			template: options.child.template || "<span data-id='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'><span class='pull-right action-buttons'><i data-trigger='delete' class='btn btn-sm btn-info fa fa-trash' title='Remove'></i></span><label>{{"+labelAttribute+"}}</label></span>",
 			events: {

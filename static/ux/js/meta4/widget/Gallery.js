@@ -10,7 +10,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "mixitup"], func
         _.defaults(options, { child: {} })
         var DEBUG = options.debug || ux.DEBUG;
 
-        var GalleryItem = Backbone.Marionette.ItemView.extend( {
+        var GalleryItem = Backbone.Marionette.View.extend( {
             isHoverPanel: true, isPopOver: true, isActionable: true, isTemplating: true,
             isSelectable: true,
             className: "gallery-item mix",

@@ -10,7 +10,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux",
 		options = _.extend({viewFacet: "type", viewable: {} }, options);
 		var DEBUG = true;
 
-		var ViewStep = Backbone.Marionette.ItemView.extend( {
+		var ViewStep = Backbone.Marionette.View.extend( {
 			className: "ux_view step",
 			templateHelpers: ux.mixin.Common.templateHelpers,
 			template: "<div class='slide' data-id='{{"+idAttribute+"}}' title='{{comment}}'>{{label}}</div>"

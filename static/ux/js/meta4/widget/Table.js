@@ -8,10 +8,10 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         options.template =  options.template ||
             ux.compileTemplate("<table><thead></thead><tbody></tbody><tfoot></tfoot></table>");
 
-        var TableHeading =  Backbone.Marionette.ItemView.extend({ tagName: "th", template: "{{label}}" });
+        var TableHeading =  Backbone.Marionette.View.extend({ tagName: "th", template: "{{label}}" });
         var TableHeadings =  Backbone.Marionette.CollectionView.extend({ tagName: "tr", childView: TableHeading });
 
-        var TableCell =  Backbone.Marionette.ItemView.extend({ tagName: "td" });
+        var TableCell =  Backbone.Marionette.View.extend({ tagName: "td" });
         var TableColumns =  Backbone.Marionette.CollectionView.extend({ tagName: "tr", childView: TableHeading,
             childViewOptions: function(model, index) {
 
@@ -36,14 +36,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 return this;
             },
             onRender: function() {
-                this.header.show(new TableHeadings({ model: this.model, collection: this.columns }));
+                this.showChildView("header",new TableHeadings({ model: this.model, collection: this.columns }));
 
                 var meta = { model: this.model, collection: this.collection, columns: this.columns };
-                this.body.show(new TableRows(meta));
+                this.showChildView("body",new TableRows(meta));
             }
         }
 
-        return Backbone.Marionette.LayoutView.extend(view_defn)
+        return Backbone.Marionette.View.extend(view_defn)
     }
 
     // Widget meta-data allows runtime / editor to inspect basic capabilities

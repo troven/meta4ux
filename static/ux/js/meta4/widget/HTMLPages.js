@@ -74,7 +74,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             options = _.extend({editable: false, editing: false, edited: false, attached: false}, options);
             var DEBUG = ux.DEBUG && true;
 
-            var HTML = Backbone.Marionette.ItemView.extend({
+            var HTML = Backbone.Marionette.View.extend({
                 template: "<div class='ux_sample'><label data-id='{{id}}'>{{label}}</label><div class='ux_toggled ux_preview'>{{{template}}}</div></div>"
             });
 //		var HTML = ux.view["meta4:ux:HTML"](options);

@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 	var DEBUG = true
 
 	ux.view.QB = ux.view["meta4:ux:QB"] = function(options, navigator) {
-        return Backbone.Marionette.ItemView.extend({
+        return Backbone.Marionette.View.extend({
             tagName: "li", template: false,
 			initialize: function(_options) {
 				ux.initialize(this, _options)

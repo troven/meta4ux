@@ -21,9 +21,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
 
 		options.template =  options.template || TEMPLATE_FORM;
 
-		var EmptyView = Backbone.Marionette.ItemView.extend({ "template": "<!- empty ->" });
+		var EmptyView = Backbone.Marionette.View.extend({ "template": "<!- empty ->" });
 
-        var ActionView = Backbone.Marionette.ItemView.extend({ "template": "<!- empty ->", "css": 'clearfix',
+        var ActionView = Backbone.Marionette.View.extend({ "template": "<!- empty ->", "css": 'clearfix',
             isActionable: true,
             initialize: function(_options) {
                 console.log("init CRUD ActionView: %o %o %o", this, _options);
@@ -31,7 +31,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
             }
         });
 
-		var CRUDView = Backbone.Marionette.LayoutView.extend( _.extend({
+		var CRUDView = Backbone.Marionette.View.extend( _.extend({
 			isNested: true, isActionable: false, isHoverPanel: false,
             template: options.template,
             className: "meta4_crud",
@@ -42,7 +42,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
 				// sanitize options
 			    _.defaults(_options, { model: false, views: {} } );
                 this.can = _.extend({ create: true, read: true, update: true, delete: true }, _options.can);
-                options.buttons = options.buttons || "buttons";
+                _options.buttons = _options.buttons || "buttons";
 
 				ux.initialize(this, _options);
 				this.initializeHeadersFooters(_options);
@@ -67,6 +67,7 @@ DEBUG && console.log("init %s CRUD: %o %o %o", this.id, this, _options, this.can
 
             getButtons: function(buttons_id) {
                 if (!buttons_id) throw "meta4:ux:crud:oops:missing-buttons-id";
+console.log("getButtons: %s -> %o", this.options.buttons, this);
                 var modelButtons = this.navigator.models.get(this.options.buttons);
                 if (!modelButtons) throw "meta4:ux:crud:oops:missing-buttons-model";
                 var viewButtons = modelButtons.get(buttons_id);
@@ -196,12 +197,12 @@ console.log("CRUD %s onSaved: %o %o", this.id, this, arguments);
             },
 
             showHeaderFooters: function(action, meta) {
-                meta = _.extend({ model: this.selected || (this.body.currentView?this.body.currentView.model:this.model),
+                meta = _.extend({ model: this.selected || (this.getChildView("body")?this.getChildView("body").model:this.model),
                     collection: this.collection, can: this.can }, meta);
 
                 if (this.isModal) {
-                    this.header.show(new ActionView(meta));
-                    this.footer.show(new ActionView(meta));
+                    this.showChildView("header",new ActionView(meta));
+                    this.showChildView("footer",new ActionView(meta));
 DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, options)
                     return;
                 }
@@ -223,13 +224,13 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                     var footerView = ( footer && this.getNestedView(footer) ) || new EmptyView();
                     //DEBUG &&
                     console.debug("show %s footer: (%s) %o %o", this.id, action, footer, footerView);
-                    this.footer.show(footerView);
+                    this.showChildView("footer",footerView);
                     this.listenToNestedEvents(footerView, { "nested:action": true });
 
                 } else {
                     //DEBUG &&
                     console.debug("noFooter: %s (%s) %o", this.id, action, this);
-//                    this.footer.show( new EmptyView() );
+//                    this.showChildView("footer", new EmptyView() );
                 }
 
                 //console.log("showHeaderFooters: %o -> %o %o", this, header, footer);
@@ -260,7 +261,7 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 this.listenToNestedEvents(view, { "nested:action": true, "nested:footer": true });
 
                 view.on("show", function() {
-                    console.log("NESTED:FOOTER: %s -> %o -> %o", view.footer?true:false, this, view);
+                    DEBUG && console.log("NESTED:FOOTER: %s -> %o -> %o", view.footer?true:false, this, view);
                     if (view.footer) {
                         self.showHeaderFooters("nested", meta);
                     }
@@ -271,7 +272,7 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                     this.navigator.Modal(view);
                 } else {
                     console.log("CRUD: body: %s -> %o", view_id, view);
-                    this.body.show(view);
+                    this.showChildView("body",view);
                     this.showHeaderFooters(view_id, meta);
                 }
                 return view;
@@ -327,7 +328,7 @@ DEBUG && console.error("CRUD %s onCreate: %o %o %o", this.id, this, self.collect
 
             onDelete: function() {
                 if (!this.can.delete) return;
-                var _model = this.body.currentView.model;
+                var _model = this.getChildView("body").model;
 DEBUG && console.log("CRUD onDelete: %o %o", this, _model);
                 var y_or_n = confirm("Delete ?");
                 if (y_or_n) {

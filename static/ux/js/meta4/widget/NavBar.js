@@ -8,13 +8,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkOptions(options); // sanity check ('this', 'label')
         if (!module) throw new Error("meta4:ux:NavBar:oops:no-module");
 
-		var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
+		var MenuItem = Backbone.Marionette.View.extend( _.extend({
 			events: { "click": "doSelect"},
 			tagName: "li", template: "<a href='#{{id}}' title='{{label}}'>{{label}}</a>",
             initialize: function(_options) {
                 ux.initialize(this, _options);
             },
             doSelect: function() {
+                this.$el.addClass("active");
 			    this.trigger("select", this.model);
             }
 		}, ux.mixin ) );
@@ -31,19 +32,18 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var MenuList = Backbone.Marionette.CollectionView.extend({
 		    childView: MenuItem, tagName: "ul", className: "nav navbar-nav",
-            childEvents: {
-                "select": function(view, model, event) {
+            childViewEvents: {
+                "select": function(model, event) {
                     this.$el.find(".active").removeClass("active");
                     this.selected = model;
-                    console.log("NavBar: selected: %o %o %o", this, view, model);
+                    console.log("NavBar: selected: %o %o %o", this, model);
                     // bubble navigate to ActionList parent
                     this.triggerMethod("select", model);
-                    view.$el.addClass("active");
                 }
             }
 		});
 
-		var NavBar = Backbone.Marionette.ItemView.extend({
+		var NavBar = Backbone.Marionette.View.extend({
             isNavigator: true,
 			tagName: "nav",
 			className: "navbar navbar-default",
@@ -52,9 +52,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             events: {
                 'click [data-navigate]': ''
             },
-            childEvents: {
-                "select": function(view, model, event) {
-                    console.log("NavBar: select: %o %o %o", this, view, model);
+            childViewEvents: {
+                "select": function(model, event) {
+                    console.log("NavBar: select: %o %o %o", this, model);
                     // bubble navigate to ActionList parent
                     this.triggerMethod("select", model);
                 }

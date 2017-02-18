@@ -12,7 +12,7 @@ define(["jquery", "jquery_ui", "underscore", "backbone", "marionette", "core", "
 
 		options.childViewOptions = options.child
 
-		var PanelItem = Backbone.Marionette.ItemView.extend( {
+		var PanelItem = Backbone.Marionette.View.extend( {
 			tagName: "li", isHoverPanel: true, isActionable: true, isTemplating: true,
 			className: "list-group-item",
 			template: options.child.template || "<div data-id='{{"+idAttribute+"}}' title='{{"+commentAttribute+"}}'>{{"+labelAttribute+"}}</div><div>{{"+commentAttribute+"}}</div>",

@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkOptions(options);
 		var DEBUG = true;
 
-		var Dropzone = Backbone.Marionette.ItemView.extend({
+		var Dropzone = Backbone.Marionette.View.extend({
 			template: "<div>Drop Zone</div>",
 			className: "ux_dropzone",
 			initialize: function() {

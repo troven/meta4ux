@@ -30,7 +30,7 @@ define(["underscore", "backbone", "core",
     fact.sync.Local = LocalSync;
     fact.sync.Remote = RemoteSync;
 
-    console.log("storage: %o factories: %o", _.keys(fact.sync), _.keys(fact.factory));
+    fact.DEBUG && console.log("Model APIs: %o, Factories: %o", _.keys(fact.sync), _.keys(fact.factory));
 
     return fact;
 });

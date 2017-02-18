@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkOptions(options, ["id"]);
 		var DEBUG = true;
 
-		var ChildView = Backbone.Marionette.ItemView.extend({ tagName: "li",
+		var ChildView = Backbone.Marionette.View.extend({ tagName: "li",
 			template: "<div data-trigger='debug' data-id='{{id}}'>{{label}}</div>",
 		});
 

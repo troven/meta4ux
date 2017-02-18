@@ -32,7 +32,7 @@ DEBUG && console.log("Columns Activated", self)
 			},
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config)
+		return Backbone.Marionette.View.extend(config)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

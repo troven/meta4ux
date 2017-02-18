@@ -11,8 +11,8 @@ define(["jquery", "underscore", "backbone", "marionette", "fact", "ux",
 
     	var DEBUG = options.debug || ux.DEBUG
 
-		// create ItemView
-		var SearchFilter = Backbone.Marionette.ItemView.extend({
+		// create View
+		var SearchFilter = Backbone.Marionette.View.extend({
 			initialize: function(_options) {
 				ux.initialize(this, options);
 				this.model = new Backbone.Model();

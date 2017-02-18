@@ -8,7 +8,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		options = ux.checkOptions(options);
         var DEBUG = options.debug || ux.DEBUG;
 
-		var ButtonItem = Backbone.Marionette.ItemView.extend({ tagName: "li",
+		var ButtonItem = Backbone.Marionette.View.extend({ tagName: "li",
 			template: "<a data-id='{{id}}' href='#'>{{label}}</a>",
 		});
 

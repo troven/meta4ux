@@ -6,7 +6,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		options.template =  options.template || ux.compileTemplate("<div class='tabs-header'></div><div class='tab-content'></div>");
 
-        var TabItem = Backbone.Marionette.ItemView.extend({
+        var TabItem = Backbone.Marionette.View.extend({
             tagName: "li", events: { "click": "doTabSelect" },
             template: "<a href='#{{_ id}}' title='{{comment}}' data-toggle='tab'>{{label}}</a>",
             doTabSelect: function(e) { console.log("Tab Select: %o %o", this, arguments); e.preventDefault(); e.stopImmediatePropagation(); this.triggerMethod("select") }
@@ -76,7 +76,7 @@ console.log("Clicked Tabs (%s) %o -> %o", self.id, self, newTab)
 console.debug("ViewTab(%s): %o ", id, this._views)
 				var view = this.getNestedView(id)
 				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id
-				this.body.show(view)
+				this.showChildView("body",view)
 				var options = view.options
 console.debug("SelectTab(%s): %o %o %o", id, this, view, options)
 				var header = options.header && ux.views.widget(options.header)
@@ -85,7 +85,7 @@ console.debug("Tab Header/Footer(%s) %o %o", id, header, footer)
 			}
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config)
+		return Backbone.Marionette.View.extend(config)
 	}
 
 return ux; })

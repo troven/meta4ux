@@ -6,10 +6,11 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		options.template =  options.template || ux.compileTemplate("<div class='tabs-header' role='navigation'></div><div class='tab-content well-sm clearfix'></div>");
 
-        var TabItem = Backbone.Marionette.ItemView.extend({
+        var TabItem = Backbone.Marionette.View.extend({
             tagName: "li", events: { "click": "doSelect" },
             template: "<a data-toggle='tab'>{{label}}</a>",
             doSelect: function() {
+                this.$el.addClass("active");
                 this.trigger("select", this.model);
             }
         });
@@ -21,14 +22,13 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 ux.initialize(this, _options)
                 this.trigger("select", this.model);
             },
-            childEvents: {
-                "select": function(view, model, event) {
+            childViewEvents: {
+                "select": function(model, event) {
                     this.$el.find(".active").removeClass("active");
                     this.selected = model;
-                    console.log("TAB: selected: %o %o %o", this, view, model);
+                    console.log("TAB: selected: %o %o %o", this, model);
                     // bubble navigate to ActionList parent
                     this.triggerMethod("select", model);
-                    view.$el.addClass("active");
                 }
             }
         });
@@ -89,12 +89,12 @@ DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
 				var view = this.getNestedView(id, { model: this.model });
 DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
 				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id;
-				this.body.show(view);
+				this.showChildView("body",view);
 				this.currentView = view;
 			}
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config)
+		return Backbone.Marionette.View.extend(config)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

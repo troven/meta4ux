@@ -10,7 +10,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "masonry"], func
 		_.defaults(options, { child: {} })
 		var DEBUG = options.debug || ux.DEBUG;
 
-		var Item = Backbone.Marionette.ItemView.extend( {
+		var Item = Backbone.Marionette.View.extend( {
 			isHoverPanel: true, isPopOver: true, isActionable: true, isTemplating: true,
 			isSelectable: true, className: "gallery-item",
 			template: options.child.template || "<div data-id='{{id}}''>{{"+labelAttribute+"}}</div>",

@@ -36,7 +36,7 @@ DEBUG && console.log("doSelectDetail: (%s) %o %o -> %o", this.id, v, m, view)
 			}
 		}
 
-		return Backbone.Marionette.LayoutView.extend(config)
+		return Backbone.Marionette.View.extend(config)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

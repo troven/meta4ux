@@ -15,7 +15,8 @@ require.config({
         Handlebars: "vendor/handlebars/handlebars.min",
         bootstrap: "vendor/bootstrap/bootstrap",
         x_marionette: "vendor/marionette/backbone.marionette.min",
-        marionette: "vendor/marionette/marionette230",
+        marionette: "vendor/marionette/backbone.marionette",
+        "backbone.radio": "vendor/marionette/backbone.radio",
 
         backbone: "vendor/backbone/backbone",
 //        deep_model: "vendor/deep-model",
@@ -109,8 +110,12 @@ require.config({
             exports : 'bootstrap'
         },
         marionette : {
-            deps : ['jquery', 'underscore', 'backbone'],
+            deps : ['jquery', 'underscore', 'backbone', "backbone.radio"],
             exports : 'Marionette'
+        },
+        "backbone.radio": {
+            deps : [ 'backbone'],
+            exports : 'backbone.radio'
         },
         backbone_forms: {
             deps : ['jquery', 'underscore', 'backbone'], exports : 'BackboneForms'

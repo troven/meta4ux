@@ -27,7 +27,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
                     alert("Error:" +evt);
                 });
 
-                console.log("Home: init: %o --> %o", this, _options);
+                DEBUG && console.log("Home: init: %o --> %o", this, _options);
 				return this;
 			},
 
@@ -60,23 +60,21 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
 
 			onNavigate: function(go_to) {
 			    var meta = { model: this.model, collection: this.collection};
-                console.log("onNavigate: %o %o", this, go_to);
+                DEBUG && console.log("onNavigate: %o %o", this, go_to);
                 var view = this.navigator.views.view(go_to, meta, this.navigator );
                 if (!view) throw new core.oops.Error("meta4:ux:mixin:oops:missing-view#"+go_to);
-//DEBUG &&
-//                console.log("onNavigate: %o %o %o", this, go_to, view);
 
                 if (view.isModal)  {
                     this.navigator.Modal(view);
                 } else {
-                    this.body.show(view);
+                    this.showChildView("body", view);
                     this.trigger("breadcrumb", view);
                 }
 
 			}
 		}
 
-		return M.LayoutView.extend(config);
+		return M.View.extend(config);
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

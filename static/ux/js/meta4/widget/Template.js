@@ -35,7 +35,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var data = this.model.toJSON();
                 // ensure we have an ID field (especially for @)
                 data.id = data.id || data[this.model.idAttribute];
-                data = this.mixinTemplateHelpers(data);
+                data = this.mixinTemplateContext(data);
                 DEBUG && console.log("Render Template: %o -> %o", this.model, data);
 
                 // Render and add to $el
@@ -47,7 +47,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         }
 
-		return Backbone.Marionette.ItemView.extend(config);
+		return Backbone.Marionette.View.extend(config);
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

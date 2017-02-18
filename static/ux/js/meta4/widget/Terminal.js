@@ -186,7 +186,7 @@ console.log("complete?: %o %o %o %o", txt, cmds, found, _.keys(found))
             }
 		}
 
-		return Backbone.Marionette.ItemView.extend(config);
+		return Backbone.Marionette.View.extend(config);
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

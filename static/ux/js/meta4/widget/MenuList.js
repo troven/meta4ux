@@ -11,7 +11,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         var isVertical = options.isVertical || options.isStacked || false;
 
 
-        var MenuItem = Backbone.Marionette.ItemView.extend( _.extend({
+        var MenuItem = Backbone.Marionette.View.extend( _.extend({
             events: { "click": "doSelect"},
             tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{comment}}'>{{label}}</a>",
 
@@ -20,6 +20,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             },
 
             doSelect: function() {
+                this.$el.addClass("active");
                 this.trigger("select", this.model);
             }
 
@@ -28,15 +29,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         var MenuList = Backbone.Marionette.CollectionView.extend({
             isNavigator: true, isSelectable: true,
             childView: MenuItem, tagName: "ul", className: "nav",
-            childEvents: {
-                "select": function(view, model, event) {
+            childViewEvents: {
+                "select": function(model, event) {
                     this.$el.find(".active").removeClass("active");
 
                     this.selected = this.select(model, event);
 //                    console.log("MenuList: selected: %o -> %o   qa", view, this.selected);
                     // bubble navigate to MenuList parent
                     this.triggerMethod("select", this.selected);
-                    view.$el.addClass("active");
                 }
             },
             childViewOptions: function(model, index) {

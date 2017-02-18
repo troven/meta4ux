@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
     var labelAttribute = ux.labelAttribute || "label";
     var DEBUG = false
 
-    var FormField = Backbone.Marionette.ItemView.extend({
+    var FormField = Backbone.Marionette.View.extend({
         tagName: "button", className: "btn btn-default", template: "{{label}}",
 
         tagName: "div", className: "form-group row form-field",
@@ -171,7 +171,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
         }
     }, ux.mixin.Common);
 
-//    var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.ItemView.extend( _.extend({{}));
+//    var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.View.extend( _.extend({{}));
 
     return {
         "id": "FormField",

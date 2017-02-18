@@ -8,11 +8,11 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "backbon
         options = ux.checkOptions(options);
         var DEBUG = options.debug || ux.DEBUG;
 
-        var Header = Backbone.Marionette.ItemView.extend({
+        var Header = Backbone.Marionette.View.extend({
             template: "<h2>{{label}}</h2><div>{{comment}}</div>"
         })
 
-        var Footer = Backbone.Marionette.ItemView.extend({
+        var Footer = Backbone.Marionette.View.extend({
             isTemplating: true, isActionable: true,
             events: {
                 "click [data-action]": "doEventAction"
@@ -182,10 +182,10 @@ console.debug("onFinish: %o %o %o", is_invalid, isCloseOnFinish, state);
             onShow: function() {
                 var self = this;
                 var header = new Header(this.options.views.header, this)
-                this.header.show(header);
+                this.showChildView("header",header);
 
                 var footer = new Footer(this.options.views.footer, this);
-                this.footer.show(footer);
+                this.showChildView("footer",footer);
 
                 setTimeout(function() {
                     self.trigger('initialized');
@@ -195,7 +195,7 @@ console.debug("onFinish: %o %o %o", is_invalid, isCloseOnFinish, state);
             }
         },Backbone.StateMachine );
 
-        return Backbone.Marionette.LayoutView.extend(StatefulWizard);
+        return Backbone.Marionette.View.extend(StatefulWizard);
     }
 
     // Widget meta-data allows runtime / editor to inspect basic capabilities

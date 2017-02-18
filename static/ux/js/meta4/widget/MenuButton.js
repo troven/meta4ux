@@ -7,7 +7,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
         // each Button
 
-		var ButtonItem = Backbone.Marionette.ItemView.extend({ tagName: "li",
+		var ButtonItem = Backbone.Marionette.View.extend({ tagName: "li",
 			template: "<a data-trigger='{{id}}' data-navigate='{{id}}' title='{{comment}}' href='#{{id}}'>{{label}}</a>",
 		});
 

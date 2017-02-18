@@ -1,5 +1,5 @@
-define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "select2", "bootstrap_datepicker"],
-    function ($, _, Backbone, Marionette, core, ux, select2, bootstrap_datepicker) {
+define(["jquery", "underscore", "marionette", "core", "ux", "select2", "bootstrap_datepicker"],
+    function ($, _, Marionette, core, ux, select2, bootstrap_datepicker) {
 
         var idAttribute = ux.idAttribute || "id";
         var typeAttribute = ux.typeAttribute || "widget";
@@ -141,7 +141,7 @@ console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid
             return true;
         };
 
-        var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Backbone.Marionette.ItemView.extend( _.extend({
+        var FormField = ux.view.FormField = ux.view["meta4:ux:FormField"] = Marionette.View.extend( _.extend({
             tagName: "div", className: "form-group row form-field",
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label>",
             events: {
@@ -185,7 +185,7 @@ console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid
         fields.ViewField = function(Field, navigator) {
             if (!Field) throw new Error("ViewField missing");
 console.log("ViewField: %o -> %o", this, navigator);
-            var View = Backbone.Marionette.ItemView.extend({
+            var View = Marionette.View.extend({
                 className: "form-group form-text",
                 template: "<div></div>",
                 initialize: function(options) {
@@ -302,7 +302,7 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             template: "<label class='col-sm-3 control-label'></label><div class='col-sm-2'><button data-action='{{id}}' class='btn btn-default' title='{{comment}}'>{{label}}</button></div>"
         })
 
-        fields.Select = Backbone.Marionette.CompositeView.extend({
+        fields.Select = Marionette.CompositeView.extend({
             className: "form-group row form-select",
             childViewContainer: "select",
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-8'><select class='col-sm-6' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
@@ -374,11 +374,11 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             }
         })
 
-        fields.Checkboxes = Backbone.Marionette.CompositeView.extend({
+        fields.Checkboxes = Marionette.CompositeView.extend({
             className: "form-group row form-checkbox",
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><ul class='col-sm-4 list-item-group form-group-container'></ul><div class='message text-danger'>{{message}}</div>",
             events: { click: "doCommit" },
-            childView: Backbone.Marionette.ItemView.extend({
+            childView: Marionette.View.extend({
                 tagName: "li",
                 template: "<input type='checkbox' name='{{id}}' value='true'/>&nbsp;<label for='{{id}}'>{{label}}</label>",
                 onRender: renderField
@@ -404,12 +404,12 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             onRender: renderField
         })
 
-        fields.Actions = Backbone.Marionette.CollectionView.extend({
+        fields.Actions = Marionette.CollectionView.extend({
             className: "row", isActionable: true,
             events: {
                 "click [data-trigger]": "doEventAction"
             },
-            childView: Backbone.Marionette.ItemView.extend({
+            childView: Marionette.View.extend({
                 tagName: "span",
                 "className": "col-sm-2",
                 template: "<button data-trigger='{{id}}' type='button' class='btn btn-default' aria-label='Left Align'><span class='glyphicon glyphicon-{{icon}}' aria-hidden='true'></span>{{label}}</button>"
@@ -425,14 +425,14 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             }
         })
 
-        fields.Selects = Backbone.Marionette.CompositeView.extend({
+        fields.Selects = Marionette.CompositeView.extend({
             className: "form-group row form-selects",
             template: "<span class='col-sm-3 control-label' title='{{comment}}'>{{label}}</span><ul class='selects list-group col-sm-9'></ul><div class='message text-danger'>{{message}}</div>",
             events: {  },
-            childEvents: { "click .selection": "commit" },
+            childViewEvents: { "click .selection": "commit" },
             childViewContainer: ".selects",
 
-            childView: Backbone.Marionette.ItemView.extend({
+            childView: Marionette.View.extend({
                 tagName: "li", className: "list-group-item", isTemplating: true,
                 initialize: function(options) {
                     ux.initialize(this, options)

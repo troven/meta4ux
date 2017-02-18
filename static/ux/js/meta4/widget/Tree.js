@@ -17,7 +17,7 @@ console.log("Tree: %o", options)
 			events: {
 			  'click [data-id]': 'doEventSelect'
 			},
-            childEvents: {
+            childViewEvents: {
                 "select": function(x,y) {
 console.log("TreeChild: select: %o %o", this, arguments);
                 }

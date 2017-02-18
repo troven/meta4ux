@@ -20,17 +20,17 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             },
             collection: new Backbone.Collection(),
             "childViewContainer": ".ux-crud2-buttons",
-            "childView": Backbone.Marionette.ItemView
+            "childView": Backbone.Marionette.View
 		});
 
-		var Header = Backbone.Marionette.ItemView.extend({
+		var Header = Backbone.Marionette.View.extend({
 		    "template": "<div><img class='pull-right' height='32' src='{{icon}}'/><h3>{{label}}</h3><p>&nbsp;{{comment}}</p></div>",
 		    initialize: function(opts) {
 		        ux.initialize(this,opts)
 		    }
 		 });
 
-		var CRUD = Backbone.Marionette.LayoutView.extend( _.extend({
+		var CRUD = Backbone.Marionette.View.extend( _.extend({
 			isNested: true, isActionable: true, isSelectable: true, isStateMachine: true,
             template: options.template,
             events: {
@@ -121,7 +121,7 @@ DEBUG && console.log("init CRUD2 (%s): %o %o %o", _options.id, this, _options, t
 
 			onRender: function() {
                 if (!this.body.currentView) {
-                    this.footer.show( new Footer() )
+                    this.showChildView("footer", new Footer() )
                     this.trigger('initialized')
                 }
 			},
@@ -177,7 +177,7 @@ DEBUG && console.log("showButtons: %o %o", this, to)
 
 //                if (!bodyView.options.modal) {
 console.log("showViewState: %o %s %o %o", this, state, meta, bodyView)
-                    this.body.show(bodyView)
+                    this.showChildView("body",bodyView)
                     this.showHeader(bodyView, meta)
                     this.showButtons(state)
 //                } else {
@@ -202,12 +202,12 @@ console.log("showHeader: %o %o", this, header)
                     var headerOptions = _.extend( _.pick(options, labelAttribute, commentAttribute, iconAttribute))
                     var headerView = new Header( headerOptions )
 console.log("Header Model: %o %o", this, headerOptions)
-                    this.header.show( headerView )
+                    this.showChildView("header", headerView )
                     return headerView
                 } else {
                     var headerView = this.getNestedView(header, meta)
 console.log("Header: %o %o %o", this, headerView, meta)
-                    if (headerView) this.header.show(headerView)
+                    if (headerView) this.showChildView("header",headerView)
                     return headerView
                 }
 

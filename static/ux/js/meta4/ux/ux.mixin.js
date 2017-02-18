@@ -18,7 +18,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "ux", "oops"
 		if (!this.render) throw "meta4:ux:mixin:oops:not-view"
 	// auto-extend and initialize Views with is[Mixin] i.e. isAttachable properties
 // DEBUG && console.debug("Init Mixin(%s): %o %o", this.id, this, options)
-		var _DEBUG = options.debug || DEBUG
+		this.DEBUG = (options.debug || DEBUG)?true:false;
 
 		var self = this;
 		for (var k in self) {
@@ -629,7 +629,7 @@ console.log("navigateTo (%s): %o", go_to, this);
 		    var _DEBUG = options.debug?true:false;
 //	        view._views = view._resolveNested(options.views)
 _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
-            this.on("show", function() {
+            this.on("render", function() {
                 self.showNestedRegions();
              })
 		},
@@ -643,10 +643,10 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
                 var view_id = $view.attr("data-view");
                 var view = self.getNestedView(view_id, { model: self.model });
                 view.on("navigate", function(g, m) {
-                    console.log("navigate-parent: %o -> %s -> %o", this, g, m);
+                    self.DEBUG && console.log("navigate-parent: %o -> %s -> %o", this, g, m);
                     self.trigger("navigate", g, m);
                 });
-                console.log("Template View: %o -> %s -> %o", this, view_id, view);
+                self.DEBUG && console.log("Template View: %o -> %s -> %o", this, view_id, view);
                 $view.append( view.render().$el );
             });
         },
@@ -660,14 +660,18 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             }
             meta = meta || { model: this.model, collection: this.collection };
 
-            if (self.regions) {
-                //DEBUG &&
-                console.warn("nested-regions: %s -> %o -> %o", self.id, self, meta);
-                _.each(self.regions, function(ignore, region) {
+            if (self.getRegions) {
+                // _DEBUG &&
+                console.log("nested-regions: %s -> %o -> %o", self.id, self, meta);
+                _.each(self.getRegions(), function(ignore, region) {
                     var view = self._views[region];
                     if (view) self.__showNested( self, view, region, meta );
-                    else _DEBUG && console.warn("Missing %s for view %o", region, self);
+                    else {
+                        _DEBUG && console.warn("Missing %s for view %o", region, self);
+                    }
                 })
+            } else {
+                console.warn("No Regions: %s -> %o", self.id, self);
             }
 		},
 
@@ -682,10 +686,13 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             } else if (v.el) {
                 DEBUG && console.warn("nested-dom: %s -> %o", self.id, subview);
                 subview.render();
-			} else if (self[k] && self[k].show && self.regions[k]) {
+			} else if (self.getChildView && self.getRegion(k)) {
                 DEBUG && console.warn("nested-view: %s --> %o -> %o", k, self, subview);
-                self[k].show(subview);
-			} else throw new Error("meta4:ux:mixin:oops:invalid-view#"+k);
+                self.showChildView(k,subview);
+			} else {
+			    console.log("Invalid Region: %o @ %s --> %o -> %o", self, k, self.getRegion(k), _.keys(self));
+			    throw new Error("meta4:ux:mixin:oops:invalid-view#"+k);
+            }
 		},
 
 		// nested view[]{} hierarchy and return a k/v of widgets
@@ -790,10 +797,10 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
                 if (!meta.collection) delete meta.collection;
                 if (!meta.model || conf.model===true) delete meta.model;
                 var _options= _.extend({}, conf, meta);
-console.log("getNestedView:models: %s -> %o %o", _options.id, conf, meta);
+                _DEBUG && console.log("nested::models: %s -> %o %o", _options.id, conf, meta);
                 if (!_options.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
                 widget = navigator.views.view(_options.id, _options, navigator);
-                _DEBUG && console.log("widget: %s -> %o -> %o", _options.id, _options, widget);
+                _DEBUG && console.log("nested:widget: %s -> %o -> %o", _options.id, _options, widget);
 		    } else throw new core.oops.Error("meta4:ux:mixin:oops:invalid-view-def", conf);
 
             // bind our parent's navigator
@@ -818,12 +825,12 @@ console.log("getNestedView:models: %s -> %o %o", _options.id, conf, meta);
 
             // bubble nested:events to parent
             _.each(when, function captureNestedEvent(then, when) {
-                if (when.indexOf("nested:")==0) {
-//                    console.log("WHEN: %s -> %o <-- %o", when, self, widget);
+                if (when.indexOf("nested:")==0 && then)   {
+                    console.log("WHEN: %s THEN: %s-> %o <-- %o", when, then, self, widget);
                     widget.on(when.substring(7), function triggerNestedEvent() {
                         var args = Array.prototype.slice.call(arguments);
                         args = [when].concat(args);
-                        console.log("nested:trigger: %s %o <- %o", when, this, args);
+                        console.log("nested:trigger: %s / %s -> %o <- %o", when, then, this, args);
                         trigger.apply(self, args);
                     });
                 }

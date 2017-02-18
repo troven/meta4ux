@@ -1,14 +1,15 @@
-define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oops", "meta4/ux/modals"], function (_, BB, M, meta4, ux, fact, iq, oops, Modals) {
+define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oops", "meta4/util/helpers", "meta4/ux/modals"], function (_, BB, M, meta4, ux, fact, iq, oops, helpers, Modals) {
 
     var ShowHome = function (options, navigator) {
         return function() {
             if (navigator.home) {
-                console.log("RE-HOME: %o -> %o", navigator.home, arguments);
+//                console.log("RE-HOME: %o -> %o", navigator.home, arguments);
                 navigator.home.show();
                 return;
             }
-            console.log("NEW-HOME: %o -> %o", (navigator.home?navigator.home:"1st home"), navigator);
+//            console.log("NEW-HOME: %o -> %o", (navigator.home?navigator.home:"1st home"), navigator);
 
+            console.log("HOME: %o", options);
             navigator.home = navigator.Home(options.home, navigator);
             navigator.home.triggerMethod("show");
 
@@ -48,7 +49,7 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
 
         var SPA = new M.Application();
 
-        SPA.on("start", function (options) {
+        SPA.on("start", function (app, options) {
 
             var _DEBUG = options.debug;
             var navigator = _.extend({}, Modals, BB.Events);
@@ -90,7 +91,7 @@ console.log("navigator goto: %s", go_to);
             });
 
             var routing = new Routing(navigator);
-            console.log("Routing: %o", routing);
+            _DEBUG && console.log("Routing: %o", routing);
 
         });
 

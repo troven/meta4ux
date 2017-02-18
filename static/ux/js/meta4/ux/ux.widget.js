@@ -20,7 +20,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
 //        _DEBUG && console.log("Widget: %s -> %s -> %o", id, widgetType, options);
 
         if (!id) {
-            console.log("Anonymous Widget: %o", options);
+            console.error("Anonymous Widget: %o", options);
             throw new Error("meta4:ux:oops:widget:missing-id#"+widgetType, options);
         }
 

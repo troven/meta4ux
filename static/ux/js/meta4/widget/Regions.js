@@ -17,13 +17,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 		 		"click [data-navigate]": ""
 		 	},
 			initialize: function(options) {
-DEBUG && console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);
+//DEBUG &&
+console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);
                 ux.initialize(this, options);
 				return this;
 			}
 		}
 
-		return Backbone.Marionette.LayoutView.extend(view_defn)
+		return Marionette.View.extend(view_defn)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

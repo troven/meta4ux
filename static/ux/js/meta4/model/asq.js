@@ -22,51 +22,57 @@ define(["underscore"], function (_) {
         },
 
         match: function(data, query) {
-            var self = this
-            var matched = true
+            var self = this;
+            var matched = true;
+            var DEBUG = false;
             var _query = query.attributes?query.attributes:query;
             _.each(_query, function(v,k,o) {
                 if (k == "*") {
                     // any key
-                    var m = false
+                    var m = false;
                     _.each(data, function(v1,k1,o1) {
-                        if (isPrimitive(v1)) {
-                            var r = self.evaluate(v, k1, data)
-                            console.log("*= %o %o %o", v, k1, data, r, m)
-                            m = m || r
+                        if (isPrimitive(v1)) {;
+                            var r = self.evaluate(v, k1, data);
+                            console.log("*= %o %o %o", v, k1, data, r, m);
+                            m = m || r;
                         }
                     })
-                    matched = m
+                    matched = matched && m;
                 } else {
-                    matched = self.evaluate(v,k,data)
+                    matched = matched && self.evaluate(v,k,data);
                 }
-            })
-            return matched
+            });
+
+            DEBUG && console.log("matched: %o & %o -> %s", data, query, matched);
+            return matched;
         },
 
         evaluate: function(v,k,data) {
             var self = this;
             var matched = true;
+            var DEBUG = false;
 
             if (_.isFunction(v)) {
-//                console.log("filter:fn: %s -> %s", k, v);
-                matched = matched && v(k, data[k], data);
+                DEBUG && console.log("filter:fn: %s -> %s", k, v);
+                matched = matched && v(data[k], k, data);
             } else if (_.isArray(v)) {
                 // or
                 var m = false;
+                DEBUG && console.log("filter:[]: %s -> %s", k, v);
                 _.each(v, function(vv) {
                     m = m || self.test(k, data[k], vv);
                 })
                 matched = ml
             } else if (_.isObject(v)) {
+                DEBUG && console.log("filter:{}: %s -> %s", k, v);
                 // and
                 _.each(v, function(vv,kk) {
                     matched = matched && self.test(kk, data[k], vv);
                 });
             } else {
+                DEBUG && console.log("filter:=: %s -> %s", k, v);
                 matched = matched && self.test(k, data[k], v);
             }
-//console.log("eval: %s %o = %o -> %o", k, v, data[k], matched)
             return matched;
         },
 

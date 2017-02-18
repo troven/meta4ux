@@ -4,7 +4,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 	ux.view.Image = ux.view["meta4:ux:Image"] = function(options) {
 		options = ux.checkOptions(options, ["label", "url"]);
 
-		return Backbone.Marionette.ItemView.extend({
+		return Backbone.Marionette.View.extend({
 			template: "<img src='{{url}}' title='{{label}}'/>",
 			initialize: function() {
 				ux.model(options, this);

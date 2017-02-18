@@ -57,7 +57,7 @@ console.debug("Toolbar: Extra: %o %o", locale, _options);
 			},
 		}, options.edited.toolbar);
 
-		var HTML = Backbone.Marionette.ItemView.extend(_.extend({
+		var HTML = Backbone.Marionette.View.extend(_.extend({
 			editTemplate: options.template || "<div><textarea data-id='{{id}}' cols='"+options.edited.cols+"' rows='"+options.edited.rows+"' placeholder='{{comment}}'>{{"+options.metaKey+"}}</textarea></div>",
 			className: "ux_html",
 			initialize: function() {
@@ -222,9 +222,9 @@ DEBUG && console.debug("HTML toolbar action: ", action, self.editor, event);
 
 DEBUG && console.debug("HTML Editor Activated", self);
 			},
-			getItemView: function(that) {
-				var View = Backbone.Marionette.ItemView.extend({ template: that.get(options.metaKey) });
-DEBUG && console.debug("HTML getItemView", that, View);
+			getView: function(that) {
+				var View = Backbone.Marionette.View.extend({ template: that.get(options.metaKey) });
+DEBUG && console.debug("HTML getView", that, View);
 				return View;
 			},
 			selectItem: function(selection) {

@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "marionette", "Handlebars", "core",
+define(["jquery", "underscore", "backbone.radio", "marionette", "Handlebars", "core",
     "meta4/ux/ux.mixin", "meta4/ux/templateHelpers", "meta4/ux/ux.util", "meta4/ux/ux.widget", "meta4/ux/ux.registry", "oops", "md5"
-], function ($,_, Marionette, Handlebars, core, ux, TemplateHelpers, ux_util, ux_widget, ux_registry, Oops, md5) {
+], function ($,_, BB_radio, Marionette, Handlebars, core, ux, TemplateHelpers, ux_util, ux_widget, ux_registry, Oops, md5) {
 
 /*
     Define the UX Mediator object
@@ -11,6 +11,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
         boot:function(module, options) {
             if (!module) throw new Error("meta4:ux:boot:oops:missing-module");
+            console.error("boot: %o", options);
 
             var self = this;
             var _DEBUG = options.debug || false;
@@ -35,11 +36,10 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core",
 
             // discover used widgets
             var widgetTypes = module.views.register(options.views);
-            console.log("widgetTypes: %o", widgetTypes);
+            _DEBUG && console.log("widgetTypes: %o", widgetTypes);
 
             // lazy-load the widgets
             module.widgets.requires(widgetTypes, function() {
-
                 module.trigger("home", options);
             });
 
