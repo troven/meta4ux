@@ -66,8 +66,8 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
                     if (action) {
                         DEBUG && console.log("[ActionList] action: %s: %o -> %o", action, this, arguments);
                         this.triggerMethod("action", action, meta);
-                        this.triggerMethod(""+action, meta);
-                    } else if (this.isSelectable===true) {
+                        // this.triggerMethod(""+action, meta);
+                    } else if (this.can.select!==false) {
                         //DEBUG &&
                         console.log("[ActionList] select: %o: %o -> %o", this, meta);
                         this.triggerMethod("select", meta.model);
@@ -91,7 +91,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
 				return _.extend({ model: model }, this.options.child);
 			},
 			initialize: function(_options) {
-				ux.initialize(this, _options);
+				ux.initialize(this, _options, navigator);
 				this.childView.template = _options.child && _options.child.template;
 				if (_options.empty) {
 					this.emptyView = EmptyView;

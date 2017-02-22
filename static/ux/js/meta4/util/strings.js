@@ -4,7 +4,14 @@ define(["jquery", "underscore"], function ($,_) {
      Utilities to deal with Strings (including special cases for 'id' strings)
      **/
 
-    return {
+    var self = {
+
+        /**
+         Generate a sanitize id suitable for use in DOM
+         **/
+        sanitize: function(id) {
+            return id?id.replace(/\W+/g, "_"):self.uuid();
+        },
 
         /**
          Generate a reasonably unique UUID
@@ -53,4 +60,6 @@ define(["jquery", "underscore"], function ($,_) {
             return serialize(obj, prefix)
         }
     }
+
+    return self;
 });

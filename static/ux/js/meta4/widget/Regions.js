@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-    ux.view.Regions= ux.view["meta4:ux:Regions"] = function(options) {
+    ux.view.Regions= ux.view["meta4:ux:Regions"] = function(options, module) {
 
 		options = ux.checkOptions(options, ["id", "views"]);
 		var DEBUG = options.debug || ux.DEBUG; // master DEBUG
@@ -19,7 +19,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			initialize: function(options) {
 //DEBUG &&
 console.log("Regions: init: %s %o -> %o", this.id, options, this.$el);
-                ux.initialize(this, options);
+                ux.initialize(this, options, module);
 				return this;
 			}
 		}

@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
 
-	ux.view.MenuButton = ux.view["meta4:ux:MenuButton"] = function(options) {
+	ux.view.MenuButton = ux.view["meta4:ux:MenuButton"] = function(options, module) {
 
     	var DEBUG = options.DEBUG || ux.DEBUG;
 
@@ -25,7 +25,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			initialize: function(options) {
                 options = _.extend({ model: true }, options);
 				ux.checkOptions(options, ["collection"]);
-				ux.initialize(this, options);
+				ux.initialize(this, options, module);
 			},
 
 			onAction: function(action, options) {

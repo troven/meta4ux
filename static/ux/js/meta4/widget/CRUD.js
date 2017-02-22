@@ -7,7 +7,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
 	var CRUD = function(options, navigator) {
 		options = ux.checkOptions(options, ["id", "views"]);
 
-		var DEBUG = options.debug?true:ux.DEBUG?true:false;
+		var DEBUG = (options.debug || ux.DEBUG)?true:false;
+
+        var CRUD_VIEWS = { create: true, read: true, update: true, delete: true };
 
         var TEMPLATE_TITLES = options.comment?"<h3>{{label}}</h3><p>{{comment}}</p>":"";
         var TEMPLATE_HEADER = ux.compileTemplate("<div class='panel-heading'><img class='pull-right' height='64' src='{{icon}}'/>"+TEMPLATE_TITLES+"</div>");
@@ -17,7 +19,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
         // var TEMPLATE_FOOTER_UPDATE = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'><button class='btn btn-danger pull-left' data-action='delete'>Delete</button><button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
         // var TEMPLATE_FOOTER_EDIT = ux.compileTemplate("<div class='form-group col-sm-12 clearfix'>button class='btn btn-primary pull-right' data-action='save'>OK</button><button class='btn btn-default pull-right' data-action='cancel'>Cancel</button></div>");
 
-        var TEMPLATE_FORM = ux.compileTemplate("<div class='regions'><div class='region_header'></div><div class='panel-body region_body'></div><div class='region_footer'></div></div>");
+        var TEMPLATE_FORM = ux.compileTemplate("<div class='regions'><div class='region_header'></div><div class='panel-body region_body'></div><div class='region_footer clearfix'></div></div>");
 
 		options.template =  options.template || TEMPLATE_FORM;
 
@@ -25,7 +27,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
 
         var ActionView = Backbone.Marionette.View.extend({ "template": "<!- empty ->", "css": 'clearfix',
             isActionable: true,
-            initialize: function(_options) {
+            initialize: function(_options, navigator) {
                 console.log("init CRUD ActionView: %o %o %o", this, _options);
                 ux.initialize(this, _options);
             }
@@ -44,7 +46,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/Bu
                 this.can = _.extend({ create: true, read: true, update: true, delete: true }, _options.can);
                 _options.buttons = _options.buttons || "buttons";
 
-				ux.initialize(this, _options);
+				ux.initialize(this, _options, navigator);
 				this.initializeHeadersFooters(_options);
 
 DEBUG && console.log("init %s CRUD: %o %o %o", this.id, this, _options, this.can);
@@ -120,17 +122,23 @@ console.log("init %s HeadersFooters: %o -> %o %o", this.id, this, this.headers, 
                     throw new Error("meta4:ux:crud:oops:cannot-"+action);
                 }
                 this.triggerMethod("action", action, meta);
-                this.triggerMethod("nested:"+action, meta);
+//                this.triggerMethod("nested:"+action, meta);
             },
 
             onAction: function(action, meta) {
-                console.log("CRUD onAction (%s): %o -> %o", action, this, meta)
                 var can = this.can || this.options.can || {};
                 if (can[action]===false) {
                     console.log("CRUD %s denied: %o -> %o", action, this, meta);
                     throw new Error("meta4:ux:crud:oops:cannot-"+action);
                 }
-                this.triggerMethod(action, meta);
+                if (this._views[action] && !CRUD_VIEWS[action]) {
+                    meta  = meta || { model: this.model, collection: this.collection };
+                    console.log("CRUD: action view: %s -> %o", this.id, meta);
+                    this.showBody(action, meta);
+                } else {
+                    console.log("CRUD onAction (%s): %o -> %o", action, this, meta)
+                    this.triggerMethod(action, meta);
+                }
             },
 
             onHeaderFooterAction: function(action, meta) {
@@ -151,7 +159,13 @@ console.log("init %s HeadersFooters: %o -> %o %o", this.id, this, this.headers, 
 
             onSave: function() {
                 var self = this;
-                var form = self.body.currentView;
+                var formRegion = this.getRegion("body");
+                if (!formRegion) {
+                    console.log("Missing CRUD body");
+                    return;
+                }
+                var form = formRegion.currentView;
+                // self.body.currentView;
                 model = this.selected || this.model; // form.model;
                 if (!model) {
                     console.log("CRUD %s not-selected: %o", this.id, this);
@@ -181,7 +195,11 @@ console.log("CRUD %s onSaved: %o %o", this.id, this, arguments);
                     if (model.url) {
                         // DEBUG &&
                         console.log("CRUD %s saving: %o -> %o", this.id, model, _.keys(model));
-                        model.save && model.save();
+                        if (model.collection && model.collection.url && model.save) {
+                            model.save && model.save();
+                        } else {
+                            DEBUG && console.warn("CRUD %s internal model: %o -> %o", this.id, model, model.collection);
+                        }
                     } else {
                         DEBUG && console.log("CRUD %s not saving: %o", this.id, model);
                     }
@@ -196,9 +214,19 @@ console.log("CRUD %s onSaved: %o %o", this.id, this, arguments);
                 }
             },
 
+            getHeader: function() {
+                return this.headerView;
+            },
+
+            getFooter: function() {
+                return this.footerView;
+            },
+
             showHeaderFooters: function(action, meta) {
                 meta = _.extend({ model: this.selected || (this.getChildView("body")?this.getChildView("body").model:this.model),
                     collection: this.collection, can: this.can }, meta);
+
+                var view = this.getChildView("body");
 
                 if (this.isModal) {
                     this.showChildView("header",new ActionView(meta));
@@ -208,32 +236,41 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 }
 
                 // Headers
-                var header = this.options.headers!==false && this.headers[action] || this.options.headers;
-                header = _.extend({}, meta, header);
-                header.id = header.id || this.id+"#header";
-                var headerView = ( header && this.getNestedView(header, meta) ) || new ActionView(header);
-                // DEBUG && console.debug("showHeader: (%s) %o %o", action, header, headerView);
-                this.listenToNestedEvents(headerView, { "nested:action": true });
-
-                var footerButtons = this.getButtons("crud:"+action);
-                if (footerButtons) {
-                    // Footers
-                    var footer = this.options.footers!==false && this.footers[action] || this.options.footers;
-                    footer = _.extend({ id: this.id+"#footer", widget: "Buttons"}, meta, { collection: footerButtons}, footer);
-
-                    var footerView = ( footer && this.getNestedView(footer) ) || new EmptyView();
-                    //DEBUG &&
-                    console.debug("show %s footer: (%s) %o %o", this.id, action, footer, footerView);
-                    this.showChildView("footer",footerView);
-                    this.listenToNestedEvents(footerView, { "nested:action": true });
-
-                } else {
-                    //DEBUG &&
-                    console.debug("noFooter: %s (%s) %o", this.id, action, this);
-//                    this.showChildView("footer", new EmptyView() );
+                this.headerView = view.getHeader?view.getHeader():null;
+                if (!this.headerView) {
+                    var header = this.options.headers!==false && this.headers[action] || this.options.headers;
+                    header = _.extend({}, meta, header);
+                    header.id = header.id || this.id+"#header";
+                    this.headerView = ( header && this.getNestedView(header, meta) ) || new ActionView(header);
+                    // DEBUG && console.debug("showHeader: (%s) %o %o", action, header, headerView);
+                }
+                if (this.headerView) {
+                    this.showChildView("header", this.headerView);
+                    this.listenToNestedEvents(this.headerView, { "nested:action": true });
                 }
 
-                //console.log("showHeaderFooters: %o -> %o %o", this, header, footer);
+                this.footerView = view.getFooter?view.getFooter():null;
+                if (!this.footerView) {
+                    var footerButtons = this.getButtons("crud:" + action);
+                    if (footerButtons) {
+                        // Footers
+                        var footer = this.options.footers !== false && this.footers[action] || this.options.footers;
+                        footer = _.extend({
+                            id: this.id + "#footer",
+                            widget: "Buttons"
+                        }, meta, {collection: footerButtons}, footer);
+
+                        this.footerView = ( footer && this.getNestedView(footer) ) || new EmptyView();
+                        //DEBUG &&
+                        console.debug("show %s footer: (%s) %o %o", this.id, action, footer, this.footerView);
+                    }
+                }
+                if (this.footerView) {
+                    this.showChildView("footer", this.footerView);
+                    this.listenToNestedEvents(this.footerView, {"nested:action": true});
+                }
+
+                console.log("showHeaderFooters: %s --> %o -> %o %o", this.id, view, this.headerView, this.footerView);
 
             },
 
@@ -243,6 +280,8 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 var _model = new _collection.model();
                 _model.schema = _collection.schema;
                 _model.collection = _collection;
+                this.selected = _model;
+console.warn("New Model: %o ---> %o", _collection, _model);
                 return _model;
             },
 
@@ -260,7 +299,7 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                 }
                 this.listenToNestedEvents(view, { "nested:action": true, "nested:footer": true });
 
-                view.on("show", function() {
+                view.on("render", function() {
                     DEBUG && console.log("NESTED:FOOTER: %s -> %o -> %o", view.footer?true:false, this, view);
                     if (view.footer) {
                         self.showHeaderFooters("nested", meta);
@@ -271,8 +310,9 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
                     console.log("CRUD: modal: %s -> %o", view_id, view);
                     this.navigator.Modal(view);
                 } else {
+//                    this.getRegion('body').empty();
                     console.log("CRUD: body: %s -> %o", view_id, view);
-                    this.showChildView("body",view);
+                    this.showChildView("body", view);
                     this.showHeaderFooters(view_id, meta);
                 }
                 return view;
@@ -280,7 +320,7 @@ DEBUG && console.debug("modalHeaderFooters (%s): %o %o", options.id, this, optio
 
             onCreate: function() {
                 var self = this;
-                var _model = this.selected = this.newModel();
+                var _model = this.newModel();
                 var meta = { model: _model };
 
                 var view = this.showBody("create", meta) || this.showBody("edit", meta);
@@ -295,7 +335,7 @@ DEBUG && console.error("CRUD %s onCreate: %o %o %o", this.id, this, self.collect
                     self.collection.add(_model);
                 })
 
-                view.collection.once("error", function(response) {
+                view.once("error", function(response) {
                     console.log("Create Error: %o", response);
                     ux.Alert({ message: "Error: "+response.message});
                     self.onRead();
@@ -321,7 +361,8 @@ DEBUG && console.error("CRUD %s onCreate: %o %o %o", this.id, this, self.collect
                 var meta = { model: selected || this.selected };
                 var view = this.showBody("update", meta) || this.showBody("edit", meta);
                 if (!view) throw "meta4:ux:crud:oops:missing:view:update-or-edit";
-                DEBUG && console.log("CRUD onUpdate: %o %o", this, selected)
+                //DEBUG &&
+                console.log("CRUD onUpdate: %o %o", this, selected)
 
                 this.once("cancel", function() { self.onRead() });
             },

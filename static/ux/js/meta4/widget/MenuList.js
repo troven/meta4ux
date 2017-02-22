@@ -16,7 +16,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             tagName: "li", template: "<i class='icon-{{icon}} icon-2x'></i><a href='#{{id}}' title='{{comment}}'>{{label}}</a>",
 
             initialize: function(_options) {
-                ux.initialize(this, _options);
+                ux.initialize(this, _options, module);
             },
 
             doSelect: function() {
@@ -44,7 +44,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             },
             initialize: function(_options) {
                 options = _.extend({ model: true }, options);
-                ux.initialize(this, _options);
+                ux.initialize(this, _options, module);
             }
         });
 

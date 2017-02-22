@@ -43,7 +43,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core"], function ($,_
             var self = this;
 
             if (_.isString(thisFN)) {
-                _fn = self.fn[thisFN] || self.compileScript(thisFN)
+                _fn = self.fn[thisFN]; // || self.compileScript(thisFN)
                 if (_fn) return _fn;
             } else if (_.isObject(thisFN) && thisFN[core.idAttribute]) {
 				var wrapped_fn = self.fn[conf[core.idAttribute]]
@@ -94,18 +94,18 @@ console.debug("Uploading Files:", this, this._navigator.options, files)
             _.each(iqFn, function(fnId,key) {
                 if (_.isString(fnId)) {
                     var fn = core.iq.get(fnId);
-                    if (fn) {
+                    if (fn && _.isFunction(fn)) {
 //console.log("WHEN [%s] on %o THEN %s %o", key, vents, fnId, fn)
                         vents.on(key, function() {
 //console.log("WHEN %s on %o\nDO: %s -=> %s -> %o", key, this, fnId, fn);
                             try {
                                 fn.apply(vents,arguments);
                             } catch(e) {
-                                console.error("Script Error: on %s -> %o", fnId, e);
+                                console.error("Script Error: on %s -> %o\n%s", fnId, e, fn);
                             }
                         })
                     } else {
-                        throw new Error("meta4:iq:oops:missing-fn#"+fnId);
+                        throw new Error("meta4:iq:oops:invalid-fn#"+fnId);
                     }
                 }
             });

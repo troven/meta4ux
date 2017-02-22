@@ -270,15 +270,25 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
             validators: ["date"],
             template: "<label class='col-sm-3 control-label' title='{{comment}}'>{{label}}</label><div class='col-sm-4'><input class='form-control' placeholder='{{label}}' name='{{id}}'/></div><div class='message text-danger'>{{message}}</div>",
             initialize: function(options) {
+            },
+            setToday: function() {
                 var fieldId = this.model.get("id");
+                this.options.formModel.set(fieldId, this.getDefault() );
+                console.log("setToday: %o -> %o == %o", this, fieldId, today);
+            },
+            getDefault() {
                 var date = new Date();
                 var day = date.getDate();
                 var monthIndex = date.getMonth();
                 var year = date.getFullYear();
 
                 var today = day+"/"+(1+monthIndex)+"/"+year;
-                this.options.formModel.set(fieldId, today);
-                console.log("Date Field: %o -> %o == %o", this, fieldId, today);
+                return today;
+            },
+            onBeforeRender: function() {
+                var date = this.options.formModel.get(fieldId);
+                if (!date) this.setToday();
+
             },
             onRender: function() {
                 $("input", this.$el).datepicker({ format: 'mm/dd/yyyy', todayBtn: "linked", todayHighlight: true, autoclose: true });
@@ -310,7 +320,7 @@ console.log("ID field: %o -> %s -> %s", this, model.get(idAttribute), slug);
                 "blur select": "commit",
                 "change": "doSelection"
             },
-            childView: Backbone.View.extend({
+            childView: Marionette.View.extend({
                 tagName: "option",
                 initialize: function(_options) {
                     this.options = _.extend({}, this.options, _options)

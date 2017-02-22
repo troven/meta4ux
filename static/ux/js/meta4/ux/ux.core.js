@@ -11,10 +11,12 @@ define(["jquery", "underscore", "backbone.radio", "marionette", "Handlebars", "c
 
         boot:function(module, options) {
             if (!module) throw new Error("meta4:ux:boot:oops:missing-module");
-            console.error("boot: %o", options);
+
+            var oops = module.oops = new Oops(options.errors||{});
 
             var self = this;
             var _DEBUG = options.debug || false;
+            _DEBUG && console.log("boot: %o", options);
 
             core.oops = new Oops(options.errors);
 
@@ -32,7 +34,7 @@ define(["jquery", "underscore", "backbone.radio", "marionette", "Handlebars", "c
                 Handlebars.registerHelper(name,fn);
             });
 
-            _DEBUG && console.log("UX: boot: %o", options.views);
+            _DEBUG && console.log("loaded views: %o", options.views);
 
             // discover used widgets
             var widgetTypes = module.views.register(options.views);
@@ -83,16 +85,20 @@ define(["jquery", "underscore", "backbone.radio", "marionette", "Handlebars", "c
         //
 
         initialize: function(view, options, navigator) {
-            if (!view) throw new ux.oops.Error("meta4:ux:oops:missing-view");
-            if (!view.render) throw new ux.oops.Error("meta4:ux:oops:not-a-view");
-            if (!options) throw new Error("meta4:ux:oops:missing-options");
+            if (!view) throw new Error("meta4:ux:oops:missing-view");
+//            if (!navigator) throw new Error("meta4:ux:oops:missing-navigator#"+view.id);
+            if (!view.render) throw new navigator.oops.Error("meta4:ux:oops:not-a-view");
+            if (!options) throw new navigator.oops.Error("meta4:ux:oops:missing-options");
             var _DEBUG = options.debug || ux.DEBUG;
 
-            if (view.navigator) throw ux.oops.Error("meta4:ux:oops:re-initialized#"+view.id);
+            if (view.navigator) throw navigator.oops.Error("meta4:ux:oops:re-initialized#"+view.id);
 
             view.navigator = navigator?navigator:false;
+
+            // initialize model/collection
             core.ux.model(options, view);
 
+            // defaults
             view.events = _.extend({}, view.events, view.options?view.options.events:{}, options.events);
             view.ui = _.extend({}, view.ui, options.ui );
             view.can = _.extend({}, view.can, options.can);

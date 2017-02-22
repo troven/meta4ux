@@ -18,9 +18,6 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 if (css) {
                     this.$el.addClass(css);
                 }
-                if (this.disabled || this.options.isDisabled) {
-                    this.$el.addClass("disabled");
-                }
             }
         });
 
@@ -30,12 +27,12 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var self = this;
                 options.collection = options.collection || options.id;
                 ux.initialize(this, options, navigator);
-                console.log("[Buttons] init: %o -> %o ->%o", this.id, this, options.can);
+                DEBUG && console.log("[Buttons] init: %o -> %o ->%o", this.id, this, options.can);
 
                 this.setFilter(function (child, index, collection) {
                     var disabled = (this.can[child.id]===false)?true:false;
-                    console.log("BUTTON:FILTER: %o ( %s ) -> %o", this, disabled, arguments);
-                    return disabled;
+                    DEBUG && console.log("[Buttons] filter: %s -> %o ( %s ) -> %o", child.id, this, disabled, arguments);
+                    return !disabled;
                 }, { preventRender: true } );
 
             },
@@ -53,7 +50,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             },
             childViewOptions: function(model, index) {
                 var disabled = (this.can[model.id]===false)?true:false;
-                console.log("Button %s %o -> disabled: %s", model.id, model, disabled);
+                DEBUG && console.log("[Buttons] child: %s %o -> disabled: %s", model.id, model, disabled);
                 return _.extend({ model: model, disabled: disabled }, this.options.child);
             }
         });

@@ -14,14 +14,14 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 			},
 			initialize: function(options) {
 				options = _.extend({ model: true }, options);
-				ux.initialize(this, options);
+				ux.initialize(this, options, navigator);
 				this.template = (this.model&&this.model.get("template")) || options.template || this.template;
 			},
             onRender: function() {
 //			    console.log("onRenderTemplate: %o", this);
 			    this.attachedNestedViews();
             },
-            onShow: function() {
+            onAttach: function() {
 //               console.log("onShowTemplate: %o", this);
                 this.attachExplicitActions();
             },

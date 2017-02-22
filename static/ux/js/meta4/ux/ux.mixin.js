@@ -18,7 +18,7 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core", "ux", "oops"
 		if (!this.render) throw "meta4:ux:mixin:oops:not-view"
 	// auto-extend and initialize Views with is[Mixin] i.e. isAttachable properties
 // DEBUG && console.debug("Init Mixin(%s): %o %o", this.id, this, options)
-		this.DEBUG = (options.debug || DEBUG)?true:false;
+		this.debug = (options.debug || DEBUG)?true:false;
 
 		var self = this;
 		for (var k in self) {
@@ -113,6 +113,38 @@ DEBUG && console.log("PopOver Title: %o %o %o ", this, _title, options)
 			return self;
 		}
 	}
+
+	ux.mixin.ButtonContext = {
+        initializeButtonContext: function(options) {
+        },
+
+        getButtonsCollection: function(buttons_id) {
+            if (!buttons_id) throw "meta4:ux:crud:oops:missing-buttons-id";
+            if (!this.navigator)  throw "meta4:ux:crud:oops:missing-buttons-navigator";
+
+            console.log("getButtons: %s -> %o", this.options.buttons, this);
+            var modelButtons = this.navigator.models.get(this.options.buttons);
+            if (!modelButtons) throw "meta4:ux:crud:oops:missing-buttons-model";
+            var viewButtons = modelButtons.get(buttons_id);
+            if (!viewButtons) return false;
+            var buttons = viewButtons.get("buttons");
+            if (!buttons) throw "meta4:ux:crud:oops:missing-button-set#"+buttons_id;
+            return buttons;
+        },
+
+        getButtonsWidget: function(buttons_id, meta) {
+            var buttons = this.getButtonsCollection(buttons_id);
+            if (!buttons) {
+                console.log("Missing Buttons: %o", buttons);
+                return false;
+            }
+            var widget = _.extend({ id: this.id+"#buttons", widget: "Buttons", template: "<div/>", collection: buttons}, meta );
+            var view = new Marionette.CollectionView(widget);
+            console.log("Buttons Widget: %o -> %o -> %o", widget, buttons, view);
+            return view;
+        }
+
+    }
 
 	ux.mixin.Attachable = {
 		initializeAttachable: function(options) {
@@ -622,14 +654,15 @@ console.log("navigateTo (%s): %o", go_to, this);
 
 	ux.mixin.Nested = {
 
-		initializeNested: function(options) {
+            initializeNested: function(options) {
 			// nested views
 		    var self = this;
             self._views = options._views;
 		    var _DEBUG = options.debug?true:false;
 //	        view._views = view._resolveNested(options.views)
-_DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
+_DEBUG && console.log("nested-init (%s) %o %o", self.id, options, self._views)
             this.on("render", function() {
+                console.log("nested-render: %o", self.id, self);
                 self.showNestedRegions();
              })
 		},
@@ -655,23 +688,23 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             var _DEBUG = this.options.debug?true:false;
 			var self = this
 			if (!self._views) {
+                console.warn("nested: no-region-views: %s -> %o -> %o", self.id, self, meta);
 			    return;
 //			    throw new Error("meta4:ux:mixin:oops:view-not-nested");
             }
             meta = meta || { model: this.model, collection: this.collection };
 
             if (self.getRegions) {
-                // _DEBUG &&
-                console.log("nested-regions: %s -> %o -> %o", self.id, self, meta);
+                _DEBUG && console.log("nested-region: %s -> %o -> %o -> %o", self.id, self, meta, self.getRegions());
                 _.each(self.getRegions(), function(ignore, region) {
                     var view = self._views[region];
                     if (view) self.__showNested( self, view, region, meta );
                     else {
-                        _DEBUG && console.warn("Missing %s for view %o", region, self);
+                        _DEBUG && console.warn("nested-region: missing region %s for view %o", region, self);
                     }
                 })
             } else {
-                console.warn("No Regions: %s -> %o", self.id, self);
+                console.warn("nested-region: no-regions: %s -> %o", self.id, self);
             }
 		},
 
@@ -681,13 +714,13 @@ _DEBUG && console.log("Init Nested(%s) %o %o", self.id, options, self._views)
             if(!subview) throw new Error("meta4:ux:mixin:oops:missing-view#"+view_id);
 
             if (subview.isHome) {
-                DEBUG && console.warn("nested-home: %s -> %o", self.id, subview);
+//                DEBUG && console.warn("nested-home: %s -> %o", self.id, subview);
                 this.showNestedHome(subview);
             } else if (v.el) {
-                DEBUG && console.warn("nested-dom: %s -> %o", self.id, subview);
+//                DEBUG && console.warn("nested-dom: %s -> %o", self.id, subview);
                 subview.render();
 			} else if (self.getChildView && self.getRegion(k)) {
-                DEBUG && console.warn("nested-view: %s --> %o -> %o", k, self, subview);
+//                DEBUG && console.warn("nested-view: %s --> %o -> %o", k, self, subview);
                 self.showChildView(k,subview);
 			} else {
 			    console.log("Invalid Region: %o @ %s --> %o -> %o", self, k, self.getRegion(k), _.keys(self));
@@ -754,7 +787,10 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
         },
 
         getNestedView: function(conf, meta, navigator) {
-			if (!conf) return false;
+			if (!conf) {
+			    console.error("nested: no-view-definition");
+			    return false;
+            }
             var self = this, widget = false;
             meta = meta || { };
             navigator = navigator || this.navigator;
@@ -806,7 +842,7 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
             // bind our parent's navigator
             widget.navigator = navigator;
 
-            if (widget) this.listenToNestedEvents(widget, conf);
+            if (widget) this.listenToNestedEvents(widget, conf.when);
 				// widget.on("all", function() {
 				// 	if (arguments[0].indexOf("nested:")<0) {
 				// 		arguments[0] = "nested:"+arguments[0];
@@ -915,7 +951,7 @@ console.log("doMenuAction %o %o", selection, vent, (self==vent)?"self":"parent" 
 	}
 
 
-	ux.mixin.Common = {
+	ux.mixin.xCommon = {
 		DEBUG: false, isCommon: true,
 		initializeCommon:function(options) {
 //			var idAttribute = core.idAttribute;

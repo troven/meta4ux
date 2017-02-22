@@ -1,14 +1,13 @@
 define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/model/validates" ],
     function ($, _, Backbone, Marionette, core, ux, validate) {
 
-	ux.view.Form = ux.view["meta4:ux:Form"] = function(options) {
+	ux.view.Form = ux.view["meta4:ux:Form"] = function(options, navigator) {
 
     	var DEBUG = options.debug || ux.DEBUG;
 
-		var FieldSet = Backbone.Marionette.CompositeView.extend( _.extend({
+		var FieldSet = Marionette.CollectionView.extend( _.extend({
 		    isActionable: true, isNested: true,
-            template: options.template || "<fieldset/>",
-            childViewContainer: "fieldset",
+            tagName: "fieldset",
 			className: "form-fields",
             events: {
                 "blur [name]": "doBlurFieldEvent",
@@ -18,19 +17,19 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 			initialize: function(_options) {
                 var self = this;
 			    _.defaults(_options, { model: false, editable: true , autoCommit: true, autoValidate: true, field: { css: "row" }  } )
-				ux.initialize(this, _options)
+				ux.initialize(this, _options, navigator);
 
 				if (!this.model) throw "meta4:ux:oops:missing-model#"+_options.id
 
 				this.collection = new Backbone.Collection() // Collection of Fields
 
-                console.debug("Form Editors: %o -> %o", this, _.keys(ux.view.fields) );
+                DEBUG && console.debug("Form Editors: %o -> %o", this, _.keys(ux.view.fields) );
 
                 var schema =   _options.schema || _options.views || {}
                 var col_schema = this.model&&this.model.collection?this.model.collection.schema:false
-//DEBUG&&
+
 				this._buildSchemaCollection( schema, col_schema );
-                console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
+                DEBUG && console.debug("Form Schema: %o %o %o", this.model, this.model.collection, col_schema);
 
                 // this.model.on("all", function() {
                 // });
@@ -41,6 +40,16 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
 				return this;
 			},
+
+            render: function render() {
+console.log("[Form] render: %o", this);
+                this._ensureViewIsIntact();
+//                this.triggerMethod('before:render', this);
+                this._renderChildren();
+                this._isRendered = true;
+                this.triggerMethod('render', this);
+                return this;
+            },
 
             validate: function() {
                 var errors = [];
@@ -64,7 +73,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 					field.id = field.id || id
 					merged[field.id] = _.extend({},merged[field.id], field)
                     schema[field.id] = field
-DEBUG&&console.debug("View Schema: %s %o", id, field)
+DEBUG && console.debug("View Schema: %s %o", id, field)
 				})
 
                 // model schema
@@ -114,9 +123,13 @@ DEBUG && console.debug("childViewOptions %o %o -> %o", field, schema, options)
             // get Child View corresponding to the field's editor widget
             //      @param model : the field meta-data as a BB model
 
-            getChildView: function(field) {
+
+            childView: function(field) {
+                throw "x"
                 var editorType = field.get(ux.editorAttribute) || field.get(ux.typeAttribute);
+                console.log("[Form] childView: %o -> %o", field, editorType);
                 var Field = ux.view.fields[editorType];
+
                 if (!Field) {
                     Field = this.navigator.widgets.get(editorType);
                     console.log("globalChildWidget: %s %o -> %o", editorType, field, Field);

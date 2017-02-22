@@ -4,10 +4,9 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
         var DEBUG = true; // options.debug || ux.DEBUG;
 
-        var FieldSet = Backbone.Marionette.CompositeView.extend( _.extend({
-            isActionable: true, isNested: true,
-            template: options.template || "<fieldset/>",
-            childViewContainer: "fieldset",className: "form-fields",
+        var FieldSet = Marionette.CollectionView.extend( {
+            tagName: "fieldset",
+            className: "form-fields",
             events: {
                 "blur [name]": "doBlurFieldEvent",
                 "click [data-trigger]": "doAction",
@@ -22,12 +21,9 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
                 if (!this.model) throw "meta4:ux:oops:missing-model#"+this.options.id
 
-                this.collection = new Backbone.Collection() // Collection of Fields
-
                 var schema =   _options.schema || _options.fields || {}
                 var model_schema = this.model&&this.model.collection?this.model.collection.schema:false
-                this._fields = this._buildFields( schema, col_schema );
-                console.debug("FieldSet: %o %o %o", this._fields );
+                this.collection = this._buildFields( schema, model_schema );
 
                 this.model.on("invalid", function() {
                     alert("invalid");
@@ -53,24 +49,25 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
                 var fieldset = new Backbone.Collection();
 
                 _.each(arguments, function(fields) {
-                    if (fields.toJSON) fields = fields.toJSON();
+                    if (fields && fields.toJSON) fields = fields.toJSON();
                     _.each(fields, function(field,id) {
                         if (_.isString(field)) field = { editor: field };
-                        field.id = field.id || id;
-                        var merge = fields.get(field.id);
-                        field _.extend({
+
+                        field = _.extend({
+                            id: id,
                             label: core.humanize(field.id || id),
+                            can: { edit: isEditable, read: true },
                             editable: isEditable, hidden: false,
                             validators: [], required: false,
-                            editor: Text
-                        }, (merge.toJSON?merge.toJSON():{}) , field);
+                            widget: field.widget || field.editor || "Text",
+                            editor: field.editor || field.widget || "Text"
+                        }, field );
 
-                        field.widget = field.widget || field.editor;
                         if (field.required) {
                             field.validators.push("required");
                         }
-                        DEBUG && console.debug("FieldSet field: %s %o", id, field);
-                        field.add(field);
+//                        DEBUG && console.debug("FieldSet field: %s %o", id, field);
+                        fieldset.add(field);
                     });
                 })
 
@@ -93,9 +90,10 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
                 var Field = ux.view.fields[editorType];
                 if (!Field) {
                     Field = this.navigator.widgets.get(editorType);
-                    console.log("globalChildWidget: %s %o -> %o", editorType, field, Field);
+                    console.log("global field: %s %o -> %o", editorType, field, Field);
                     Field = Field && ux.view.fields.ViewField( Field.get("fn"), this.navigator );
-                }
+                };
+                DEBUG && console.log("field: %o %o %o", field, editorType, Field);
                 if (!Field) throw "meta4:ux:form:oops:missing-editor#"+field.get(ux.idAttribute)
 
 //DEBUG && console.log("getChildView: %s %o -> %o", editorType, field, Field);
@@ -105,11 +103,11 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
             refocus: function() {
                 // focus on first field
                 var $this = $("[name]:first", this.$el);
-                setTimeout(function() { $this.select().focus() },200)
+                setTimeout(function() { $this.select().focus() },200);
             },
 
-            onRender: function() {
-                this.refocus();
+            onAttach: function() {
+                if (!(this.can.refocus===false)) this.refocus();
             },
 
             doBlurFieldEvent: function(e) {
@@ -147,7 +145,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
             _commitField: function($this) {
                 var self = this
-                var fieldId = $this.attr("data-id") || $this.attr("name")
+                var fieldId = $this.attr("data-id") || $this.attr("name");
                 if (!fieldId) return;
                 var _options = self.collection.get(fieldId)
                 if (_.isUndefined(_options)) return; // not our field
@@ -155,7 +153,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
                 if (fieldView && fieldView.commit) fieldView.commit();
             }
 
-        }, ux.mixin.Common));
+        } );
 
         return FieldSet;
     }
@@ -169,8 +167,6 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
         "collection": true,
         "options": true,
         "schema": true,
-        "fn": ux.view.Form
+        "fn": ux.view.FieldSet
     };
-
-    return ux;
 })

@@ -20,7 +20,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
 
 				_options.views.body = _options.views.body || _options.views.home;
 
-                ux.initialize(this, _options);
+                ux.initialize(this, _options, module);
 
                 module.on("error", function(evt) {
                     console.log("HOME ERROR: %o -> %o", this, evt);

@@ -1,16 +1,8 @@
-define(["jquery", "underscore", "backbone", "marionette", "ux",
-    "meta4/widget/PickList",
-    "meta4/widget/form/Form",
-    "meta4/widget/form/FormFields",
-    "meta4/widget/form/FormValidate",
-    "meta4/widget/form/HTMLEditor"
-],
-    function ($, _, Backbone, Marionette, ux, PickList, Form, FormFields, FormValidate, HTMLEditor) {
+define(["jquery", "underscore", "backbone", "marionette", "ux", "meta4/widget/form2/FormLayout"],
+    function ($, _, Backbone, Marionette, ux, FormLayout) {
 
     ux.view.fields = ux.view.fields || {}
     ux.view.validators = ux.view.validators || {}
-
-    if (!HTMLEditor) throw new Error("Missing HTMLEditor");
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities
 
@@ -23,7 +15,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux",
         "collection": true,
         "options": true,
         "schema": true,
-        "fn": ux.view.Form
+        "fn": FormLayout
     };
 
 })

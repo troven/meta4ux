@@ -25,12 +25,14 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
         }
 
         // sanitize the 'ID' to keep the DOM happy
-        id = core.ux.uid(options[core.ux.idAttribute]);
+        id = options[core.ux.idAttribute] = core.ux.uid(options[core.ux.idAttribute]);
+
         if (!widgetClass) throw new Error("meta4:ux:oops:unknown-widget#"+widgetType);
+
+        //_DEBUG && console.log("new view: %s (%s) %o -> %o", id, widgetType, options, widgetClass);
 
         // get Widget instance
         var ViewClass = widgetClass(options, navigator);
-        _DEBUG && console.log("new view: %s (%s) %o", id, widgetType, options);
 
         if (!ViewClass || !_.isFunction(ViewClass)) {
             throw new Error("meta4:ux:oops:invalid-widget#"+widgetType);

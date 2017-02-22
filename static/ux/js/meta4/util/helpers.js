@@ -1,4 +1,5 @@
-define(["underscore"], function (_) {
+define(["underscore", "marionette"], function (_, M) {
+
 
     Date.prototype.getToday = function() {
         var today = new Date(this.valueOf());

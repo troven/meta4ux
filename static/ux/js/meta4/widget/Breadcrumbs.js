@@ -53,6 +53,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 });
                 view.on("action", function(action, action_meta) {
                     console.warn("Breadcrumb: %s action: %o -> %o", action, view, action_meta);
+                    if (action=="select") {
+                        view.trigger("select", action_meta);
+                    }
                     // meta && self.collection.add(action_meta.model);
                     // self.showCurrent();
                 });
