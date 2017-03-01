@@ -2,48 +2,82 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
     ux.view.Table= ux.view["meta4:ux:Table"] = function(options) {
 
-        options = ux.checkOptions(options, ["id", "columns"]);
-        var DEBUG = options.debug || ux.DEBUG; // master DEBUG
+        options = ux.checkOptions(options, ["id"]);
+        var DEBUG = true; // options.debug || ux.DEBUG; // master DEBUG
 
         options.template =  options.template ||
-            ux.compileTemplate("<table><thead></thead><tbody></tbody><tfoot></tfoot></table>");
+            ux.compileTemplate("<thead></thead><tbody></tbody><tfoot></tfoot>");
 
-        var TableHeading =  Backbone.Marionette.View.extend({ tagName: "th", template: "{{label}}" });
-        var TableHeadings =  Backbone.Marionette.CollectionView.extend({ tagName: "tr", childView: TableHeading });
+        var TableHeading =  Marionette.View.extend({ tagName: "th", template: "{{label}}" });
+        var TableHeadings =  Marionette.CollectionView.extend({ tagName: "tr", childView: TableHeading });
 
-        var TableCell =  Backbone.Marionette.View.extend({ tagName: "td" });
-        var TableColumns =  Backbone.Marionette.CollectionView.extend({ tagName: "tr", childView: TableHeading,
-            childViewOptions: function(model, index) {
+//        var TableCells = Marionette.View.extend({ tagName: "td" });
 
-                return { model: model, collection: this.columns };
-            }
-        });
-        var TableRows = Backbone.Marionette.CollectionView.extend({ tagName: "tr", childView: TableColumns,
-            childViewOptions: function(model, index) {
-                return { model: model, collection: this.columns };
+        var TableRows = Backbone.View.extend({ initialize: function(options) { this.options = options },
+            render: function() {
+                var self = this;
+                var $table = $();
+                DEBUG && console.log("[Table] rows: %o -> %o", this, $table);
+                var template = ux.compileTemplate(this.options.template);
+                this.collection.each(function(model) {
+                    $table.append( template(model.attributes) );
+                });
+                this.$el.replaceWith($table);
             }
         });
 
         var view_defn = {
+            tagName: "table",
             isNested: true, isNavigator: true,
             template: options.template,
             className: "table table-striped",
-            regions: { header: "table>thead" , body: "table>tbody", footer: "table>.tfoot" },
+            regions: { header: "thead" , body: "tbody", footer: "tfoot" },
             initialize: function(options) {
-                DEBUG && console.log("Table: init: %s %o -> %o", this.id, options, this.$el);
+                var columns = options.columns || options.schema;
+                this.columns = new Backbone.Collection( columns );
                 ux.initialize(this, options);
-                this.columns = new Backbone.Collection(this.options.columns);
+                DEBUG && console.log("[Table] init: %s %o -> %o", this.id, this, options);
+
+                var row_template = "<tr>";
+                this.columns.each(function(column) { row_template+="<td>{{"+column.id+"}}</td>"; });
+                this.row_template = row_template+"</tr>";
+
                 return this;
             },
-            onRender: function() {
-                this.showChildView("header",new TableHeadings({ model: this.model, collection: this.columns }));
+            onBeforeRender: function() {
+                var meta_headers = { model: this.model, collection: this.columns };
 
-                var meta = { model: this.model, collection: this.collection, columns: this.columns };
-                this.showChildView("body",new TableRows(meta));
+                this.header =  new TableHeadings(meta_headers);
+                // var meta_rows = { model: this.model, collection: this.collection, template: row_template };
+//                this.rows = new TableRows(meta_rows);
+                console.log("[Table] onBeforeRender: %o -> %o", this, meta_headers);
+            },
+            onRender: function() {
+                this.showChildView("header", this.header);
+ //               this.showChildView("body", this.rows );
+                DEBUG && console.log("[Table] onRender: %o", this);
+                this.renderRows();
+            },
+            renderRows: function() {
+                var self = this;
+                var view = this.getRegion("body");
+                DEBUG && console.log("[Table] rows: %o -> %o", this, view);
+                if (!view) return;
+                var $tbody = $(this.$el, view.el);
+                var template = ux.compileTemplate(this.row_template);
+                this.collection.each(function(model) {
+                    var $row = $(template(model.attributes));
+                    $row.on("click", function() {
+                        console.log("[Table] select: %o -> %o", self, model);
+                        self.trigger("action", "select", { model: model });
+                    })
+                    $tbody.append( $row );
+                    console.log("ROW: %o", $row);
+                });
             }
         }
 
-        return Backbone.Marionette.View.extend(view_defn)
+        return Marionette.View.extend(view_defn)
     }
 
     // Widget meta-data allows runtime / editor to inspect basic capabilities

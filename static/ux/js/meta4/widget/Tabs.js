@@ -4,9 +4,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 
 		var DEBUG = options.debug || ux.DEBUG;
 
-		options.template =  options.template || ux.compileTemplate("<div class='tabs-header' role='navigation'></div><div class='tab-content well-sm clearfix'></div>");
+		options.template =  options.template || ux.compileTemplate("<div class='tabs-header' role='navigation'></div><div class='tab-content well-sm clearfix'></div><div class='tabs-footer'>");
 
-        var TabItem = Backbone.Marionette.View.extend({
+        var TabItem = Marionette.View.extend({
             tagName: "li", events: { "click": "doSelect" },
             template: "<a data-toggle='tab'>{{label}}</a>",
             doSelect: function() {
@@ -15,9 +15,9 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
             }
         });
 
-        var TabSelector = Backbone.Marionette.CompositeView.extend({
-            isSelectable: true,
-            template: "<ul class='nav nav-pills'></ul>", childViewContainer: "ul", childView: TabItem,
+        var TabSelector = Marionette.CollectionView.extend({
+            template: "<div></div>", className: "nav nav-tabs",
+            isSelectable: true, tagName: "ul", childView: TabItem,
             initialize: function(_options) {
                 ux.initialize(this, _options)
                 this.trigger("select", this.model);
@@ -26,7 +26,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 "select": function(model, event) {
                     this.$el.find(".active").removeClass("active");
                     this.selected = model;
-                    console.log("TAB: selected: %o %o %o", this, model);
+                    console.log("[Tabs] selected: %o %o %o", this, model);
                     // bubble navigate to ActionList parent
                     this.triggerMethod("select", model);
                 }
@@ -34,67 +34,69 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
         });
 
 
-        var config = {
+        var defn = {
 			isNested: true,
 	 		template: options.template,
-		 	regions: { tabs: ".tabs-header" , body: ".tab-content" },
+		 	regions: { header: ".tabs-header" , body: ".tab-content", footer: ".tabs-footer" },
 			initialize: function(_options) {
-
                 _options = _.extend({ views: {}, tabs: {} }, _options)
-
 				ux.initialize(this, _options, navigator);
-				this._collection = this.collection;
-
 				return this;
 			},
             onBeforeRender: function() {
                 var self = this;
                 var _options = this.options;
 
-                this._views = this._resolveNested(_options.tabs || _options.views);
-                this.currentTab = _options.firstTab || _options.currentTab || _.keys(_options.tabs)[0];
-                DEBUG && console.log("Init Tabs (%o) %o", this, _options, this.currentTab);
+                this._views = this._resolveNested(_options.tabs || _options.views );
+                this.currentTab = _options.firstTab || _options.currentTab || _.keys(this._views)[0];
 
                 this.collection = this.collection || new Backbone.Collection();
                 _.each(this._views, function(tab, id) {
                     self.currentTab = self.currentTab || id;
-                    var conf = { id: _options.id+"_"+id, label: tab.title || tab.label || id, comment: tab.comment || "", goto: id }
+                    var title = tab.title || tab.label || id;
+                    var conf = _.extend({ id: _options.id+"_"+id, label: title, comment: tab.comment || title , goto: id }, tab);
                     self.collection.add( conf );
                 })
-                DEBUG && console.log("Initialzed Tabs (%s): %o", this.currentTab, this);
+                DEBUG && console.log("[Tabs] onBeforeRender (%s) %o -> %o", this.currentTab, this, this.collection );
 
+                var meta = { model: this.model, collection: this.collection };
+                this.tabs = new TabSelector(meta);
             },
-			onShow: function() {
+			onRender: function() {
 			    var self = this
-DEBUG && console.log("Show Tabs (%s) %o %o", this.id, this, self.collection)
 
-                var meta = { model: this.model, collection: self.collection };
-
-                var tabs = new TabSelector(meta);
-                tabs.on("select", function(model) {
- console.log("Tab Select: %o", model);
+                this.tabs.on("select", function(model) {
+ console.log("[Tabs] Select: %o", model);
                     self.trigger("select", model);
                     self.selectTab( model.get("goto") || model.id );
                 })
-			    this.tabs.show(tabs);
+			    this.showChildView("header", this.tabs);
 
-			    if (self.currentTab) {
-			        this.selectTab(self.currentTab)
+			    if (this.currentTab) {
+			        this.selectTab(self.currentTab);
                 }
 
+                var view = this.getChildView("body");
+                DEBUG && console.log("[Tabs] onRender (%s) %o %o", this.id, this, self.collection)
 			},
 
 			selectTab: function(id) {
+			    var self = this;
 				id = ux.uid(id)
 				var view = this.getNestedView(id, { model: this.model });
-DEBUG && console.debug("SelectTab(%s) %o %o", id, this, view)
+DEBUG && console.debug("[Tabs] SelectTab(%s) %o %o", id, this, view)
 				if (!view) throw "scorpio4:ux:Tabs:oops:tab-not-found#"+id;
-				this.showChildView("body",view);
-				this.currentView = view;
+
+                view.on("render", function() {
+                    if (view.getFooter) {
+                        self.showChildView("footer", view.getFooter());
+                    }
+                })
+                this.showChildView("body", view);
 			}
 		}
 
-		return Backbone.Marionette.View.extend(config)
+		return Marionette.View.extend(defn)
 	}
 
 	// Widget meta-data allows runtime / editor to inspect basic capabilities

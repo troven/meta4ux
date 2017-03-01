@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "backbone", "core", "iq", "meta4/model/asq", "meta4/model/index"], function ($,_,Backbone, core, iq, asq, Fact) {
+define(["jquery", "underscore", "backbone", "core", "iq", "meta4/model/asq", "meta4/model/index", "meta4/model/buttons"], function ($,_,Backbone, core, iq, asq, Fact, buttons) {
 
 /* *****************************************************************************************************************
 	Fact: Data / Model Related
@@ -26,6 +26,12 @@ _DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, c
 			});
 
             self.models = module.models = module.models || self.models;
+
+            if (!self.models.get("buttons")) {
+                fact.models.set("buttons", self.Collection(buttons) );
+                console.log("Buttons: %o -> %o", self.models.get("buttons"), buttons );
+            }
+
 
             iq.bubble('error', self.models, navigator);
 
