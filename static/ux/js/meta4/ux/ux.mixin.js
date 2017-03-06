@@ -662,7 +662,7 @@ console.log("navigateTo (%s): %o", go_to, this);
 //	        view._views = view._resolveNested(options.views)
 _DEBUG && console.log("nested-init (%s) %o %o", self.id, options, self._views)
             this.on("render", function() {
-                console.log("nested-render: %o", self.id, self);
+                _DEBUG && console.log("nested-render: %o", self.id, self);
                 self.showNestedRegions();
              })
 		},
@@ -833,7 +833,7 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
                 if (!meta.collection) delete meta.collection;
                 if (!meta.model || conf.model===true) delete meta.model;
                 var _options= _.extend({}, conf, meta);
-                _DEBUG && console.log("nested::models: %s -> %o %o", _options.id, conf, meta);
+                _DEBUG && console.warn("nested::models: %s -> %o %o", _options.id, conf, meta);
                 if (!_options.id) throw new core.oops.Error("meta4:ux:mixin:oops:unidentified-nested-view", meta);
                 widget = navigator.views.view(_options.id, _options, navigator);
                 _DEBUG && console.log("nested:widget: %s -> %o -> %o", _options.id, _options, widget);
@@ -862,7 +862,7 @@ _DEBUG && console.log("resolve view: %s -> %o --> %o", key, view, _view);
             // bubble nested:events to parent
             _.each(when, function captureNestedEvent(then, when) {
                 if (when.indexOf("nested:")==0 && then)   {
-                    console.log("WHEN: %s THEN: %s-> %o <-- %o", when, then, self, widget);
+                    // console.log("WHEN: %s THEN: %s-> %o <-- %o", when, then, self, widget);
                     widget.on(when.substring(7), function triggerNestedEvent() {
                         var args = Array.prototype.slice.call(arguments);
                         args = [when].concat(args);

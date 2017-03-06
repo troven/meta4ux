@@ -20,7 +20,7 @@ _DEBUG && console.log("Module Models: %o %o -> %s", module, options, baseURL)
 			_.each(options.models, function(model, id) {
 				if (!_.isEmpty(model)) {
 					model.id = model.id || id;
-					var collection = self.register(model);
+					var collection = self.register(model, module);
 _DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, collection);
 				}
 			});
@@ -42,7 +42,7 @@ _DEBUG && console.log("Boot Model: %s @ %s -> %o -> %o", id, model.url, model, c
             return self;
 		},
 
-		register: function(options) {
+		register: function(options, module) {
 		    var self = this;
 			if (!options) throw "meta4:fact:register:oops:missing-options";
 			if (!_.isObject(options)) "meta4:fact:register:oops:invalid-options";
@@ -63,7 +63,7 @@ console.warn("Duplicate Collection: %s %o %o", id, fact.models, options)
 				if (!collection) throw "meta4:fact:register:invalid-singleton#"+id;
 			} else {
 _DEBUG && console.log("Register Collection: %s %o", options.id, options)
-				collection = fact.Collection(options);
+				collection = fact.Collection(options, module);
 				if (!collection) throw "meta4:fact:register:invalid-collection#"+id;
 
 				collection.options = options
@@ -92,12 +92,12 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
 			var _Model = Backbone.DocumentModel.extend(_options);
 			var model = new _Model();
 
-			core.iq.aware(model, options.iq || options.when );
+            core.iq.aware(model, _options.iq || _options.when );
 
-			return model
+			return model;
 		},
 
-		Collection: function(options) {
+		Collection: function(options, module) {
 			var _DEBUG = options.debug || fact.DEBUG;
 			if (!options) throw "meta4:fact:Collection:oops:missing-options";
 			options.type = options.type || "Local";
@@ -136,15 +136,13 @@ _DEBUG && console.log("Pre-Fetch Collection: %s %o", options.id, collection)
                     if (!type) {
                         throw "meta4:fact:Collection:oops:missing-"+fact.typeAttribute;
                     }
-
                     // lookup by 'type' [ Local / Remote / etc ]
                     var Finder = fact.factory[type];
                     if (!Finder) throw "meta4:fact:Collection:oops:missing-finder#"+type;
 
-                    options = fact.mutate(options);
-
                     // instantiate typed-finder
-                    collection = new Finder(options);
+                    options = fact.mutate(options);
+                    collection = new Finder(options, module);
                     collection[fact.idAttribute] = id;
                 }
 

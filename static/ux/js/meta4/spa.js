@@ -3,13 +3,9 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
     var ShowHome = function (options, navigator) {
         return function() {
             if (navigator.home) {
-//                console.log("RE-HOME: %o -> %o", navigator.home, arguments);
                 navigator.home.show();
                 return;
             }
-//            console.log("NEW-HOME: %o -> %o", (navigator.home?navigator.home:"1st home"), navigator);
-
-            console.log("HOME: %o", options);
             navigator.home = navigator.Home(options.home, navigator);
             navigator.home.triggerMethod("show");
 
@@ -21,19 +17,18 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
     var Routing = function(navigator, options) {
 
         var routing = Backbone.Router.extend({
-
             routes: {
-                "views:view":           "view",
-                // "auth/:code":           "auth",
-                // "search/:query":        "search",
-                "logout":               "logout"
+                "views:view":   "view",
+                "oauth/:code":  "oauth",
+                "logout":       "logout"
             },
-
             view: function(view) {
-                console.log("direct view: views%s", view);
+                // console.log("direct view: views%s", view);
                 navigator.trigger("navigate", "views"+view);
             },
-
+            oauth: function() {
+                console.log("oauth: %o", arguments);
+            },
             logout: function() {
                 console.log("LOGOUT: %o", arguments);
                 navigator.trigger("logout");
@@ -63,7 +58,7 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
 
             // define the user principal
             var ProfileModel = Backbone.Model.extend({url: "/models/me"});
-            navigator.user = new ProfileModel(options.principal || {label: "Anonymous"});
+            navigator.user = new ProfileModel(options.user || {label: "Anonymous"});
             navigator.state = new Backbone.Model();
 
             // handle events
@@ -72,7 +67,7 @@ define(["underscore", "backbone", "marionette", "core", "ux", "fact", "iq", "oop
             // });
 
             navigator.on("navigate", function (go_to) {
-console.log("navigator goto: %s", go_to);
+_DEBUG && console.log("navigator goto: %s", go_to);
                 if (!navigator.home || !go_to || go_to === options.home || go_to === "home")  navigator.trigger("home");
                 else navigator.home.onNavigate(go_to);
             });
@@ -94,6 +89,29 @@ console.log("navigator goto: %s", go_to);
             _DEBUG && console.log("Routing: %o", routing);
 
         });
+
+        SPA.boot = function(options) {
+            var _DEBUG = options.debug;
+            options = _.extend({}, this.options, options);
+            var self = this;
+//            console.log("booting %s from %s", options.boot.id, options.boot.url);
+            $.ajax({url: options.boot.url, dataType: "json", type: "GET", contentType: "application/json; charset=utf-8",
+                success: function(resp) {
+                    var result = options.parse(resp);
+                    _DEBUG && console.log("loaded %o from %s", result, options.boot.url);
+                    if (!result) {
+                        self.trigger("error", "application:missing");
+                        throw oops.Error("meta4:app:oops:invalid-payload")
+                        return;
+                    }
+                    // hide splash screen (if displayed)
+                    if ( (!options.splash.disabled) ) {
+                        self.on("started", function() { splash.close(); });
+                    }
+                    self.trigger("booted", result);
+                }
+            });
+        }
 
         return SPA;
     }

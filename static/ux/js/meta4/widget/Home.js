@@ -5,7 +5,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux"], functio
 
 		var DEBUG = options.debug || ux.DEBUG;
 
-		options.template =  options.template || ux.compileTemplate("<div class='home-regions container'><div class='home-header'></div><div class='wrapper main'><div class='col-sm-12 home-body'>loading home ...</div></div><div class='home-footer'></div></div>");
+		options.template =  options.template || ux.compileTemplate("<div class='home-regions panel panel-default clearfix'><div class='home-header'></div><div class='wrapper main'><div class='col-sm-12 home-body'>loading home ...</div></div><div class='home-footer'></div></div>");
 
 		var config = {
 			isNested: true, isNavigator: true, isTemplating: true,

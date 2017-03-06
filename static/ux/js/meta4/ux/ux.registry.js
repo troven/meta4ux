@@ -51,9 +51,9 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
                 // functions
                 widget = id(_options, navigator);
             } else if (_.isString(id)) {
-                _options = _.extend({}, this.get(id), _options);
+                _options = _.extend({}, _options, this.get(id));
                 widget = new Widget(_options, navigator);
-//                console.log("view reference: %s %o ->%o", id, _options, widget);
+                // console.log("view reference: %s %o ->%o", id, _options, widget);
             }
             if (!widget) throw new Error("meta4:ux:oops:invalid-view#"+id);
 
@@ -199,7 +199,7 @@ define(["underscore", "marionette", "Handlebars", "core", "meta4/ux/ux.widget"],
                     self.add(widget);
                 })
 
-               console.log("Loaded widgets: %o ->> %o", widgetTypes, arguments);
+               // console.log("Loaded widgets: %o ->> %o", widgetTypes, arguments);
                 self.debug && console.log("Loaded %s x widgets (total: %s)", widgetTypes.length, self.size());
                 cb && cb();
             })

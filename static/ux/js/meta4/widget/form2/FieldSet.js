@@ -2,7 +2,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
     ux.view.FieldSet = ux.view["meta4:ux:FieldSet"] = function(options, navigator) {
 
-        var DEBUG = true; // options.debug || ux.DEBUG;
+        var DEBUG = options.debug || ux.DEBUG;
 
         var FieldSet = Marionette.CollectionView.extend( {
             tagName: "fieldset",
@@ -118,7 +118,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
                 }
 
                 var errors = this.validate();
-                console.log("doBlurFieldEvent: %o -> %o", this, errors);
+                DEBUG && console.log("doBlurFieldEvent: %o -> %o", this, errors);
                 return this;
             },
 

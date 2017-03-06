@@ -61,31 +61,33 @@ define(["jquery", "underscore", "marionette", "Handlebars", "core"], function ($
 
         // handle data
 
-        var collection_options = view.collection?view.collection.options:{};
-        _DEBUG && console.log("New View %o %o\ncollection: %o -> %o", id, view, view.collection||"No Data", collection_options);
+        if (view.collection && !_.isString(view.collection)) {
+            var collection_options = _.extend({ fetch: false, prefetch: false },view.collection.options);
+            _DEBUG && console.log("New View %o %o\ncollection: %o -> %o", id, view, view.collection||"No Data", collection_options);
 
-        // refresh remote collections
-        var collections_id = view.collection?view.collection.id:false;
-        var fetch = (options.fetch===false?false:true) || (collections_id && collection_options.fetch===false?false:true);
-        var prefetch = (options.prefetch?true:false)  || (collections_id && collection_options.prefetch?true:false);
+            // refresh remote collections
+            var collections_id = view.collection?view.collection.id:false;
+            var fetch = (options.fetch===false?false:true) || (collections_id && collection_options.fetch===false?false:true);
+            var prefetch = (options.prefetch?true:false)  || (collections_id && collection_options.prefetch?true:false);
 
-        if (collections_id && fetch) {
-            _DEBUG && console.log("fetch? %s -> %s / v: (%s) %s -> %s / m: (%s) %s -> %s",
-                fetch, prefetch,
-                id, options.fetch===false?false:true, options.prefetch?true:false,
-                collections_id, collection_options.fetch===false?false:true, collection_options.prefetch?true:false );
+            if (!view.collection.parent && collections_id && fetch) {
+                _DEBUG && console.log("fetch? %s -> %s / v: (%s) %s -> %s / m: (%s) %s -> %s",
+                    fetch, prefetch,
+                    id, options.fetch===false?false:true, options.prefetch?true:false,
+                    collections_id, collection_options.fetch===false?false:true, collection_options.prefetch?true:false );
 
-            view.on("before:render", function() {
-                if (view.collection.synced) return;
-                var idAttribute = collection_options.idAttribute;
-                var fields = _.pick(view.model.attributes, collection_options.parameters || [idAttribute] );
-                console.debug("fetching (%s @ %o): %o", id, fields, view.collection);
-                view.collection.fetch( { debug: options.debug?true:false, filter: fields } );
-            })
+                view.on("before:render", function() {
+                    if (view.collection.synced) return;
+                    var idAttribute = collection_options.idAttribute;
+                    var fields = _.pick(view.model.attributes, collection_options.parameters || [idAttribute] );
+                    console.debug("fetching (%s @ %o): %o", id, fields, view.collection);
+                    view.collection.fetch( { debug: options.debug?true:false, filter: fields } );
+                })
 
-            // view.collection.on("request", function() {
-            //     view.$el.append("[loading]");
-            // })
+                // view.collection.on("request", function() {
+                //     view.$el.append("[loading]");
+                // })
+            }
         }
 
         // show inline help ... TODO: reconsider this strategy

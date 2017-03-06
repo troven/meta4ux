@@ -94,7 +94,7 @@ console.log("is %o valid?: %s --> %s %s -> %o", fieldId, value, validator, patte
             var value = $field.val();
             value = this.getDefault && this.getDefault( value );
             var invalid = this.validate?this.validate(value, model):{};
-console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid, this.getDefault?"getDefault":"noDefault");
+            DEBUG && console.warn("$et %o field = %o ==> %o / %o <-%s", fieldId, value, this, invalid, this.getDefault?"getDefault":"noDefault");
 
             if (!invalid || !invalid.message) {
                 model.set(fieldId, value );

@@ -1,11 +1,11 @@
 define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, Backbone, Marionette, ux) {
 
-	var DEBUG = true;
-
 	// Navigation Bar
 
 	var NavBar = ux.view.NavBar = ux.view["meta4:ux:NavBar"] = function(options, module) {
 		options = ux.checkOptions(options); // sanity check ('this', 'label')
+        var DEBUG = options.debug || ux.DEBUG; // master DEBUG
+
         if (!module) throw new Error("meta4:ux:NavBar:oops:no-module");
 
 		var MenuItem = Backbone.Marionette.View.extend( _.extend({
@@ -63,7 +63,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
 				var self = this;
 
 				ux.initialize(this, options);
-DEBUG && console.log("NavBar: init", this, options);
+                DEBUG && console.log("NavBar: init", this, options);
 
 				this.menuList = new MenuList( { model: this.model, collection: this.collection } );
                 this.menuList.on("select", function(model) {

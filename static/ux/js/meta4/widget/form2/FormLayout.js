@@ -40,7 +40,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
                 //     this.buttonsView = this.getButtonsWidget("form:save");
                 // }
 
-                var footer = _.extend({ id: this.id+"#buttons", debug: true, widget: "Buttons",
+                var footer = _.extend({ id: this.id+"#buttons", debug: false, widget: "Buttons",
                     collection: this.getButtonsCollection("form:save") }, this._views.footer );
 
                 this.footerView = this.getNestedView(footer);
@@ -59,7 +59,7 @@ define(["jquery", "underscore", "backbone", "marionette", "core", "ux", "meta4/m
 
             onAttach: function () {
                 this.showChildView("body", this.fieldset);
-                console.log("onAttached: footerView %s -> %o", this.id, this.footerView);
+//                console.log("onAttached: footerView %s -> %o", this.id, this.footerView);
 //                this.showChildView("footer", footerView);
             },
 

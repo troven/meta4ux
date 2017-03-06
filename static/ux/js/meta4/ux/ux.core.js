@@ -24,6 +24,9 @@ define(["jquery", "underscore", "backbone.radio", "marionette", "Handlebars", "c
             module.widgets = new core.ux.WidgetRegistry();
             module.templates = {};
 
+            // register globally
+            core.fact.models.set("meta4views", module.views);
+
             // compile HTML templates
             _.each(options.templates, function(template, id) {
                 module.templates[id] = self.compileTemplate(template);

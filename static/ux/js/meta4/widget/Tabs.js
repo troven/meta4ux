@@ -26,7 +26,7 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 "select": function(model, event) {
                     this.$el.find(".active").removeClass("active");
                     this.selected = model;
-                    console.log("[Tabs] selected: %o %o %o", this, model);
+                    DEBUG && console.log("[Tabs] selected: %o %o %o", this, model);
                     // bubble navigate to ActionList parent
                     this.triggerMethod("select", model);
                 }
@@ -62,11 +62,21 @@ define(["jquery", "underscore", "backbone", "marionette", "ux"], function ($,_, 
                 var meta = { model: this.model, collection: this.collection };
                 this.tabs = new TabSelector(meta);
             },
+            getHeader: function() {
+                var view = this.getChildView("body");
+                if (!view || !view.getHeader) return false;
+                return view.getHeader();
+            },
+            getFooter: function() {
+                var view = this.getChildView("body");
+                if (!view || !view.getFooter) return false;
+                return view.getFooter();
+            },
 			onRender: function() {
 			    var self = this
 
                 this.tabs.on("select", function(model) {
- console.log("[Tabs] Select: %o", model);
+                    DEBUG && console.log("[Tabs] Select: %o", model);
                     self.trigger("select", model);
                     self.selectTab( model.get("goto") || model.id );
                 })

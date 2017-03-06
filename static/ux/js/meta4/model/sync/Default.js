@@ -31,12 +31,18 @@ define(["underscore", "backbone", "core"], function (_, Backbone, core) {
         collection.trigger("busy");
 
         var $future = $.ajax( { url: url, type: httpMethod,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("Accept", "application/json");
+                if (collection.token) {
+                    xhr.setRequestHeader("Authorization", "Bearer " + collection.token());
+                }
+            },
             dataType: "json", data: data && JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             success: function(response) {
                 collection.busy = false;
                 collection.synced = new Date().getTime();
-                collection.trigger("done");
+                collection.trigger("success");
                 if (response && response.status == "success" ) {
                     _DEBUG && console.log("CRUD Success: %s %s -> %o", url, response.status, response.data);
                     options.success(response.data);

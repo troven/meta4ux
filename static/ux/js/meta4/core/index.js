@@ -52,9 +52,14 @@ define(["jquery", "underscore", "backbone", "meta4/util/strings"], function ($,_
 
 			// Resolve Backbone Model - last resort, use 'options'
 			if (_.isString(options.model)) {
-				modelled.model = this.fact.models.get(options.model);
+			    if (options.model.indexOf(".")==0) {
+                    modelled.model = options.model.get(options.model.substring(1));
+//                    console.warn("Local Model$ (%s) %o %o -> %o", options.model, this.fact.models, options, modelled);
+                } else {
+                    modelled.model = this.fact.models.get(options.model);
+//                    console.warn("Model$ (%s) %o %o -> %o", options.model, this.fact.models, options, modelled);
+                }
 //_DEBUG &&
-console.warn("Model$ (%s) %o %o -> %o", options.model, this.fact.models, options, modelled);
 			} else if ( options.model instanceof Backbone.Model ) {
 				modelled.model = options.model;
 //console.warn("BB Model$ (%s) %o %o -> %o", options.id, options.model, options, modelled);
@@ -67,9 +72,10 @@ console.warn("Explicit Model$ (%s) %o %o -> %o", options.model, this.fact.models
 
 			if ( !modelled.model || options.model===true ) {
 				var _options = { id: options.id, label: options.label, comment: (options.comment || options.label), icon: (options.icon || "") };
-				modelled.model = new this.fact.Model({});
-				modelled.model.set(_options);
-_DEBUG &&console.debug("View Model (%s): %o %o", modelled.id, _options, modelled);
+				modelled.model = new this.fact.Model();
+                modelled.model.options = _.extend({ fetch: false }, modelled.model.options, _options);
+                modelled.model.set(_options);
+_DEBUG && console.warn("View Model (%s): %o %o", modelled.id, _options, modelled);
 			} else {
                 // _DEBUG && console.debug("NestedModel (%s): %o %o", modelled.id, _options, modelled);
             }

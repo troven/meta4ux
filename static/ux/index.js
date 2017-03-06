@@ -57,6 +57,8 @@ require.config({
         ctrl: "meta4/ctrl/index",
         oops: "meta4/core/oops",
 
+        keycloak: "vendor/keycloak/keycloak",
+
 // QB
         colorbrewer: "vendor/dc/colorbrewer",
         crossfilter: "vendor/dc/crossfilter",
@@ -159,9 +161,12 @@ require.config({
 
     }
 });
+
 // load splash first ..
 
-require(['splash'], function(splash) {
+//
+
+require(['underscore', 'splash', "keycloak"], function(_, splash, Keycloak) {
 
     // reload the SPA boot page
     var Reload = function() { (window.location = window.location.href) };
@@ -182,36 +187,48 @@ require(['splash'], function(splash) {
 
     // handle global/fatal errors
     try {
-        require(['meta4app'], function (SinglePageApp) {
+        require(['meta4app', "keycloak"], function (SinglePageApp, keycloak) {
 
-            if (!options.boot.url) throw new oops.Error("meta4:app:oops:missing-boot-url");
+            if (!options.boot || !options.boot.url) throw new oops.Error("meta4:app:oops:missing-boot-url");
 
-            var meta4 = new SinglePageApp();
 
-            // load application payload
+            var meta4 = new SinglePageApp(options);
+            meta4.on("booted", function(options) {
 
-            // console.log("booting %s from %s", options.boot.id, options.boot.url);
-            $.ajax({url: options.boot.url, dataType: "json", type: "GET", contentType: "application/json; charset=utf-8",
-                success: function(resp) {
-                    var result = options.parse(resp);
-                    if (!result) {
-                        meta4.trigger("error", "application:missing");
-                        throw oops.Error("meta4:app:oops:invalid-payload")
-                        return;
-                    }
-
-                    try {
-                        // hide splash screen (if displayed)
-                        if ( (!options.splash.disabled) ) {
-                            meta4.on("started", function() { splash.close(); });
-                        }
-                        meta4.start(result);
-                    } catch(e) {
-                        console.log("BOOT ERROR: %o", e);
-                        throw e;
-                    }
+                console.log("booted: %o", options);
+                if (!options.meta4.keycloak) {
+                    meta4.start(options);
+                    return;
                 }
-            });
+                var keycloak = Keycloak();
+
+                keycloak.onAuthSuccess = function() {
+                    console.error("onAuthSuccess: %o", keycloak);
+                    options.user = _.extend({}, keycloak.tokenParsed, { token: keycloak.token } );
+                    options.keycloak = keycloak;
+                    meta4.start(options);
+                };
+                if (!keycloak.authenticated) {
+                    keycloak.init() .success(function(authenticated) {
+                        if (!authenticated) keycloak.login();
+                        console.log("authenticated: %o", authenticated);
+                    });
+                }
+//                         keycloak.login().success(function() {
+//                             console.error("logged in: %o", arguments);
+//                         })
+// //                     // if (authenticated) {
+//                     //     meta4.start(options);
+//                     // } else {
+//                     //     console.error("not authenticated: %o -> %o", this, arguments)
+//                     //     alert('not authenticated');
+//                     // }
+//                 }).error(function() {
+//                     alert('failed to initialize');
+//
+//                 });
+            })
+            meta4.boot(options);
         });
     } catch(e) {
         console.log("DOWNLOAD ERROR: %o", e);
